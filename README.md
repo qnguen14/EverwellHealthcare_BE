@@ -1,5 +1,5 @@
 ## SWP391 Project
-# SexCare - Gender Health Management System API
+# Everwell - Gender Health Management System API
 
 ## Project Overview: 
 An integrated web-based platform for managing services related to sexual and reproductive health, designed for both patients and healthcare providers. It includes features for education, online consultation, STI testing services, and cycle tracking.
