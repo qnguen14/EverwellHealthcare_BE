@@ -447,23 +447,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Admin\\.nuget\\packages\\": {},
+    "C:\\Users\\qnguy\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\SexCare.API\\SexCare.API.csproj",
-      "projectName": "SexCare.API",
-      "projectPath": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\SexCare.API\\SexCare.API.csproj",
-      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\SexCare.API\\obj\\",
+      "projectUniqueName": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\Everwell.API.csproj",
+      "projectName": "Everwell.API",
+      "projectPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\Everwell.API.csproj",
+      "packagesPath": "C:\\Users\\qnguy\\.nuget\\packages\\",
+      "outputPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\qnguy\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -490,7 +490,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -512,6 +512,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.Net.Sdk.Compilers.Toolset",
+            "version": "[9.0.202, 9.0.202]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -520,7 +526,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

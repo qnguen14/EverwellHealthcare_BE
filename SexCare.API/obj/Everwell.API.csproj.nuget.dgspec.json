@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\SexCare.API.csproj": {}
+    "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\Everwell.API.csproj": {}
   },
   "projects": {
-    "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\SexCare.API.csproj": {
+    "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\Everwell.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\SexCare.API.csproj",
-        "projectName": "SexCare.API",
-        "projectPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\SexCare.API.csproj",
+        "projectUniqueName": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\Everwell.API.csproj",
+        "projectName": "Everwell.API",
+        "projectPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\Everwell.API.csproj",
         "packagesPath": "C:\\Users\\qnguy\\.nuget\\packages\\",
         "outputPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\SexCare.API\\obj\\",
         "projectStyle": "PackageReference",

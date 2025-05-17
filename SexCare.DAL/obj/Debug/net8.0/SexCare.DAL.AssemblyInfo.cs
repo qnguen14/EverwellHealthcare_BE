@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SexCare.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c491ea7564247e9edf8e9577ca98b31a206e279d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc13cab442de234393432c732024727d8fca1c29")]
 [assembly: System.Reflection.AssemblyProductAttribute("SexCare.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SexCare.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
