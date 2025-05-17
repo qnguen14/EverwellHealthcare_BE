@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everwell.API", "SexCare.API\Everwell.API.csproj", "{FAFDE8F3-157F-49DC-A470-8D15548F45A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everwell.API", "Everwell.API\Everwell.API.csproj", "{FAFDE8F3-157F-49DC-A470-8D15548F45A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everwell.BLL", "SexCare.BLL\Everwell.BLL.csproj", "{19005E1D-BC76-4E53-A42A-9E03BBC5CB1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everwell.BLL", "Everwell.BLL\Everwell.BLL.csproj", "{19005E1D-BC76-4E53-A42A-9E03BBC5CB1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everwell.DAL", "SexCare.DAL\Everwell.DAL.csproj", "{413D7897-94FE-4A45-A12C-1702769FD0B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everwell.DAL", "Everwell.DAL\Everwell.DAL.csproj", "{413D7897-94FE-4A45-A12C-1702769FD0B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
