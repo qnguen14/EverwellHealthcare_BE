@@ -1,16 +1,12 @@
-﻿using Everwell.BLL.Services.Interfaces;
+﻿using Everwell.BLL.Infrastructure;
+using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
-using Everwell.DAL.Data.Infrastructure;
 using Everwell.DAL.Data.Requests.Auth;
 using Everwell.DAL.Data.Responses.Auth;
 using Everwell.DAL.Data.Responses.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Everwell.BLL.Services.Implements
 {
@@ -69,7 +65,7 @@ namespace Everwell.BLL.Services.Implements
                 {
                     Token = token,
                     User = userResponse,
-                    Expiration = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:ExpirationTimeInMinutes"))
+                    Expiration = DateTime.UtcNow.AddMinutes(60)
                 };
             }
             catch (Exception ex)

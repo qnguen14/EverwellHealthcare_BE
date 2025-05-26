@@ -11,10 +11,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("0ed888a3-5606-46b4-8c17-409d758d21f2")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Everwell.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80864437ab76a6436b24b0880124a6ee15515d2d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1262b5f6e51345f8b5a155ea86f903471d1e7f73")]
 [assembly: System.Reflection.AssemblyProductAttribute("Everwell.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Everwell.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

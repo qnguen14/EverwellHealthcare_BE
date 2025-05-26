@@ -227,7 +227,7 @@
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:",
+        "description": "Enter JWT token to access protected endpoints",
         "scheme": "Bearer",
         "bearerFormat": "JWT"
       }

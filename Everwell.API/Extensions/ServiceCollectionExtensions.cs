@@ -11,22 +11,19 @@ namespace Everwell.API.Extensions
         {
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo
+                var securityScheme = new OpenApiSecurityScheme
                 {
-                    Title = "Everwell.API",
-                    Version = "v1",
-                    Description = "A Gender Healthcare Service System "
-                });
-                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
+                    Name = "JWT Authorization",
+                    Description = "Enter JWT token to access protected endpoints",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
-                });
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                    BearerFormat = "JWT"
+                };
+
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
+
+                var securityRequirement = new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
@@ -39,7 +36,16 @@ namespace Everwell.API.Extensions
                         },
                         new List<string>()
                     }
+                }; 
+
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Everwell.API",
+                    Version = "v1",
+                    Description = "A Gender Healthcare Service System "
                 });
+
+                options.AddSecurityRequirement(securityRequirement);
             });
 
             return services;

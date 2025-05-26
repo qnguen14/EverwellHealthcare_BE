@@ -9,6 +9,7 @@
       "Everwell.API/1.0.0": {
         "dependencies": {
           "Everwell.BLL": "1.0.0",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.5",
           "Microsoft.EntityFrameworkCore.Design": "9.0.5",
           "Microsoft.EntityFrameworkCore.Tools": "9.0.5",
           "Microsoft.Extensions.Configuration.Json": "9.0.5",

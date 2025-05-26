@@ -1,50 +1,59 @@
-﻿using Everwell.DAL.Data.Entities;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
+using Everwell.DAL.Data.Entities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
-using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
-namespace Everwell.DAL.Data.Infrastructure
+namespace Everwell.BLL.Infrastructure
 {
-    public class TokenProvider(IConfiguration config)
+    public class TokenProvider(IConfiguration _config)
     {
         public string Create(User user)
         {
-            string secretKey = config["Jwt:Secret"];
+            string secretKey = _config["Jwt:Secret"];
             if (string.IsNullOrEmpty(secretKey))
             {
                 throw new InvalidOperationException("JWT SecretKey is not configured.");
             }
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            // Create claims manually instead of using SecurityTokenDescriptor
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role.ToString()),
+                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.Role, user.Role.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(config.GetValue<int>("ExpirationTimeInMinutes")), // Token expiration time
+                Expires = DateTime.UtcNow.AddMinutes(60), // Set token expiration time
                 SigningCredentials = credentials,
-                Issuer = config["Jwt:Issuer"],
-                Audience = config["Jwt:Audience"]
-
+                Issuer = _config["Jwt:Issuer"],
+                Audience = _config["Jwt:Audience"]
             };
 
-            var tokenHandler = new JsonWebTokenHandler();
+            // var handler = new JsonWebTokenHandler();
+            
+            // string token = handler.CreateToken(tokenDescriptor);
 
-            string token = tokenHandler.CreateToken(tokenDescriptor);
+            // return token;
 
-            return token;
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: tokenDescriptor.Subject.Claims,
+                expires: DateTime.UtcNow.AddMinutes(60),
+                signingCredentials: credentials
+            );
+
+            Console.WriteLine($"User role: {user.Role.ToString()}");
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            return tokenHandler.WriteToken(token);
         }
-    } 
+    }
 }
