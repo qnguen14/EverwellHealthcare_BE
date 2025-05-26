@@ -1,14 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>1f139225-6680-4469-83d0-d2769552efb1</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Interfaces\" />
-    <Folder Include="Services\Implements\" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Everwell.DAL\Everwell.DAL.csproj">
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

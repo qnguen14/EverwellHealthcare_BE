@@ -1,6 +1,8 @@
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.deps.json
+D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.runtimeconfig.json
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.dll
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.pdb
+D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.csproj.AssemblyReference.cache
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.GeneratedMSBuildEditorConfig.editorconfig
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.AssemblyInfoInputs.cache
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.AssemblyInfo.cs
@@ -9,4 +11,5 @@ D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwel
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.dll
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\refint\Everwell.DAL.dll
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.pdb
+D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.genruntimeconfig.cache
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.DAL\obj\Debug\net8.0\ref\Everwell.DAL.dll
