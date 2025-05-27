@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Everwell.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1262b5f6e51345f8b5a155ea86f903471d1e7f73")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef734ac6cf7b68809e122caac2bc53ed2bcdd98d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Everwell.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Everwell.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
