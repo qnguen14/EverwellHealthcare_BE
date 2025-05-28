@@ -16,6 +16,5 @@ namespace Everwell.DAL.Data.Responses.User
         public string Password { get; set; }
         public string Role { get; set; }
         public bool IsActive { get; set; }
-        public bool IsAdmin { get; set; }
     }
 }

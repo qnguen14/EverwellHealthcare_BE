@@ -202,9 +202,6 @@
           },
           "isActive": {
             "type": "boolean"
-          },
-          "isAdmin": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false

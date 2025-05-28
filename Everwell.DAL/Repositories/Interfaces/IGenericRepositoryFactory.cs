@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SexCare.DAL.Repositories.Interfaces
+namespace Everwell.DAL.Repositories.Interfaces
 {
-    internal class IGenericRepositoryFactory
+    public interface IGenericRepositoryFactory
     {
+        IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : class;
     }
 }

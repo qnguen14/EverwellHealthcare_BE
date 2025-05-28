@@ -1,12 +1,20 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SexCare.DAL.Repositories.Interfaces
+namespace Everwell.DAL.Repositories.Interfaces
 {
-    internal class IUnitOfWork
+    public interface IUnitOfWork : IGenericRepositoryFactory, IDisposable
     {
+        Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> operation);
+        Task ExecuteInTransactionAsync(Func<Task> operation);
+    }
+
+    public interface IUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+    {
+        TContext Context { get; }
     }
 }

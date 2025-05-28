@@ -1,14 +1,16 @@
+using Everwell.API.Extensions;
+using Everwell.BLL.Infrastructure;
 using Everwell.BLL.Services.Implements;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
-using Everwell.BLL.Infrastructure;
-using Everwell.API.Extensions;
+using Everwell.DAL.Repositories.Implements;
+using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,9 @@ builder.Services.AddDbContext<EverwellDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection"));
 });
 
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

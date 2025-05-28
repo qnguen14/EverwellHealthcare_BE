@@ -1,9 +1,12 @@
-﻿using Everwell.BLL.Infrastructure;
+﻿using AutoMapper;
+using Everwell.BLL.Infrastructure;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Data.Requests.Auth;
 using Everwell.DAL.Data.Responses.Auth;
 using Everwell.DAL.Data.Responses.User;
+using Everwell.DAL.Repositories.Implements;
+using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,15 +15,17 @@ namespace Everwell.BLL.Services.Implements
 {
     public class AuthService : IAuthService
     {
-        private readonly EverwellDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly TokenProvider _tokenProvider;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public AuthService(EverwellDbContext context, TokenProvider tokenProvider, IConfiguration configuration)
+        public AuthService(IUnitOfWork<EverwellDbContext> unitOfWork, TokenProvider tokenProvider, IConfiguration configuration, IMapper mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _tokenProvider = tokenProvider;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -34,7 +39,7 @@ namespace Everwell.BLL.Services.Implements
                 }
 
                 // Fetch user from the database
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+                var user = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive, null, null);
                 if (user == null)
                 {
                     throw new UnauthorizedAccessException("Invalid email or password.");
@@ -50,22 +55,14 @@ namespace Everwell.BLL.Services.Implements
                 var token = _tokenProvider.Create(user);
 
                 // Map user to GetUserResponse
-                var userResponse = new GetUserResponse
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Address = user.Address,
-                    Role = user.Role.ToString()
-                };
+                var userResponse = _mapper.Map<GetUserResponse>(user);
 
                 // Return response
                 return new LoginResponse
                 {
                     Token = token,
                     User = userResponse,
-                    Expiration = DateTime.UtcNow.AddMinutes(60)
+                    Expiration = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["Jwt:ExpirationInMinutes"]))
                 };
             }
             catch (Exception ex)
