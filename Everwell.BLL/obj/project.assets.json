@@ -2,6 +2,22 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "AutoMapper/14.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Options": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/AutoMapper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/AutoMapper.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.EntityFrameworkCore/8.0.11": {
         "type": "package",
         "dependencies": {
@@ -553,6 +569,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
+          "AutoMapper": "14.0.0",
           "Microsoft.EntityFrameworkCore": "8.0.11",
           "Microsoft.Extensions.Configuration": "8.0.0",
           "Microsoft.Extensions.Configuration.UserSecrets": "6.0.1",
@@ -571,6 +588,21 @@
     }
   },
   "libraries": {
+    "AutoMapper/14.0.0": {
+      "sha512": "OC+1neAPM4oCCqQj3g2GJ2shziNNhOkxmNB9cVS8jtx4JbgmRzLcUOxB9Tsz6cVPHugdkHgCaCrTjjSI0Z5sCQ==",
+      "type": "package",
+      "path": "automapper/14.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "automapper.14.0.0.nupkg.sha512",
+        "automapper.nuspec",
+        "icon.png",
+        "lib/net8.0/AutoMapper.dll",
+        "lib/net8.0/AutoMapper.xml"
+      ]
+    },
     "Microsoft.EntityFrameworkCore/8.0.11": {
       "sha512": "stbjWBTtpQ1HtqXMFyKnXFTr76PvaOHI2b2h85JqBi3eZr00nspvR/a90Zwh8CQ4rVawqLiTG0+0yZQWaav+sQ==",
       "type": "package",
@@ -1408,23 +1440,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\qnguy\\.nuget\\packages\\": {},
+    "C:\\Users\\Admin\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.BLL\\Everwell.BLL.csproj",
+      "projectUniqueName": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.BLL\\Everwell.BLL.csproj",
       "projectName": "Everwell.BLL",
-      "projectPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.BLL\\Everwell.BLL.csproj",
-      "packagesPath": "C:\\Users\\qnguy\\.nuget\\packages\\",
-      "outputPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.BLL\\obj\\",
+      "projectPath": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.BLL\\Everwell.BLL.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.BLL\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\qnguy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -1439,8 +1471,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.DAL\\Everwell.DAL.csproj": {
-              "projectPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.DAL\\Everwell.DAL.csproj"
+            "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.DAL\\Everwell.DAL.csproj": {
+              "projectPath": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.DAL\\Everwell.DAL.csproj"
             }
           }
         }
@@ -1455,7 +1487,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
@@ -1494,7 +1526,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

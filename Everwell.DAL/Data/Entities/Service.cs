@@ -27,6 +27,10 @@ namespace Everwell.DAL.Data.Entities
         public string Description { get; set; }
 
         [Required]
+        [Column("price", TypeName = "numeric")]
+        public decimal Price { get; set; }
+
+        [Required]
         [Column("is_active")]
         public bool IsActive { get; set; }
         

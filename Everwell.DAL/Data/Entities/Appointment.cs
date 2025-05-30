@@ -18,35 +18,36 @@ public class Appointment
     [Key]
     [Required]
     [Column("appointment_id")]
-    public int AppointmentId { get; set; }
+    public Guid AppointmentId { get; set; }
 
     [Required]
     [Column("customer_id")]
     [ForeignKey("Customer")]
-    public int CustomerId { get; set; }    
+    public Guid CustomerId { get; set; }    
     public virtual User Customer { get; set; }
-    
-    [Required]
-    [Column("service_id")]
-    [ForeignKey("Service")]
-    public int ServiceId { get; set; }
-    public virtual Service Service { get; set; }
 
+    [Required]
     [Column("consultant_id")]
     [ForeignKey("Consultant")]
-    public int? ConsultantId { get; set; }
+    public Guid ConsultantId { get; set; }
     public virtual User Consultant { get; set; }
 
     [Required]
+    [Column("service_id")]
+    [ForeignKey("Service")]
+    public Guid ServiceId { get; set; }
+    public virtual Service Service { get; set; }
+
+    [Required]
     [Column("appointment_date")]
-    public DateTime AppointmentDate { get; set; }
+    public DateOnly AppointmentDate { get; set; }
 
     [Required]
     [Column("start_time")]
-    public TimeSpan StartTime { get; set; }
+    public TimeOnly StartTime { get; set; }
 
     [Column("end_time")]
-    public TimeSpan? EndTime { get; set; }
+    public TimeOnly EndTime { get; set; }
 
     [Required]
     [Column("status")]

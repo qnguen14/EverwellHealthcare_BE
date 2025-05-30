@@ -14,11 +14,12 @@ public class Feedback
     public Guid Id { get; set; }
     
     [Required]
-    [Column("id")]
+    [Column("customer_id")]
     [ForeignKey("Customer")]
     public Guid CustomerId { get; set; }
     public virtual User Customer { get; set; }
-    
+
+    [Required]
     [Column("consultant_id")]
     [ForeignKey("Consultant")]
     public Guid ConsultantId { get; set; }
@@ -31,8 +32,8 @@ public class Feedback
     public virtual Service Service { get; set; }
     
     [Required]
-    [ForeignKey("Service")]
     [Column("appoinement_id")]
+    [ForeignKey("Appointment")]
     public Guid AppointmentId { get; set; }
     // public virtual Appointment Appointment { get; set; }
     
@@ -41,7 +42,7 @@ public class Feedback
     public int Rating { get; set; }
     
     [Required]
-    [Column("comment")]
+    [Column("comment", TypeName = "text")]
     public string Comment { get; set; }
     
     [Required]

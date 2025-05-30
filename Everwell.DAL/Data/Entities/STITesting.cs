@@ -24,7 +24,9 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("appointment_id")]
-        public int AppointmentId { get; set; }
+        [ForeignKey("AppointmentId")]
+        public Guid AppointmentId { get; set; }
+        public virtual Appointment Appointment { get; set; }
 
         [Required]
         [StringLength(100)] // Sets the maximum string length, matching VARCHAR(100)
@@ -33,18 +35,9 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("status")]
-        public Status Status { get; set; }
+        public Status Status { get; set; } = Status.Pending;
 
         [Column("collected_date", TypeName = "date")]
         public DateOnly? CollectedDate { get; set; }
-
-        [ForeignKey("AppointmentId")]
-        public virtual Appointment Appointment { get; set; }
-
-        public STITesting()
-        {
-            Id = Guid.NewGuid(); // Automatically generate a new GUID for Id
-            Status = Status.Pending; // Default status
-        }
     }
 }
