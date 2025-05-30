@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "2K+Fjv1nosM=",
+  "dgSpecHash": "i82zCP/1o2k=",
   "success": true,
   "projectFilePath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.DAL\\Everwell.DAL.csproj",
   "expectedPackageFiles": [
@@ -56,8 +56,7 @@
     "C:\\Users\\qnguy\\.nuget\\packages\\system.text.encoding.codepages\\6.0.0\\system.text.encoding.codepages.6.0.0.nupkg.sha512",
     "C:\\Users\\qnguy\\.nuget\\packages\\system.text.encodings.web\\6.0.0\\system.text.encodings.web.6.0.0.nupkg.sha512",
     "C:\\Users\\qnguy\\.nuget\\packages\\system.text.json\\6.0.0\\system.text.json.6.0.0.nupkg.sha512",
-    "C:\\Users\\qnguy\\.nuget\\packages\\system.threading.channels\\6.0.0\\system.threading.channels.6.0.0.nupkg.sha512",
-    "C:\\Users\\qnguy\\.nuget\\packages\\microsoft.net.sdk.compilers.toolset\\9.0.202\\microsoft.net.sdk.compilers.toolset.9.0.202.nupkg.sha512"
+    "C:\\Users\\qnguy\\.nuget\\packages\\system.threading.channels\\6.0.0\\system.threading.channels.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }
