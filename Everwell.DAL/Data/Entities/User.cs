@@ -63,5 +63,10 @@ namespace Everwell.DAL.Data.Entities
         public bool IsActive { get; set; } = true;
 
         public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+        public virtual ICollection<STITesting> STITests { get; set; } = new List<STITesting>(); // For customers
+
+        public virtual ICollection<TestResult> TestResultsExamined { get; set; } = new List<TestResult>(); // For staff who examine results
+        public virtual ICollection<TestResult> TestResultsSent { get; set; } = new List<TestResult>(); // For staff who send results
+
     }
 }

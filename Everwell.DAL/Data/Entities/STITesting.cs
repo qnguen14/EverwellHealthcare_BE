@@ -14,7 +14,25 @@ namespace Everwell.DAL.Data.Entities
         InProgress,
         Completed
     }
-
+    
+    public enum TestType
+    {
+        Hiv,
+        Syphilis,
+        Gonorrhea,
+        Chlamydia,
+        HepatitisB,
+        HepatitisC
+    }
+    
+    public enum Method
+    {
+        BloodTest,
+        UrineTest,
+        SwabTest,
+        RapidTest
+    }
+    
     [Table("STITesting")]
     public class STITesting
     {
@@ -24,14 +42,21 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("appointment_id")]
-        [ForeignKey("AppointmentId")]
         public Guid AppointmentId { get; set; }
         public virtual Appointment Appointment { get; set; }
 
         [Required]
-        [StringLength(100)] // Sets the maximum string length, matching VARCHAR(100)
+        [Column("customer_id")]
+        public Guid CustomerId { get; set; }
+        public virtual User Customer { get; set; }
+
+        [Required]
         [Column("test_type")]
-        public string TestType { get; set; }
+        public TestType TestType { get; set; }
+        
+        [Required]
+        [Column("method")]
+        public Method Method { get; set; }
 
         [Required]
         [Column("status")]
@@ -39,5 +64,8 @@ namespace Everwell.DAL.Data.Entities
 
         [Column("collected_date", TypeName = "date")]
         public DateOnly? CollectedDate { get; set; }
+
+        // Navigation to Test Results
+        public virtual ICollection<TestResult> TestResults { get; set; } = new List<TestResult>();
     }
 }

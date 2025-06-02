@@ -32,10 +32,10 @@ public class Feedback
     public virtual Service Service { get; set; }
     
     [Required]
-    [Column("appoinement_id")]
+    [Column("appointment_id")]
     [ForeignKey("Appointment")]
     public Guid AppointmentId { get; set; }
-    // public virtual Appointment Appointment { get; set; }
+    public virtual Appointment Appointment { get; set; }
     
     [Required]
     [Column("rating")]

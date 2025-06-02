@@ -124,4 +124,4 @@ D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\refint\
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.pdb
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.genruntimeconfig.cache
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\ref\Everwell.API.dll
-D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\AutoMapper.dll

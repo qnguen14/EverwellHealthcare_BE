@@ -20,7 +20,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
 builder.Services.AddDbContext<EverwellDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection"),
+    npgsqlOptionsAction: sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorCodesToAdd: null);
+    });
 });
 
 builder.Services.AddScoped<IUserService, UserService>();

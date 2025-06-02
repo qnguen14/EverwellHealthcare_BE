@@ -12,7 +12,7 @@ public enum AppointmentStatus
     NoShow
 }
 
-[Table("appointment")]
+[Table("Appointment")]
 public class Appointment
 {
     [Key]

@@ -9,52 +9,124 @@ namespace Everwell.DAL.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("EverWellDB_v1");
             base.OnModelCreating(modelBuilder);
 
+            // Post - User (Staff)
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.Staff)
-                .WithMany(u => u.Posts) // if you've added ICollection<Post> in User
+                .WithMany(u => u.Posts)
                 .HasForeignKey(p => p.StaffId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Appointment relationships
             modelBuilder.Entity<Appointment>(entity =>
             {
-                // Relationships
                 entity.HasOne(a => a.Customer)
-                    .WithMany() // Assuming User does not have ICollection<Appointment> CustomerAppointments
+                    .WithMany()
                     .HasForeignKey(a => a.CustomerId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(a => a.Service)
-                    .WithMany() // Assuming Service does not have ICollection<Appointment>
-                    .HasForeignKey(a => a.ServiceId)
+                entity.HasOne(a => a.Consultant)
+                    .WithMany()
+                    .HasForeignKey(a => a.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(a => a.Consultant)
-                    .WithMany() // Assuming User does not have ICollection<Appointment> ConsultantAppointments
-                    .HasForeignKey(a => a.ConsultantId)
+                entity.HasOne(a => a.Service)
+                    .WithMany()
+                    .HasForeignKey(a => a.ServiceId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // Feedback relationships
             modelBuilder.Entity<Feedback>(entity =>
             {
                 entity.HasOne(f => f.Customer)
-                    .WithMany() // or .WithMany(u => u.Feedbacks) if User has ICollection<Feedback>
+                    .WithMany()
                     .HasForeignKey(f => f.CustomerId)
                     .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(f => f.Consultant)
-                    .WithMany() // or .WithMany(u => u.ConsultantFeedbacks) if User has ICollection<Feedback>
+                    .WithMany()
                     .HasForeignKey(f => f.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(f => f.Service)
-                    .WithMany() // or .WithMany(s => s.Feedbacks) if Service has ICollection<Feedback>
+                    .WithMany()
                     .HasForeignKey(f => f.ServiceId)
                     .OnDelete(DeleteBehavior.Restrict);
+                // Feedback to Appointment (optional navigation)
+                // entity.HasOne<Appointment>()
+                //     .WithMany()
+                //     .HasForeignKey(f => f.AppointmentId)
+                //     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // STITesting relationships
+            modelBuilder.Entity<STITesting>(entity =>
+            {
+                entity.HasOne(s => s.Appointment)
+                    .WithMany()
+                    .HasForeignKey(s => s.AppointmentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(s => s.Customer)
+                    .WithMany(u => u.STITests)
+                    .HasForeignKey(s => s.CustomerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // TestResult relationships
+            modelBuilder.Entity<TestResult>(entity =>
+            {
+                entity.HasOne(tr => tr.STITesting)
+                    .WithMany(sti => sti.TestResults)
+                    .HasForeignKey(tr => tr.STITestingId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(tr => tr.Customer)
+                    .WithMany()
+                    .HasForeignKey(tr => tr.CustomerId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(tr => tr.Staff)
+                    .WithMany()
+                    .HasForeignKey(tr => tr.StaffId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // MenstrualCycleTracking relationships
+            modelBuilder.Entity<MenstrualCycleTracking>(entity =>
+            {
+                entity.HasOne(m => m.Customer)
+                    .WithMany()
+                    .HasForeignKey(m => m.CustomerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(m => m.Notifications)
+                    .WithOne(n => n.Tracking)
+                    .HasForeignKey(n => n.TrackingId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // MenstrualCycleNotification relationships
+            modelBuilder.Entity<MenstrualCycleNotification>(entity =>
+            {
+                entity.HasOne(n => n.Tracking)
+                    .WithMany(t => t.Notifications)
+                    .HasForeignKey(n => n.TrackingId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Question relationships
+            modelBuilder.Entity<Question>(entity =>
+            {
+                entity.HasOne(q => q.Customer)
+                    .WithMany()
+                    .HasForeignKey(q => q.CustomerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(q => q.Consultant)
+                    .WithMany()
+                    .HasForeignKey(q => q.ConsultantId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
         }
-
 
         public DbSet<User> Users { get; set; }
         public DbSet<Service> Services { get; set; }
@@ -62,11 +134,5 @@ namespace Everwell.DAL.Data.Entities
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<STITesting> STITests { get; set; }
-
-
-
     }
-
-
-
 }
