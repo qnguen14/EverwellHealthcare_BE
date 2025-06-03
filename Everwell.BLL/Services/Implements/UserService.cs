@@ -8,16 +8,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Everwell.DAL.Data.Requests.User;
+using AutoMapper;
+using Everwell.DAL.Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Everwell.BLL.Services.Implements
 {
-    public class UserService : IUserService
+    public class UserService : BaseService<UserService>, IUserService
     {
-        private readonly EverwellDbContext _context;
-
-        public UserService(EverwellDbContext context)
+        public UserService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<UserService> logger, IMapper mapper)
+            : base(unitOfWork, logger, mapper)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
+            _logger = logger;
+            _mapper = mapper;
         }
 
 
@@ -25,27 +29,22 @@ namespace Everwell.BLL.Services.Implements
         {
             try
             {
-                var users = await _context.Set<User>().ToListAsync();
+                var users = await _unitOfWork.GetRepository<User>()
+                    .GetListAsync(
+                        predicate: u => u.IsActive
+                    );
 
-                return users.Select(u => new CreateUserResponse
+                if (users == null || !users.Any())
                 {
-                    Id = u.Id,
-                    Name = u.Name,
-                    Email = u.Email,
-                    PhoneNumber = u.PhoneNumber,
-                    Address = u.Address,
-                    Password = u.Password,
-                    Role = u.Role.ToString(),
-                    IsActive = u.IsActive
-                });
+                    throw new DirectoryNotFoundException("No active users found.");
+                }
 
+                return _mapper.Map<IEnumerable<CreateUserResponse>>(users);
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-
-
         }
 
 
@@ -53,36 +52,29 @@ namespace Everwell.BLL.Services.Implements
         {
             try
             {
-                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-                if (existingUser != null)
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
                 {
-                    throw new InvalidOperationException("A user with the same email already exists.");
-                }
+                    if (request == null)
+                    {
+                        throw new ArgumentNullException(nameof(request), "Request cannot be null.");
+                    }
 
-                var newUser = new User
-                {
-                    Name = request.Name,
-                    Email = request.Email,
-                    PhoneNumber = request.PhoneNumber,
-                    Address = request.Address,
-                    Password = request.Password,
-                    Role = Enum.Parse<Role>(request.Role),
-                    IsActive = true
-                };
-                _context.Set<User>().Add(newUser);
-                await _context.SaveChangesAsync();
+                    // Validate the user entity (e.g., check for existing email)
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                                predicate: u => u.Email == request.Email && u.IsActive);
+                    if (existingUser != null)
+                    {
+                        throw new InvalidOperationException("A user with this email already exists.");
+                    }
 
-                return new CreateUserResponse
-                {
-                    Id = newUser.Id,
-                    Name = newUser.Name,
-                    Email = newUser.Email,
-                    PhoneNumber = newUser.PhoneNumber,
-                    Address = newUser.Address,
-                    Password = newUser.Password,
-                    Role = newUser.Role.ToString(),
-                    IsActive = newUser.IsActive
-                };
+                    var newUser = _mapper.Map<User>(request);
+
+                    // Add the new user
+                    await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
+
+                    return _mapper.Map<CreateUserResponse>(newUser);
+                });
             }
             catch (Exception ex)
             {
