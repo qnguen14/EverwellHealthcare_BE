@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Everwell.BLL.Services
+namespace Everwell.BLL
 {
     public abstract class BaseService<T> where T : class
     {

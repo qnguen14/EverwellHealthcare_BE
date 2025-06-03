@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Everwell.BLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0ff2cbdf10d8c9c878cf414ee0c66f499856a28e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b748e259c3804bd9d94826f33d87791701f172bb")]
 [assembly: System.Reflection.AssemblyProductAttribute("Everwell.BLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Everwell.BLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

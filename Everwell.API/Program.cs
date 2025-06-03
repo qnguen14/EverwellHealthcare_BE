@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Everwell.DAL.Repositories.Interfaces;
+using Everwell.DAL.Repositories.Implements;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,12 @@ builder.Services.AddDbContext<EverwellDbContext>(options =>
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
 
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
