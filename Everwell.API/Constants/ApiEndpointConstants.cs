@@ -21,11 +21,11 @@
         public static class User
         {
             public const string UserEndpoint = ApiEndpoint + "/user";
-            public const string GetUserEndpoint = UserEndpoint + "/{id}"; // to do
+            public const string GetUserEndpoint = UserEndpoint + "/{id}";
             public const string GetAllUsersEndpoint = UserEndpoint + "/getall"; 
             public const string CreateUserEndpoint = UserEndpoint + "/create"; 
-            public const string UpdateUserEndpoint = UserEndpoint + "/update"; // to do
-            public const string DeleteUserEndpoint = UserEndpoint + "/delete"; // to do
+            public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
+            public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";
         }
     }
 }

@@ -81,5 +81,106 @@ namespace Everwell.BLL.Services.Implements
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<GetUserResponse> GetUserById(Guid id)
+        {
+            try
+            {
+                var user = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(
+                        predicate: u => u.Id == id && u.IsActive
+                    );
+
+                if (user == null)
+                {
+                    throw new InvalidOperationException("User not found.");
+                }
+
+                return _mapper.Map<GetUserResponse>(user);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<UpdateUserResponse> UpdateUser(Guid id, UpdateUserRequest request)
+        {
+            try
+            {
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                {
+                    if (request == null)
+                    {
+                        throw new ArgumentNullException(nameof(request), "Request cannot be null.");
+                    }
+
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                            predicate: u => u.Id == id && u.IsActive
+                        );
+
+                    if (existingUser == null)
+                    {
+                        throw new InvalidOperationException("User not found.");
+                    }
+
+                    // Check if email is being changed and if it's already taken
+                    if (existingUser.Email != request.Email)
+                    {
+                        var emailExists = await _unitOfWork.GetRepository<User>()
+                            .FirstOrDefaultAsync(
+                                predicate: u => u.Email == request.Email && u.IsActive && u.Id != id
+                            );
+
+                        if (emailExists != null)
+                        {
+                            throw new InvalidOperationException("A user with this email already exists.");
+                        }
+                    }
+
+                    // Map the request to the existing user
+                    _mapper.Map(request, existingUser);
+
+                    // Update the user
+                    _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
+
+                    return _mapper.Map<UpdateUserResponse>(existingUser);
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeleteUser(Guid id)
+        {
+            try
+            {
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                {
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                            predicate: u => u.Id == id && u.IsActive
+                        );
+
+                    if (existingUser == null)
+                    {
+                        throw new InvalidOperationException("User not found.");
+                    }
+
+                    // Soft delete by setting IsActive to false
+                    existingUser.IsActive = false;
+                    _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
+
+                    return true;
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -9,6 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Everwell.DAL.Repositories.Implements;
+using Everwell.DAL.Repositories.Interfaces;
+using Everwell.DAL.Mappers.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,14 +33,19 @@ builder.Services.AddDbContext<EverwellDbContext>(options =>
     });
 });
 
+builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+builder.Services.AddAutoMapper(typeof(UserMapper));
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = true; // Set to true in production
+        options.RequireHttpsMetadata = true; // Set to true in productionx
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

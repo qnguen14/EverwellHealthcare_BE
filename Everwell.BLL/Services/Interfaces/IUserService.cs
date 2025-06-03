@@ -12,6 +12,10 @@ namespace Everwell.BLL.Services.Interfaces
     public interface IUserService
     {
         Task<IEnumerable<CreateUserResponse>> GetUsers();
+        Task<GetUserResponse> GetUserById(Guid id);
         Task<CreateUserResponse> CreateUser(CreateUserRequest request);
+        Task<UpdateUserResponse> UpdateUser(Guid id, UpdateUserRequest request);
+        Task<bool> DeleteUser(Guid id);
+
     }
 }

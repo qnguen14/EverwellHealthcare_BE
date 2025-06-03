@@ -15,6 +15,17 @@ namespace Everwell.DAL.Mappers.User
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true)) // Default to active
                 .ForMember(dest => dest.Password, opt => opt.Ignore()); // Password will be hashed later
 
+            // UpdateUserRequest to User
+            CreateMap<UpdateUserRequest, Data.Entities.User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()) // Don't update the ID
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore()) // Don't update IsActive in normal updates
+                .ForMember(dest => dest.Password, opt => opt.Ignore()) // Don't update password in normal updates
+                .ForMember(dest => dest.AvatarUrl, opt => opt.Ignore()) // Don't update avatar in normal updates
+                .ForMember(dest => dest.Posts, opt => opt.Ignore()) // Don't update related entities
+                .ForMember(dest => dest.STITests, opt => opt.Ignore()) // Don't update related entities
+                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore()) // Don't update related entities
+                .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore()); // Don't update related entities
+
             // User to CreateUserResponse
             CreateMap<Data.Entities.User, CreateUserResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
@@ -26,6 +37,16 @@ namespace Everwell.DAL.Mappers.User
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
+            // User to UpdateUserResponse
+            CreateMap<Data.Entities.User, UpdateUserResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+
             // User to GetUserResponse
             CreateMap<Data.Entities.User, GetUserResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
@@ -33,9 +54,9 @@ namespace Everwell.DAL.Mappers.User
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password)) // This should be hashed before saving
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
-
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
         }
     }
 }
