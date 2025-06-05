@@ -11,7 +11,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Everwell.DAL.Repositories.Implements;
 using Everwell.DAL.Repositories.Interfaces;
-using Everwell.DAL.Mappers.User;
+using Everwell.DAL.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 

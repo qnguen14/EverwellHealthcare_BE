@@ -2,6 +2,8 @@ using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Everwell.DAL.Data.Requests.Appointments;
+using Everwell.DAL.Data.Responses.Appointments;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -12,19 +14,32 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
     public AppointmentService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<AppointmentService> logger, IMapper mapper)
         : base(unitOfWork, logger, mapper)
     {
+        _unitOfWork = unitOfWork;
+        _logger = logger;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Appointment>> GetAllAppointmentsAsync()
+    public async Task<IEnumerable<CreateAppointmentsResponse>> GetAllAppointmentsAsync()
     {
         try
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetListAsync(
+                    predicate: a => a.Customer.IsActive == true 
+                                    && a.Consultant.IsActive == true,
                     include: a => a.Include(ap => ap.Customer)
                                   .Include(ap => ap.Consultant)
                                   .Include(ap => ap.Service));
             
-            return appointments ?? new List<Appointment>();
+            if (appointments != null && appointments.Any())
+            {
+                return _mapper.Map<IEnumerable<CreateAppointmentsResponse>>(appointments);
+            }
+            else
+            {
+                throw new DirectoryNotFoundException("No appointments found");
+            }
+            
         }
         catch (Exception ex)
         {
@@ -33,16 +48,25 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<Appointment?> GetAppointmentByIdAsync(Guid id)
+    public async Task<CreateAppointmentsResponse> GetAppointmentByIdAsync(Guid id)
     {
         try
         {
-            return await _unitOfWork.GetRepository<Appointment>()
+            var appointment = await _unitOfWork.GetRepository<Appointment>()
                 .FirstOrDefaultAsync(
-                    predicate: a => a.AppointmentId == id,
+                    predicate: a => a.Id == id 
+                                    && a.Customer.IsActive == true 
+                                    && a.Consultant.IsActive == true,
                     include: a => a.Include(ap => ap.Customer)
                                   .Include(ap => ap.Consultant)
                                   .Include(ap => ap.Service));
+            
+            if (appointment == null)
+            {
+                throw new KeyNotFoundException($"Appointment with id {id} not found.");
+            }
+            
+            return _mapper.Map<CreateAppointmentsResponse>(appointment);
         }
         catch (Exception ex)
         {
@@ -51,17 +75,36 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<Appointment> CreateAppointmentAsync(Appointment appointment)
+    public async Task<CreateAppointmentsResponse> CreateAppointmentAsync(CreateAppointmentRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                appointment.AppointmentId = Guid.NewGuid();
-                appointment.CreatedAt = DateTime.UtcNow;
+                if (request == null)
+                {
+                    throw new ArgumentNullException(nameof(request), "request cannot be null.");
+                }
                 
-                await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
-                return appointment;
+                var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(predicate: a => a.AppointmentDate == request.AppointmentDate 
+                                                         && a.Slot == request.Slot 
+                                                         && a.ConsultantId == request.ConsultantId,
+                                        include: a => a.Include(ap => ap.Customer)
+                                            .Include(ap => ap.Consultant)
+                                                         );
+                if (existingAppointment != null &&
+                    existingAppointment.Customer.IsActive &&
+                    existingAppointment.Consultant.IsActive)
+                {
+                    throw new InvalidOperationException("An appointment already exists for the specified date, slot, and consultant.");
+                }
+                
+                var newAppointment = _mapper.Map<Appointment>(request);
+                
+                await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
+                
+                return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
             });
         }
         catch (Exception ex)
@@ -78,7 +121,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.AppointmentId == id);
+                    .FirstOrDefaultAsync(predicate: a => a.Id == id);
                 
                 if (existingAppointment == null) return null;
 
@@ -104,7 +147,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var appointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.AppointmentId == id);
+                    .FirstOrDefaultAsync(predicate: a => a.Id == id);
                 
                 if (appointment == null) return false;
 

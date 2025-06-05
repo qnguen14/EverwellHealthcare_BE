@@ -61,7 +61,8 @@ namespace Everwell.BLL.Services.Implements
                 return new LoginResponse
                 {
                     Token = token,
-                    User = userResponse,
+                    FullName = userResponse.Name,
+                    Email = userResponse.Email,
                     Expiration = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["Jwt:ExpirationInMinutes"]))
                 };
             }

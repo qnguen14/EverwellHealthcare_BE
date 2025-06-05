@@ -10,7 +10,8 @@ namespace Everwell.DAL.Data.Responses.Auth
     public class LoginResponse
     {
         public string Token { get; set; }
-        public GetUserResponse User { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
         public DateTime Expiration { get; set; }
     }
 }

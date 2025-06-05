@@ -1,6 +1,7 @@
 using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
+using Everwell.DAL.Data.Requests.Appointments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.Appointment.GetAllAppointmentsEndpoint)]
-    [Authorize]
+    [Authorize(Roles = "Admin,Customer,Consultant")]
     public async Task<ActionResult<IEnumerable<Appointment>>> GetAllAppointments()
     {
         try
@@ -32,7 +33,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.Appointment.GetAppointmentEndpoint)]
-    [Authorize]
+    [Authorize(Roles =  "Admin,Customer,Consultant")]
     public async Task<ActionResult<Appointment>> GetAppointmentById(Guid id)
     {
         try
@@ -40,6 +41,26 @@ public class AppointmentsController : ControllerBase
             var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
             if (appointment == null)
                 return NotFound(new { message = "Appointment not found" });
+            
+            return Ok(appointment);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+    
+    [HttpPost(ApiEndpointConstants.Appointment.CreateAppointmentEndpoint)]
+    [Authorize(Roles =  "Admin,Customer,Consultant")]
+    public async Task<ActionResult<Appointment>> CreateAppointment(CreateAppointmentRequest request)
+    {
+        try
+        {
+            var appointment = await _appointmentService.CreateAppointmentAsync(request);
+            if (appointment != null)
+            {
+                return NotFound(new { message = "Appointment is already booked" });
+            }
             
             return Ok(appointment);
         }

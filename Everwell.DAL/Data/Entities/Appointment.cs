@@ -25,8 +25,8 @@ public class Appointment
 {
     [Key]
     [Required]
-    [Column("appointment_id")]
-    public Guid AppointmentId { get; set; }
+    [Column("id")]
+    public Guid Id { get; set; }
 
     [Required]
     [Column("customer_id")]
@@ -40,7 +40,7 @@ public class Appointment
     public Guid ConsultantId { get; set; }
     public virtual User Consultant { get; set; }
 
-    [Required]
+    // [Required]
     [Column("service_id")]
     [ForeignKey("Service")]
     public Guid ServiceId { get; set; }
@@ -52,7 +52,7 @@ public class Appointment
     
     [Required]
     [Column("shift_slot")]
-    public ShiftSlot ShiftSlot { get; set; }
+    public ShiftSlot Slot { get; set; }
 
     [Required]
     [Column("status")]
