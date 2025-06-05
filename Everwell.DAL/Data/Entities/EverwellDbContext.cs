@@ -53,11 +53,6 @@ namespace Everwell.DAL.Data.Entities
                     .WithMany()
                     .HasForeignKey(f => f.ServiceId)
                     .OnDelete(DeleteBehavior.Restrict);
-                // Feedback to Appointment (optional navigation)
-                // entity.HasOne<Appointment>()
-                //     .WithMany()
-                //     .HasForeignKey(f => f.AppointmentId)
-                //     .OnDelete(DeleteBehavior.Restrict);
             });
 
             // STITesting relationships
@@ -126,6 +121,18 @@ namespace Everwell.DAL.Data.Entities
                     .HasForeignKey(q => q.ConsultantId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
+            
+            // ConsultantSchedule relationships and unique constraint
+            modelBuilder.Entity<ConsultantSchedule>(entity =>
+            {
+                entity.HasOne(cs => cs.Consultant)
+                    .WithMany()
+                    .HasForeignKey(cs => cs.ConsultantId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(cs => new { cs.ConsultantId, cs.WorkDate, cs.ShiftSlot })
+                    .IsUnique();
+            });
         }
 
         public DbSet<User> Users { get; set; }
@@ -134,5 +141,6 @@ namespace Everwell.DAL.Data.Entities
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<STITesting> STITests { get; set; }
+        public DbSet<ConsultantSchedule> ConsultantSchedules { get; set; }
     }
 }

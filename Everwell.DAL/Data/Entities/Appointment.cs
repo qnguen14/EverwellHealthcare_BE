@@ -12,6 +12,14 @@ public enum AppointmentStatus
     NoShow
 }
 
+public enum ShiftSlot
+{
+    Morning1, // 8:00 AM - 10:00 AM
+    Morning2, // 10:00 AM - 12:00 PM
+    Afternoon1, // 1:00 PM - 3:00 PM
+    Afternoon2, // 3:00 PM - 5:00 PM
+}
+
 [Table("Appointment")]
 public class Appointment
 {
@@ -41,13 +49,10 @@ public class Appointment
     [Required]
     [Column("appointment_date")]
     public DateOnly AppointmentDate { get; set; }
-
+    
     [Required]
-    [Column("start_time")]
-    public TimeOnly StartTime { get; set; }
-
-    [Column("end_time")]
-    public TimeOnly EndTime { get; set; }
+    [Column("shift_slot")]
+    public ShiftSlot ShiftSlot { get; set; }
 
     [Required]
     [Column("status")]
