@@ -30,19 +30,19 @@ D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\obj\Debug\net8.0\Ever
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\obj\Debug\net8.0\refint\Everwell.BLL.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.pdb
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\obj\Debug\net8.0\ref\Everwell.BLL.dll
+D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.BLL.deps.json
+D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.BLL.dll
+D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.BLL.pdb
+D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.dll
+D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.pdb
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.csproj.AssemblyReference.cache
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.GeneratedMSBuildEditorConfig.editorconfig
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.AssemblyInfoInputs.cache
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.AssemblyInfo.cs
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.csproj.CoreCompileInputs.cache
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.sourcelink.json
+D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.2BFA89E9.Up2Date
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\refint\Everwell.BLL.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.pdb
-D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.BLL.deps.json
-D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.BLL.dll
-D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.BLL.pdb
-D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.dll
-D:\Gender System\GenderMngSystem_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.pdb
-D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.2BFA89E9.Up2Date
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\ref\Everwell.BLL.dll

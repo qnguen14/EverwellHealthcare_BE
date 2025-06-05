@@ -26,6 +26,8 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
+builder.Services.AddMemoryCache();
+
 builder.Services.AddDbContext<EverwellDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection"),
@@ -54,6 +56,8 @@ builder.Services.AddScoped<ISTITestingService, STITestingService>();
 builder.Services.AddScoped<ITestResultService, TestResultService>();
 builder.Services.AddScoped<IMenstrualCycleTrackingService, MenstrualCycleTrackingService>();
 builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

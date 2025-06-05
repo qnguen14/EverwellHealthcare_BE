@@ -11,5 +11,7 @@ namespace Everwell.BLL.Services.Interfaces
     public interface IAuthService
     {
         Task<LoginResponse> Login(LoginRequest request);
+        Task<bool> SendPasswordResetCodeAsync(string email);
+        Task<bool> VerifyResetCodeAndResetPasswordAsync(string code, string email, string newPassword);
     }
 }

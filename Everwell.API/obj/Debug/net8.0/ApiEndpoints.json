@@ -501,5 +501,37 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AuthController",
+    "Method": "SendResetCode",
+    "RelativePath": "send-reset-code",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.ForgotPasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AuthController",
+    "Method": "VerifyCodeAndReset",
+    "RelativePath": "verify-code-and-reset",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.VerifyCodeAndResetRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

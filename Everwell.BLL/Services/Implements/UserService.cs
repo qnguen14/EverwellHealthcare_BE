@@ -11,6 +11,7 @@ using Everwell.DAL.Data.Requests.User;
 using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
+using BCrypt.Net;
 
 namespace Everwell.BLL.Services.Implements
 {
@@ -68,7 +69,41 @@ namespace Everwell.BLL.Services.Implements
                         throw new InvalidOperationException("A user with this email already exists.");
                     }
 
+                    // Map the basic fields
                     var newUser = _mapper.Map<User>(request);
+                    
+                    // Handle the fields that need special processing
+                    
+                    // 1. Generate a new ID
+                    newUser.Id = Guid.NewGuid();
+                    
+                    // 2. Hash the password
+                    newUser.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                    
+                    // 3. Parse and set the role
+                    if (Enum.TryParse<Role>(request.Role, true, out Role role))
+                    {
+                        newUser.Role = role;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid role: {request.Role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(Role)))}");
+                    }
+                    
+                    // 4. Set default values
+                    newUser.IsActive = true;
+                    
+                    // 5. Validate required fields
+                    if (string.IsNullOrEmpty(newUser.Name))
+                        throw new ArgumentException("Name is required");
+                    if (string.IsNullOrEmpty(newUser.Email))
+                        throw new ArgumentException("Email is required");
+                    if (string.IsNullOrEmpty(newUser.PhoneNumber))
+                        throw new ArgumentException("Phone number is required");
+                    if (string.IsNullOrEmpty(newUser.Address))
+                        throw new ArgumentException("Address is required");
+
+                    Console.WriteLine($"Creating user: {newUser.Email} with role: {newUser.Role}");
 
                     // Add the new user
                     await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
@@ -78,7 +113,9 @@ namespace Everwell.BLL.Services.Implements
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                Console.WriteLine($"Error creating user: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                throw new Exception($"Failed to create user: {ex.Message}", ex);
             }
         }
 
@@ -172,6 +209,58 @@ namespace Everwell.BLL.Services.Implements
 
                     // Soft delete by setting IsActive to false
                     existingUser.IsActive = false;
+                    _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
+
+                    return true;
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<GetUserResponse> GetUserByEmailAsync(string email)
+        {
+            try
+            {
+                var user = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(
+                        predicate: u => u.Email == email && u.IsActive
+                    );
+
+                if (user == null)
+                {
+                    return null; // Don't throw exception for security reasons
+                }
+
+                return _mapper.Map<GetUserResponse>(user);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> UpdatePasswordAsync(Guid userId, string newPassword)
+        {
+            try
+            {
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                {
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                            predicate: u => u.Id == userId && u.IsActive
+                        );
+
+                    if (existingUser == null)
+                    {
+                        throw new InvalidOperationException("User not found.");
+                    }
+
+                    // Hash the new password before saving
+                    existingUser.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
                     _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
 
                     return true;

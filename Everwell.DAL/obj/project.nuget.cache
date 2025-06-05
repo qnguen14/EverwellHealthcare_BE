@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "scCdeeRFEpA=",
+  "dgSpecHash": "uh7km6UMj3A=",
   "success": true,
   "projectFilePath": "D:\\Gender System\\GenderMngSystem_BE\\Everwell.DAL\\Everwell.DAL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Manh\\.nuget\\packages\\automapper\\14.0.0\\automapper.14.0.0.nupkg.sha512",
+    "C:\\Users\\Manh\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Manh\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Manh\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "C:\\Users\\Manh\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.3\\microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",
