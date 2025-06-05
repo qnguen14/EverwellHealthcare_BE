@@ -17,7 +17,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
@@ -40,6 +45,14 @@ builder.Services.AddAutoMapper(typeof(UserMapper));
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<ISTITestingService, STITestingService>();
+builder.Services.AddScoped<ITestResultService, TestResultService>();
+builder.Services.AddScoped<IMenstrualCycleTrackingService, MenstrualCycleTrackingService>();
 builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
