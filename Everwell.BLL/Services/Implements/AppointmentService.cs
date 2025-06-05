@@ -83,8 +83,6 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 if (existingAppointment == null) return null;
 
                 existingAppointment.AppointmentDate = appointment.AppointmentDate;
-                existingAppointment.StartTime = appointment.StartTime;
-                existingAppointment.EndTime = appointment.EndTime;
                 existingAppointment.Status = appointment.Status;
                 existingAppointment.Notes = appointment.Notes;
                 
