@@ -124,7 +124,11 @@ D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\refint\
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.pdb
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.genruntimeconfig.cache
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\ref\Everwell.API.dll
+<<<<<<< HEAD
 D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+=======
+D:\coding\fpt\SWP391\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\AutoMapper.dll
+>>>>>>> 8a97ac1725fc1a5d085520886ad240ee4e33dac9
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\appsettings.Development.json
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Everwell.API.staticwebassets.endpoints.json
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Everwell.API.exe
@@ -133,6 +137,10 @@ D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Ever
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Everwell.API.runtimeconfig.json
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Everwell.API.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Everwell.API.pdb
+<<<<<<< HEAD
+=======
+D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\AutoMapper.dll
+>>>>>>> 8a97ac1725fc1a5d085520886ad240ee4e33dac9
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Humanizer.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
@@ -247,4 +255,7 @@ D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\refi
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\Everwell.API.pdb
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\Everwell.API.genruntimeconfig.cache
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\ref\Everwell.API.dll
+<<<<<<< HEAD
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\AutoMapper.dll
+=======
+>>>>>>> 8a97ac1725fc1a5d085520886ad240ee4e33dac9

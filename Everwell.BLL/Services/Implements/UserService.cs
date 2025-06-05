@@ -67,9 +67,15 @@ namespace Everwell.BLL.Services.Implements
                     {
                         throw new InvalidOperationException("A user with this email already exists.");
                     }
+<<<<<<< HEAD
                     
                     var newUser = _mapper.Map<User>(request);
 
+=======
+
+                    var newUser = _mapper.Map<User>(request);
+
+>>>>>>> 8a97ac1725fc1a5d085520886ad240ee4e33dac9
                     // Add the new user
                     await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
 

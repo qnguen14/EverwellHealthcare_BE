@@ -46,14 +46,17 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("PostStatus")]
+        [EnumDataType(typeof(PostStatus))]
         public PostStatus Status { get; set; } = PostStatus.Pending;
 
         [Required]
         [Column("PostCategory")]
+        [EnumDataType(typeof(PostCategory))]
         public PostCategory Category { get; set; } 
 
         [Required]
         [Column("staff_id")]
+        [ForeignKey("Customer")]
         public Guid StaffId { get; set; }
         public virtual User Staff { get; set; }
 
