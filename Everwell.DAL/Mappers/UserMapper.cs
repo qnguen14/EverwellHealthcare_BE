@@ -63,6 +63,29 @@ namespace Everwell.DAL.Mappers.User
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
                 .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+
+            // CreateUserResponse to GetUserResponse
+            CreateMap<CreateUserResponse, GetUserResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => (string)null)) // Default null since CreateUserResponse doesn't have this
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+
+            // UpdateProfileRequest to User (partial mapping)
+            CreateMap<UpdateProfileRequest, Data.Entities.User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Role, opt => opt.Ignore())
+                .ForMember(dest => dest.Password, opt => opt.Ignore())
+                .ForMember(dest => dest.AvatarUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.Posts, opt => opt.Ignore())
+                .ForMember(dest => dest.STITests, opt => opt.Ignore())
+                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore())
+                .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore());
         }
     }
 }

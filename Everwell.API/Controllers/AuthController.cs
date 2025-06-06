@@ -85,6 +85,38 @@ public async Task<IActionResult> VerifyCodeAndReset([FromBody] VerifyCodeAndRese
         return StatusCode(500, "An error occurred while resetting your password.");
     }
 }
+[HttpPost(ApiEndpointConstants.Auth.RegisterEndpoint)]
+public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+{
+    if (request == null)
+    {
+        return BadRequest("Invalid registration request.");
+    }
+
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState);
+    }
+
+    try
+    {
+        var response = await _authService.Register(request);
+        
+        if (response.Success)
+        {
+            return Ok(response);
+        }
+        else
+        {
+            return BadRequest(response);
+        }
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+            new { Success = false, Message = "An error occurred during registration." });
+    }
+}
 
     }
 }

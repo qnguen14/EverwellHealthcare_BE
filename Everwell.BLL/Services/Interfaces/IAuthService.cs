@@ -1,4 +1,5 @@
 ﻿using Everwell.DAL.Data.Requests.Auth;
+using Everwell.DAL.Data.Requests.User;
 using Everwell.DAL.Data.Responses.Auth;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Everwell.BLL.Services.Interfaces
     public interface IAuthService
     {
         Task<LoginResponse> Login(LoginRequest request);
+        Task<RegisterResponse> Register(RegisterRequest request);
         Task<bool> SendPasswordResetCodeAsync(string email);
         Task<bool> VerifyResetCodeAndResetPasswordAsync(string code, string email, string newPassword);
     }

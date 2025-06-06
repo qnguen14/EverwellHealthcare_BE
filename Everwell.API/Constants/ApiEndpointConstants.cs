@@ -26,6 +26,11 @@
             public const string CreateUserEndpoint = UserEndpoint + "/create"; 
             public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
             public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";
+            
+            // New endpoints
+            public const string SetRoleEndpoint = UserEndpoint + "/set-role/{id}";
+            public const string UpdateProfileEndpoint = UserEndpoint + "/profile/{id}";
+            public const string UpdateAvatarEndpoint = UserEndpoint + "/avatar/{id}";
         }
 
         public static class Service

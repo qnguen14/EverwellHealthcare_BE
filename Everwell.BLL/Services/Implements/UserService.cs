@@ -271,5 +271,137 @@ namespace Everwell.BLL.Services.Implements
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<UpdateUserResponse> SetUserRole(Guid userId, SetUserRoleRequest request)
+        {
+            try
+            {
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                {
+                    if (request == null)
+                    {
+                        throw new ArgumentNullException(nameof(request), "Request cannot be null.");
+                    }
+
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                            predicate: u => u.Id == userId && u.IsActive
+                        );
+
+                    if (existingUser == null)
+                    {
+                        throw new InvalidOperationException("User not found.");
+                    }
+
+                    // Parse and set the role
+                    if (Enum.TryParse<Role>(request.Role, true, out Role role))
+                    {
+                        existingUser.Role = role;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid role: {request.Role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(Role)))}");
+                    }
+
+                    // Update the user
+                    _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
+
+                    return _mapper.Map<UpdateUserResponse>(existingUser);
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to update user role: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<UpdateUserResponse> UpdateProfile(Guid userId, UpdateProfileRequest request)
+        {
+            try
+            {
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                {
+                    if (request == null)
+                    {
+                        throw new ArgumentNullException(nameof(request), "Request cannot be null.");
+                    }
+
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                            predicate: u => u.Id == userId && u.IsActive
+                        );
+
+                    if (existingUser == null)
+                    {
+                        throw new InvalidOperationException("User not found.");
+                    }
+
+                    // Check if email is being changed and if it's already taken
+                    if (existingUser.Email != request.Email)
+                    {
+                        var emailExists = await _unitOfWork.GetRepository<User>()
+                            .FirstOrDefaultAsync(
+                                predicate: u => u.Email == request.Email && u.IsActive && u.Id != userId
+                            );
+
+                        if (emailExists != null)
+                        {
+                            throw new InvalidOperationException("A user with this email already exists.");
+                        }
+                    }
+
+                    // Update profile fields (not role - that's handled separately)
+                    existingUser.Name = request.Name;
+                    existingUser.Email = request.Email;
+                    existingUser.PhoneNumber = request.PhoneNumber;
+                    existingUser.Address = request.Address;
+
+                    // Update the user
+                    _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
+
+                    return _mapper.Map<UpdateUserResponse>(existingUser);
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to update user profile: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<UpdateUserResponse> UpdateAvatar(Guid userId, UpdateAvatarRequest request)
+        {
+            try
+            {
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                {
+                    if (request == null)
+                    {
+                        throw new ArgumentNullException(nameof(request), "Request cannot be null.");
+                    }
+
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                            predicate: u => u.Id == userId && u.IsActive
+                        );
+
+                    if (existingUser == null)
+                    {
+                        throw new InvalidOperationException("User not found.");
+                    }
+
+                    // Update avatar URL
+                    existingUser.AvatarUrl = request.AvatarUrl;
+
+                    // Update the user
+                    _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
+
+                    return _mapper.Map<UpdateUserResponse>(existingUser);
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to update user avatar: {ex.Message}", ex);
+            }
+        }
     }
 }

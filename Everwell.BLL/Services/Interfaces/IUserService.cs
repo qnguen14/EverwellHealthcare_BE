@@ -20,5 +20,10 @@ namespace Everwell.BLL.Services.Interfaces
         // Add these new methods for password reset functionality
         Task<GetUserResponse> GetUserByEmailAsync(string email);
         Task<bool> UpdatePasswordAsync(Guid userId, string newPassword);
+        
+        // New methods for admin role management and profile updates
+        Task<UpdateUserResponse> SetUserRole(Guid userId, SetUserRoleRequest request);
+        Task<UpdateUserResponse> UpdateProfile(Guid userId, UpdateProfileRequest request);
+        Task<UpdateUserResponse> UpdateAvatar(Guid userId, UpdateAvatarRequest request);
     }
 }

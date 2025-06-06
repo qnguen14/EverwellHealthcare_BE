@@ -10,6 +10,7 @@ using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using Everwell.DAL.Data.Requests.User;
 
 namespace Everwell.BLL.Services.Implements
 {
@@ -197,6 +198,68 @@ namespace Everwell.BLL.Services.Implements
             {
                 Console.WriteLine($"Error resetting password: {ex.Message}");
                 return false;
+            }
+        }
+
+        public async Task<RegisterResponse> Register(RegisterRequest request)
+        {
+            try
+            {
+                // Check if email already exists
+                var existingUser = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(u => u.Email == request.Email, null, null);
+                
+                if (existingUser != null)
+                {
+                    return new RegisterResponse
+                    {
+                        Success = false,
+                        Message = "Email already exists. Please use a different email address."
+                    };
+                }
+
+                // Create user with Customer role (default role for public registration)
+                var createUserRequest = new CreateUserRequest
+                {
+                    Name = request.Name,
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                    Address = request.Address,
+                    Password = request.Password,
+                    Role = Role.Customer.ToString() // Default role for public registration
+                };
+
+                // Use the existing UserService to create the user
+                var userResponse = await _userService.CreateUser(createUserRequest);
+
+                // Convert CreateUserResponse to GetUserResponse manually (safer approach)
+                var getUserResponse = new GetUserResponse
+                {
+                    Id = userResponse.Id,
+                    Name = userResponse.Name,
+                    Email = userResponse.Email,
+                    PhoneNumber = userResponse.PhoneNumber,
+                    Address = userResponse.Address,
+                    Role = userResponse.Role,
+                    AvatarUrl = null, // Default for new users
+                    IsActive = userResponse.IsActive
+                };
+
+                return new RegisterResponse
+                {
+                    Success = true,
+                    Message = "User registered successfully. You can now login with your credentials.",
+                    User = getUserResponse
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Registration error: {ex.Message}");
+                return new RegisterResponse
+                {
+                    Success = false,
+                    Message = "An error occurred during registration. Please try again."
+                };
             }
         }
     }
