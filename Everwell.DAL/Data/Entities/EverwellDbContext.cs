@@ -126,6 +126,14 @@ namespace Everwell.DAL.Data.Entities
                     .HasForeignKey(q => q.ConsultantId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
+
+            // BlacklistedToken configuration
+            modelBuilder.Entity<BlacklistedToken>(entity =>
+            {
+                entity.HasKey(bt => bt.Id);
+                entity.HasIndex(bt => bt.TokenHash).IsUnique();
+                entity.HasIndex(bt => bt.ExpiresAt);
+            });
         }
 
         public DbSet<User> Users { get; set; }
@@ -134,5 +142,10 @@ namespace Everwell.DAL.Data.Entities
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<STITesting> STITests { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
+        public DbSet<MenstrualCycleTracking> MenstrualCycleTrackings { get; set; }
+        public DbSet<MenstrualCycleNotification> MenstrualCycleNotifications { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
     }
 }

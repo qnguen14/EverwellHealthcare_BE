@@ -6,5 +6,10 @@ namespace Everwell.BLL.Services.Interfaces
     {
         string GeneratePasswordResetCode(Guid userId);
         bool ValidatePasswordResetCode(string code, string email, out Guid userId);
+
+        // Blacklist token
+        Task<bool> BlacklistTokenAsync(string token);
+        Task<bool> IsTokenBlacklistedAsync(string token);
+        Task CleanupExpiredTokensAsync();
     }
 }

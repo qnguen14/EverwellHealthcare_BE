@@ -3,6 +3,7 @@ using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Everwell.BLL.Infrastructure;
 using Everwell.API.Extensions;
+using Everwell.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,8 @@ using Everwell.DAL.Mappers.User;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+TimeZoneInfo.ClearCachedData();
+var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -112,7 +114,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseCors(options =>
 {
     options.SetIsOriginAllowed(origin =>
@@ -122,10 +123,10 @@ app.UseCors(options =>
         .AllowCredentials();
 });
 
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseMiddleware<TokenBlacklistMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

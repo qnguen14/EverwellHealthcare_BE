@@ -4,6 +4,8 @@ using Everwell.DAL.Data.Requests.Auth;
 using Everwell.DAL.Data.Requests.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace Everwell.API.Controllers
 {
@@ -115,6 +117,37 @@ public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         return StatusCode(StatusCodes.Status500InternalServerError, 
             new { Success = false, Message = "An error occurred during registration." });
+    }
+}
+
+[HttpPost(ApiEndpointConstants.Auth.LogoutEndpoint)]
+[Authorize]
+public async Task<IActionResult> Logout()
+{
+    try
+    {
+        // Get the token from the Authorization header
+        var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(authHeader))
+        {
+            return BadRequest("Authorization header is missing.");
+        }
+
+        var response = await _authService.Logout(authHeader);
+        
+        if (response.Success)
+        {
+            return Ok(response);
+        }
+        else
+        {
+            return BadRequest(response);
+        }
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+            new { Success = false, Message = "An error occurred during logout." });
     }
 }
 
