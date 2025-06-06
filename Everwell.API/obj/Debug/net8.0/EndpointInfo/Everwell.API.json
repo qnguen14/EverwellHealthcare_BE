@@ -208,6 +208,18 @@
         }
       }
     },
+    "/api/v1/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/feedback/getall": {
       "get": {
         "tags": [
@@ -1693,7 +1705,7 @@
           },
           "password": {
             "maxLength": 20,
-            "minLength": 6,
+            "minLength": 3,
             "type": "string"
           },
           "confirmPassword": {

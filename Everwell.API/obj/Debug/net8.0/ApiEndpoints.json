@@ -108,6 +108,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Everwell.API.Controllers.AuthController",
+    "Method": "Logout",
+    "RelativePath": "api/v1/logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
     "Method": "GetMenstrualCycleTrackingById",
     "RelativePath": "api/v1/menstrualcycletracking/{id}",
