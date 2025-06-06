@@ -262,5 +262,55 @@ namespace Everwell.BLL.Services.Implements
                 };
             }
         }
+
+        public async Task<LogoutResponse> Logout(string token)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return new LogoutResponse
+                    {
+                        Success = false,
+                        Message = "Token is required for logout."
+                    };
+                }
+
+                // Remove "Bearer " prefix if present
+                if (token.StartsWith("Bearer "))
+                {
+                    token = token.Substring(7);
+                }
+
+                // Blacklist the token
+                var blacklisted = await _tokenService.BlacklistTokenAsync(token);
+
+                if (blacklisted)
+                {
+                    return new LogoutResponse
+                    {
+                        Success = true,
+                        Message = "Logged out successfully."
+                    };
+                }
+                else
+                {
+                    return new LogoutResponse
+                    {
+                        Success = false,
+                        Message = "Failed to logout. Please try again."
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Logout error: {ex.Message}");
+                return new LogoutResponse
+                {
+                    Success = false,
+                    Message = "An error occurred during logout."
+                };
+            }
+        }
     }
 }
