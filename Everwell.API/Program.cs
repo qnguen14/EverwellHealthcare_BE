@@ -3,6 +3,7 @@ using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Everwell.BLL.Infrastructure;
 using Everwell.API.Extensions;
+using Everwell.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,8 @@ using Everwell.DAL.Mappers;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+TimeZoneInfo.ClearCachedData();
+var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -26,6 +28,8 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
+builder.Services.AddMemoryCache();
+
 builder.Services.AddDbContext<EverwellDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection"),
@@ -54,6 +58,8 @@ builder.Services.AddScoped<ISTITestingService, STITestingService>();
 builder.Services.AddScoped<ITestResultService, TestResultService>();
 builder.Services.AddScoped<IMenstrualCycleTrackingService, MenstrualCycleTrackingService>();
 builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -110,7 +116,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseCors(options =>
 {
     options.SetIsOriginAllowed(origin =>
@@ -120,10 +125,10 @@ app.UseCors(options =>
         .AllowCredentials();
 });
 
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseMiddleware<TokenBlacklistMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -108,6 +108,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Everwell.API.Controllers.AuthController",
+    "Method": "Logout",
+    "RelativePath": "api/v1/logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
     "Method": "GetMenstrualCycleTrackingById",
     "RelativePath": "api/v1/menstrualcycletracking/{id}",
@@ -244,6 +254,22 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AuthController",
+    "Method": "Register",
+    "RelativePath": "api/v1/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.RegisterRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "Everwell.API.Controllers.ServicesController",
@@ -411,6 +437,37 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
+    "Method": "UpdateAvatar",
+    "RelativePath": "api/v1/user/avatar/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.UpdateAvatarRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Responses.User.UpdateUserResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "CreateUser",
     "RelativePath": "api/v1/user/create",
     "HttpMethod": "POST",
@@ -473,6 +530,68 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
+    "Method": "UpdateProfile",
+    "RelativePath": "api/v1/user/profile/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.UpdateProfileRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Responses.User.UpdateUserResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.UsersController",
+    "Method": "SetUserRole",
+    "RelativePath": "api/v1/user/set-role/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.SetUserRoleRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Responses.User.UpdateUserResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateUser",
     "RelativePath": "api/v1/user/update/{id}",
     "HttpMethod": "PUT",
@@ -501,5 +620,37 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AuthController",
+    "Method": "SendResetCode",
+    "RelativePath": "send-reset-code",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.ForgotPasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AuthController",
+    "Method": "VerifyCodeAndReset",
+    "RelativePath": "verify-code-and-reset",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.User.VerifyCodeAndResetRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

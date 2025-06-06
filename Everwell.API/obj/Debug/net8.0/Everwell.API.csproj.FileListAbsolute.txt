@@ -121,17 +121,6 @@ D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\refi
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\Everwell.API.pdb
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\Everwell.API.genruntimeconfig.cache
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\obj\Debug\net8.0\ref\Everwell.API.dll
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.csproj.AssemblyReference.cache
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.GeneratedMSBuildEditorConfig.editorconfig
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.AssemblyInfoInputs.cache
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.AssemblyInfo.cs
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.csproj.CoreCompileInputs.cache
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.MvcApplicationPartsAssemblyInfo.cs
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.MvcApplicationPartsAssemblyInfo.cache
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.sourcelink.json
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.dll
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\refint\Everwell.API.dll
-D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.pdb
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\appsettings.Development.json
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.API.staticwebassets.endpoints.json
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.API.exe
@@ -141,6 +130,7 @@ D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.API.r
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.API.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.API.pdb
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\AutoMapper.dll
+D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\BCrypt.Net-Next.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Humanizer.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
@@ -235,6 +225,14 @@ D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.BLL.d
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.DAL.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.BLL.pdb
 D:\Gender System\GenderMngSystem_BE\Everwell.API\bin\Debug\net8.0\Everwell.DAL.pdb
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.csproj.AssemblyReference.cache
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.GeneratedMSBuildEditorConfig.editorconfig
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.AssemblyInfoInputs.cache
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.AssemblyInfo.cs
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.csproj.CoreCompileInputs.cache
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.MvcApplicationPartsAssemblyInfo.cs
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.MvcApplicationPartsAssemblyInfo.cache
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.sourcelink.json
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\scopedcss\bundle\Everwell.API.styles.css
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\staticwebassets.build.json
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\staticwebassets.development.json
@@ -247,5 +245,8 @@ D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\staticwebasset
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\staticwebassets.pack.json
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.A6BC451D.Up2Date
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.dll
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\refint\Everwell.API.dll
+D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.pdb
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.genruntimeconfig.cache
 D:\Gender System\GenderMngSystem_BE\Everwell.API\obj\Debug\net8.0\ref\Everwell.API.dll
