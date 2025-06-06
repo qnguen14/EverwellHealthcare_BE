@@ -19,7 +19,7 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet(ApiEndpointConstants.Appointment.GetAllAppointmentsEndpoint)]
     [Authorize(Roles = "Admin,Customer,Consultant")]
-    public async Task<ActionResult<IEnumerable<Appointment>>> GetAllAppointments()
+    public async Task<IActionResult> GetAllAppointments()
     {
         try
         {
@@ -34,7 +34,7 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet(ApiEndpointConstants.Appointment.GetAppointmentEndpoint)]
     [Authorize(Roles =  "Admin,Customer,Consultant")]
-    public async Task<ActionResult<Appointment>> GetAppointmentById(Guid id)
+    public async Task<IActionResult> GetAppointmentById(Guid id)
     {
         try
         {
@@ -52,7 +52,7 @@ public class AppointmentsController : ControllerBase
     
     [HttpPost(ApiEndpointConstants.Appointment.CreateAppointmentEndpoint)]
     [Authorize(Roles =  "Admin,Customer,Consultant")]
-    public async Task<ActionResult<Appointment>> CreateAppointment(CreateAppointmentRequest request)
+    public async Task<IActionResult> CreateAppointment(CreateAppointmentRequest request)
     {
         try
         {
