@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Everwell.DAL.Data.Requests.User;
 using AutoMapper;
+using Everwell.DAL.Data.Exceptions;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -31,19 +32,21 @@ namespace Everwell.BLL.Services.Implements
             {
                 var users = await _unitOfWork.GetRepository<User>()
                     .GetListAsync(
-                        predicate: u => u.IsActive
+                        predicate: u => u.IsActive,
+                        orderBy: u => u.OrderBy(n => n.Name)
                     );
 
                 if (users == null || !users.Any())
                 {
-                    throw new DirectoryNotFoundException("No active users found.");
+                    throw new NotFoundException("No active users found.");
                 }
 
                 return _mapper.Map<IEnumerable<CreateUserResponse>>(users);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                _logger.LogError("An error occurred while retrieving users: " + ex.Message);
+                throw;
             }
         }
 
@@ -65,7 +68,7 @@ namespace Everwell.BLL.Services.Implements
                                 predicate: u => u.Email == request.Email && u.IsActive);
                     if (existingUser != null)
                     {
-                        throw new InvalidOperationException("A user with this email already exists.");
+                        throw new BadRequestException("A user with this email already exists.");
                     }
 
                     var newUser = _mapper.Map<User>(request);
@@ -78,7 +81,8 @@ namespace Everwell.BLL.Services.Implements
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                _logger.LogError("An error occurred while creating: " + ex.Message);
+                throw;
             }
         }
 
@@ -93,14 +97,15 @@ namespace Everwell.BLL.Services.Implements
 
                 if (user == null)
                 {
-                    throw new InvalidOperationException("User not found.");
+                    throw new NotFoundException("User not found.");
                 }
 
                 return _mapper.Map<GetUserResponse>(user);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                _logger.LogError("An error occurred while retrieving user by ID: {Id}. Error: {Message}", id, ex.Message);
+                throw;
             }
         }
 
@@ -122,7 +127,7 @@ namespace Everwell.BLL.Services.Implements
 
                     if (existingUser == null)
                     {
-                        throw new InvalidOperationException("User not found.");
+                        throw new NotFoundException("User not found.");
                     }
 
                     // Check if email is being changed and if it's already taken
@@ -135,7 +140,7 @@ namespace Everwell.BLL.Services.Implements
 
                         if (emailExists != null)
                         {
-                            throw new InvalidOperationException("A user with this email already exists.");
+                            throw new BadRequestException("A user with this email already exists.");
                         }
                     }
 
@@ -167,7 +172,7 @@ namespace Everwell.BLL.Services.Implements
 
                     if (existingUser == null)
                     {
-                        throw new InvalidOperationException("User not found.");
+                        throw new NotFoundException("User not found.");
                     }
 
                     // Soft delete by setting IsActive to false

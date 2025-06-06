@@ -2,6 +2,7 @@ using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Everwell.DAL.Data.Exceptions;
 using Everwell.DAL.Data.Requests.Appointments;
 using Everwell.DAL.Data.Responses.Appointments;
 using Everwell.DAL.Repositories.Interfaces;
@@ -29,7 +30,8 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                                     && a.Consultant.IsActive == true,
                     include: a => a.Include(ap => ap.Customer)
                                   .Include(ap => ap.Consultant)
-                                  .Include(ap => ap.Service));
+                                  .Include(ap => ap.Service),
+                    orderBy: a => a.OrderBy(ap => ap.AppointmentDate));
             
             if (appointments != null && appointments.Any())
             {
@@ -37,7 +39,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             }
             else
             {
-                throw new DirectoryNotFoundException("No appointments found");
+                throw new NotFoundException("No appointments found");
             }
             
         }
@@ -63,7 +65,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             
             if (appointment == null)
             {
-                throw new KeyNotFoundException($"Appointment with id {id} not found.");
+                throw new NotFoundException($"Appointment with id {id} not found.");
             }
             
             return _mapper.Map<CreateAppointmentsResponse>(appointment);
@@ -75,6 +77,34 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
+    public async Task<IEnumerable<GetAppointmentConsultantResponse>> GetAppointmentsByConsultant(Guid id)
+    {
+        try
+        {
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: a => a.ConsultantId == id &&
+                                    a.Customer.IsActive &&
+                                    a.Consultant.IsActive,
+                    include: a => a.Include(ap => ap.Customer)
+                        .Include(ap => ap.Consultant)
+                        .Include(ap => ap.Service),
+                    orderBy: a => a.OrderBy(ap => ap.AppointmentDate));
+
+            if (appointments == null || !appointments.Any())
+            {
+                throw new NotFoundException($"No appointments found for consultant with id {id}");
+            }
+
+            return _mapper.Map<IEnumerable<GetAppointmentConsultantResponse>>(appointments);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting appointments by consultant id: {Id}", id);
+            throw;
+        }
+    }
+    
     public async Task<CreateAppointmentsResponse> CreateAppointmentAsync(CreateAppointmentRequest request)
     {
         try
@@ -97,7 +127,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                     existingAppointment.Customer.IsActive &&
                     existingAppointment.Consultant.IsActive)
                 {
-                    throw new InvalidOperationException("An appointment already exists for the specified date, slot, and consultant.");
+                    throw new BadRequestException("An appointment already exists for the specified date, slot, and consultant.");
                 }
                 
                 var newAppointment = _mapper.Map<Appointment>(request);
@@ -114,7 +144,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<Appointment?> UpdateAppointmentAsync(Guid id, Appointment appointment)
+    public async Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, Appointment appointment)
     {
         try
         {
@@ -122,15 +152,19 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             {
                 var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
                     .FirstOrDefaultAsync(predicate: a => a.Id == id);
-                
-                if (existingAppointment == null) return null;
+
+                if (existingAppointment == null)
+                {
+                    throw new NotFoundException($"Appointment with ID {id} not found");
+                }
 
                 existingAppointment.AppointmentDate = appointment.AppointmentDate;
                 existingAppointment.Status = appointment.Status;
                 existingAppointment.Notes = appointment.Notes;
                 
                 _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
-                return existingAppointment;
+                
+                return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
             });
         }
         catch (Exception ex)
@@ -140,7 +174,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<bool> DeleteAppointmentAsync(Guid id)
+    public async Task<DeleteAppointmentResponse> DeleteAppointmentAsync(Guid id)
     {
         try
         {
@@ -149,10 +183,16 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 var appointment = await _unitOfWork.GetRepository<Appointment>()
                     .FirstOrDefaultAsync(predicate: a => a.Id == id);
                 
-                if (appointment == null) return false;
+                if (appointment == null)
+                {
+                    throw new NotFoundException($"Appointment with ID {id} not found");
+                };
 
                 _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointment);
-                return true;
+                var response = _mapper.Map<DeleteAppointmentResponse>(appointment);
+                response.IsDeleted = true;
+                response.Message = "Appointment deleted successfully";
+                return response;
             });
         }
         catch (Exception ex)

@@ -42,6 +42,7 @@
         {
             public const string AppointmentEndpoint = ApiEndpoint + "/appointment";
             public const string GetAllAppointmentsEndpoint = AppointmentEndpoint + "/getall";
+            public const string GetAppointmentsByConsultantEndpoint = AppointmentEndpoint + "/consultant/{id}";
             public const string GetAppointmentEndpoint = AppointmentEndpoint + "/{id}";
             public const string CreateAppointmentEndpoint = AppointmentEndpoint + "/create";
             public const string UpdateAppointmentEndpoint = AppointmentEndpoint + "/update/{id}";

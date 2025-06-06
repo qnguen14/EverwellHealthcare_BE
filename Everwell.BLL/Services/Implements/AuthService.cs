@@ -10,6 +10,8 @@ using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using Everwell.DAL.Data.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Everwell.BLL.Services.Implements
 {
@@ -19,13 +21,15 @@ namespace Everwell.BLL.Services.Implements
         private readonly TokenProvider _tokenProvider;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(IUnitOfWork<EverwellDbContext> unitOfWork, TokenProvider tokenProvider, IConfiguration configuration, IMapper mapper)
+        public AuthService(IUnitOfWork<EverwellDbContext> unitOfWork, TokenProvider tokenProvider, IConfiguration configuration, IMapper mapper, ILogger<AuthService> logger)
         {
             _unitOfWork = unitOfWork;
             _tokenProvider = tokenProvider;
             _configuration = configuration;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -35,20 +39,20 @@ namespace Everwell.BLL.Services.Implements
                 // Validate input
                 if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
                 {
-                    throw new ArgumentException("Email and password must be provided.");
+                    throw new NotFoundException("Email and password must be provided.");
                 }
 
                 // Fetch user from the database
                 var user = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive, null, null);
                 if (user == null)
                 {
-                    throw new UnauthorizedAccessException("Invalid email or password.");
+                    throw new UnauthorizedException("Invalid email or password.");
                 }
 
                 // Verify password (replace with actual password hashing logic)
                 if (!VerifyPassword(request.Password, user.Password))
                 {
-                    throw new UnauthorizedAccessException("Invalid email or password.");
+                    throw new UnauthorizedException("Invalid email or password.");
                 }
 
                 // Generate token (replace with actual token generation logic, e.g., JWT)
@@ -58,17 +62,20 @@ namespace Everwell.BLL.Services.Implements
                 var userResponse = _mapper.Map<GetUserResponse>(user);
 
                 // Return response
-                return new LoginResponse
+                var response = new LoginResponse
                 {
                     Token = token,
                     FullName = userResponse.Name,
                     Email = userResponse.Email,
                     Expiration = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["Jwt:ExpirationInMinutes"]))
                 };
+
+                return response;
             }
             catch (Exception ex)
             {
-                throw new Exception($"An error occurred during login: {ex.Message}", ex);
+                _logger.LogError(ex, "An error occurred during login.");
+                throw;
             }
         }
 

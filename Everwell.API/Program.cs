@@ -91,12 +91,14 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdminRole", policy =>
         policy.RequireRole(Role.Admin.ToString()));
-    //options.AddPolicy("RequireProjectManagerRole", policy =>
-    //    policy.RequireRole(SystemRole.Approver.ToString()));
-    //options.AddPolicy("RequireFinanceRole", policy =>
-    //    policy.RequireRole(SystemRole.Finance.ToString()));
-    //options.AddPolicy("RequireStaffRole", policy =>
-    //    policy.RequireRole(SystemRole.Staff.ToString()));
+    options.AddPolicy("RequireManagerRole", policy =>
+        policy.RequireRole(Role.Manager.ToString()));
+    options.AddPolicy("RequireConsultant", policy =>
+        policy.RequireRole(Role.Consultant.ToString()));
+    options.AddPolicy("RequireStaffRole", policy =>
+        policy.RequireRole(Role.Staff.ToString()));
+    options.AddPolicy("RequireCustomerRole", policy =>
+        policy.RequireRole(Role.Customer.ToString()));
 });
 
 var app = builder.Build();

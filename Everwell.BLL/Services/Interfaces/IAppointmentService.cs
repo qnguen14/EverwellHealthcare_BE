@@ -8,7 +8,8 @@ public interface IAppointmentService
 {
     Task<IEnumerable<CreateAppointmentsResponse>> GetAllAppointmentsAsync();
     Task<CreateAppointmentsResponse> GetAppointmentByIdAsync(Guid id); // to do: getappointmentresponse
+    Task<IEnumerable<GetAppointmentConsultantResponse>> GetAppointmentsByConsultant (Guid id); // to do: getappointmentresponse
     Task<CreateAppointmentsResponse> CreateAppointmentAsync(CreateAppointmentRequest request);
-    Task<Appointment?> UpdateAppointmentAsync(Guid id, Appointment appointment);
-    Task<bool> DeleteAppointmentAsync(Guid id);
+    Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, Appointment appointment);
+    Task<DeleteAppointmentResponse> DeleteAppointmentAsync(Guid id);
 }

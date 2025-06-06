@@ -1,5 +1,6 @@
 ﻿using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
+using Everwell.DAL.Data.Metadata;
 using Everwell.DAL.Data.Requests.User;
 using Everwell.DAL.Data.Responses.User;
 using Microsoft.AspNetCore.Authorization;
@@ -12,13 +13,17 @@ namespace Everwell.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger _logger;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, ILogger logger)
         {
             _userService = userService;
         }
 
         [HttpGet(ApiEndpointConstants.User.GetAllUsersEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateUserResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<CreateUserResponse>>> GetUsers()
         {
@@ -27,6 +32,9 @@ namespace Everwell.API.Controllers
         }
 
         [HttpPost(ApiEndpointConstants.User.CreateUserEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CreateUserResponse>> CreateUser(CreateUserRequest request)
         {
@@ -35,6 +43,9 @@ namespace Everwell.API.Controllers
         }
 
         [HttpGet(ApiEndpointConstants.User.GetUserEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<GetUserResponse>> GetUserById(Guid id)
         {
@@ -52,8 +63,13 @@ namespace Everwell.API.Controllers
                 return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
         }
+        
+        //to do: fix update and delete to follow other controller patterns
 
         [HttpPut(ApiEndpointConstants.User.UpdateUserEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UpdateUserResponse>> UpdateUser(Guid id, UpdateUserRequest request)
         {
@@ -77,6 +93,9 @@ namespace Everwell.API.Controllers
         }
 
         [HttpDelete(ApiEndpointConstants.User.DeleteUserEndpoint)]
+        // [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
+        // [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        // [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteUser(Guid id)
         {

@@ -57,6 +57,24 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
                 .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl));
             // .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+            
+            // Appointment to GetAppointmentConsultantResponse
+            CreateMap<Appointment, GetAppointmentConsultantResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceId))
+                .ForMember(dest => dest.AppointmentDate, opt => opt.MapFrom(src => src.AppointmentDate))
+                .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
+            
+            // Appointment to DeleteAppointmentResponse
+            CreateMap<Appointment, DeleteAppointmentResponse>()
+                .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore()) // Set this in your service logic
+                .ForMember(dest => dest.Message, opt => opt.Ignore());  // Set this in your service logic
         }
     }
 }
