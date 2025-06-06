@@ -18,6 +18,7 @@ An integrated web-based platform for managing services related to sexual and rep
 - AutoMapper for object mapping.
 - Hangfire for background jobs.
 - JWT Bearer authentication.
+- BCrypt.NET for encryptions.
 - Swagger/OpenAPI documentation.
 
 ### Database & Storage (not yet implemented): 
