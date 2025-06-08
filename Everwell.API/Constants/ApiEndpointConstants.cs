@@ -113,5 +113,14 @@
             public const string UpdateMenstrualCycleTrackingEndpoint = MenstrualCycleTrackingEndpoint + "/update/{id}";
             public const string DeleteMenstrualCycleTrackingEndpoint = MenstrualCycleTrackingEndpoint + "/delete/{id}";
         }
+
+        public static class Dashboard
+        {
+            public const string DashboardEndpoint = ApiEndpoint + "/dashboard";
+            public const string GetDashboardDataEndpoint = DashboardEndpoint + "/data";
+            public const string GetDashboardStatsEndpoint = DashboardEndpoint + "/stats";
+            public const string GetUsersByRoleEndpoint = DashboardEndpoint + "/users-by-role";
+            public const string GetAppointmentsByStatusEndpoint = DashboardEndpoint + "/appointments-by-status";
+        }
     }
 }
