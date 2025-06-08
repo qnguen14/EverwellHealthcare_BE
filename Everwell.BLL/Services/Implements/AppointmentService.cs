@@ -201,4 +201,84 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             throw;
         }
     }
+
+    public async Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedules()
+    {
+        try
+        {
+            var schedules = _unitOfWork.GetRepository<ConsultantSchedule>()
+                .GetListAsync(
+                    predicate: s => s.Consultant.IsActive,
+                    include: s => s.Include(sc => sc.Consultant),
+                    orderBy: s => s.OrderBy(sc => sc.WorkDate)
+            );
+
+            if (schedules == null)
+            {
+                throw new NotFoundException("No consultant schedules found");
+            }
+
+            return _mapper.Map<IEnumerable<GetScheduleResponse>>(schedules);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting consultant schedules");
+            throw;
+        }
+    }
+
+    // Get Consultant Schedules by Their Id
+
+    public async Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedulesById(Guid id)
+    {
+        try
+        {
+            var schedules = _unitOfWork.GetRepository<ConsultantSchedule>()
+                .GetListAsync(
+                    predicate: s => s.ConsultantId == id 
+                                    && s.Consultant.IsActive,
+                    include: s => s.Include(sc => sc.Consultant),
+                    orderBy: s => s.OrderBy(sc => sc.WorkDate)
+            );
+
+            if (schedules == null)
+            {
+                throw new NotFoundException("No consultant schedules found");
+            }
+
+            return _mapper.Map<IEnumerable<GetScheduleResponse>>(schedules);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error occurred while getting consultant schedules with {id}");
+            throw;
+        }
+    }
+
+    public async Task<GetScheduleResponse> CreateConsultantSchedule(CreateAppointmentRequest request)
+    {
+        try
+        {
+            var schedule = _unitOfWork.GetRepository<ConsultantSchedule>()
+                .FirstOrDefaultAsync(
+                    predicate: s => s.Consultant.IsActive,
+                    include: s => s.Include(sc => sc.Consultant));
+            if (schedule == null)
+            {
+                throw new NotFoundException("No consultant schedules found");
+            }
+
+            var newSchedule = _mapper.Map<ConsultantSchedule>(request);
+
+            await _unitOfWork.GetRepository<ConsultantSchedule>().InsertAsync(newSchedule);
+
+            return _mapper.Map<GetScheduleResponse>(newSchedule);
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while creating consultant schedule");
+            throw;
+        }
+    }
 } 

@@ -8,7 +8,7 @@ public class ConsultantSchedule
 {
     [Key]
     [Column("schedule_id")]
-    public Guid ScheduleId { get; set; }
+    public Guid Id { get; set; }
 
     [Required]
     [Column("consultant_id")]
@@ -22,9 +22,15 @@ public class ConsultantSchedule
 
     [Required]
     [Column("shift_slot")]
-    public ShiftSlot ShiftSlot { get; set; }
+    public ShiftSlot Slot { get; set; }
 
     [Required]
     [Column("is_available")]
     public bool IsAvailable { get; set; } = true;
+
+    [Required]
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+
 }
