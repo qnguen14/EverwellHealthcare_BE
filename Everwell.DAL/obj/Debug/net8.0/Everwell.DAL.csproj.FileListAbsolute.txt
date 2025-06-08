@@ -1,18 +1,3 @@
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.deps.json
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.runtimeconfig.json
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.dll
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.pdb
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.csproj.AssemblyReference.cache
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.GeneratedMSBuildEditorConfig.editorconfig
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.AssemblyInfoInputs.cache
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.AssemblyInfo.cs
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.csproj.CoreCompileInputs.cache
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.sourcelink.json
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.dll
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\refint\Everwell.DAL.dll
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.pdb
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\Everwell.DAL.genruntimeconfig.cache
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.DAL\obj\Debug\net8.0\ref\Everwell.DAL.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.deps.json
 D:\Gender System\GenderMngSystem_BE\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.runtimeconfig.json
 D:\Gender System\GenderMngSystem_BE\Everwell.DAL\bin\Debug\net8.0\Everwell.DAL.dll
