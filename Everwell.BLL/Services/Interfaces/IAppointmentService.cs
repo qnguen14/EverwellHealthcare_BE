@@ -14,5 +14,5 @@ public interface IAppointmentService
     Task<DeleteAppointmentResponse> DeleteAppointmentAsync(Guid id);
     Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedules();
     Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedulesById(Guid id);
-    Task<GetScheduleResponse> CreateConsultantSchedule(CreateAppointmentRequest request);
+    Task<GetScheduleResponse> CreateConsultantSchedule(CreateScheduleRequest request);
 }

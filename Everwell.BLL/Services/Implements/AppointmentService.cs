@@ -206,7 +206,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
     {
         try
         {
-            var schedules = _unitOfWork.GetRepository<ConsultantSchedule>()
+            var schedules = await _unitOfWork.GetRepository<ConsultantSchedule>()
                 .GetListAsync(
                     predicate: s => s.Consultant.IsActive,
                     include: s => s.Include(sc => sc.Consultant),
@@ -233,7 +233,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
     {
         try
         {
-            var schedules = _unitOfWork.GetRepository<ConsultantSchedule>()
+            var schedules = await _unitOfWork.GetRepository<ConsultantSchedule>()
                 .GetListAsync(
                     predicate: s => s.ConsultantId == id 
                                     && s.Consultant.IsActive,
@@ -255,29 +255,38 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<GetScheduleResponse> CreateConsultantSchedule(CreateAppointmentRequest request)
+    public async Task<GetScheduleResponse> CreateConsultantSchedule(CreateScheduleRequest request)
     {
         try
         {
-            var schedule = _unitOfWork.GetRepository<ConsultantSchedule>()
-                .FirstOrDefaultAsync(
-                    predicate: s => s.Consultant.IsActive,
-                    include: s => s.Include(sc => sc.Consultant));
-            if (schedule == null)
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                throw new NotFoundException("No consultant schedules found");
-            }
+                var existingSchedule = await _unitOfWork.GetRepository<ConsultantSchedule>()
+                    .FirstOrDefaultAsync(
+                        predicate: s => s.ConsultantId == request.ConsultantId
+                                        && s.WorkDate == request.WorkDate
+                                        && s.Slot == request.Slot,
+                        include: s => s.Include(sc => sc.Consultant));
 
-            var newSchedule = _mapper.Map<ConsultantSchedule>(request);
+                if (existingSchedule != null)
+                {
+                    throw new BadRequestException("This schedule already exists for this consultant.");
+                }
 
-            await _unitOfWork.GetRepository<ConsultantSchedule>().InsertAsync(newSchedule);
+                var newSchedule = _mapper.Map<ConsultantSchedule>(request);
 
-            return _mapper.Map<GetScheduleResponse>(newSchedule);
+                // Ensure values are set properly
+                newSchedule.IsAvailable = request.IsAvailable;
+                newSchedule.CreatedAt = DateTime.UtcNow;
 
+                await _unitOfWork.GetRepository<ConsultantSchedule>().InsertAsync(newSchedule);
+
+                return _mapper.Map<GetScheduleResponse>(newSchedule);
+            });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while creating consultant schedule");
+            _logger.LogError(ex, "Error occurred while creating consultant schedule: {@Request}", request);
             throw;
         }
     }

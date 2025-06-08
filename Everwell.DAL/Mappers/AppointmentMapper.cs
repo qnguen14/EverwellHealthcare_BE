@@ -82,19 +82,18 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.ConsultantId, opt => opt.MapFrom(src => src.ConsultantId))
                 .ForMember(dest => dest.WorkDate, opt => opt.MapFrom(src => src.WorkDate))
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
-                .ForMember(dest => dest.IsAvailable, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
-
-
+                .ForMember(dest => dest.IsAvailable, opt => opt.MapFrom(src => src.IsAvailable))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now));
 
             // ConsultantSchedule to GetScheduleResponse
             CreateMap<ConsultantSchedule, GetScheduleResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.ConsultantId, opt => opt.MapFrom(src => src.ConsultantId))
+                .ForMember(dest => dest.Consultant, opt => opt.MapFrom(src => src.Consultant))
                 .ForMember(dest => dest.WorkDate, opt => opt.MapFrom(src => src.WorkDate))
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
-                .ForMember(dest => dest.IsAvailable, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
+                .ForMember(dest => dest.IsAvailable, opt => opt.MapFrom(src => src.IsAvailable))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
 
         }

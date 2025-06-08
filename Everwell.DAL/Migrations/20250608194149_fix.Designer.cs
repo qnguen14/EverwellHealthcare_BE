@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Everwell.DAL.Migrations
 {
     [DbContext(typeof(EverwellDbContext))]
-    [Migration("20250608141758_updated_consultantschedule")]
-    partial class updated_consultantschedule
+    [Migration("20250608194149_fix")]
+    partial class fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

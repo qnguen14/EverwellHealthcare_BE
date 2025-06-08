@@ -1,6 +1,7 @@
 using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
+using Everwell.DAL.Data.Exceptions;
 using Everwell.DAL.Data.Metadata;
 using Everwell.DAL.Data.Requests.Appointments;
 using Everwell.DAL.Data.Responses.Appointments;
@@ -249,27 +250,33 @@ public class AppointmentsController : ControllerBase
 
     [HttpPost(ApiEndpointConstants.Appointment.CreateConsultantScheduleEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<GetScheduleResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Admin, Staff, Consultant")]
-    public async Task<IActionResult> CreateConsultantSchedule(CreateAppointmentRequest request)
+    public async Task<IActionResult> CreateConsultantSchedule(CreateScheduleRequest request)
     {
         try
         {
             var response = await _appointmentService.CreateConsultantSchedule(request);
 
-            if (response != null)
-                return NotFound(new { message = "No schedules found for this consultant" });
-
             var apiResponse = new ApiResponse<GetScheduleResponse>
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment deleted successfully",
+                Message = "Schedule created successfully",
                 IsSuccess = true,
                 Data = response
             };
 
             return Ok(apiResponse);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = ex.Message,
+                IsSuccess = false
+            });
         }
         catch (Exception ex)
         {
