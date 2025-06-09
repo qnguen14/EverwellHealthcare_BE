@@ -292,3 +292,4 @@ D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\ru\M
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.MvcApplicationPartsAssemblyInfo.cs
