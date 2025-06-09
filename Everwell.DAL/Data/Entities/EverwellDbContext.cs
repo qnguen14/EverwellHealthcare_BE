@@ -130,7 +130,7 @@ namespace Everwell.DAL.Data.Entities
                     .HasForeignKey(cs => cs.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasIndex(cs => new { cs.ConsultantId, cs.WorkDate, cs.ShiftSlot })
+                entity.HasIndex(cs => new { cs.ConsultantId, cs.WorkDate, cs.Slot })
                     .IsUnique();
             });
 

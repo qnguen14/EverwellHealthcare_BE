@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Everwell.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+caef9801c03db433ba68ba01922964854130ef31")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+48bbf1143f09f50ba2f4d8594b80f9d5b5a02d15")]
 [assembly: System.Reflection.AssemblyProductAttribute("Everwell.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Everwell.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

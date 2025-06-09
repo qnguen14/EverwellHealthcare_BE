@@ -12,4 +12,7 @@ public interface IAppointmentService
     Task<CreateAppointmentsResponse> CreateAppointmentAsync(CreateAppointmentRequest request);
     Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, Appointment appointment);
     Task<DeleteAppointmentResponse> DeleteAppointmentAsync(Guid id);
+    Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedules();
+    Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedulesById(Guid id);
+    Task<GetScheduleResponse> CreateConsultantSchedule(CreateScheduleRequest request);
 }
