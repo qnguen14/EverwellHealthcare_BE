@@ -13,9 +13,9 @@ namespace Everwell.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ILogger _logger;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(IUserService userService, ILogger logger)
+        public UsersController(IUserService userService, ILogger<UsersController> logger)
         {
             _userService = userService;
         }
