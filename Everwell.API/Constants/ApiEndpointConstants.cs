@@ -52,9 +52,6 @@
             public const string CreateAppointmentEndpoint = AppointmentEndpoint + "/create";
             public const string UpdateAppointmentEndpoint = AppointmentEndpoint + "/update/{id}";
             public const string DeleteAppointmentEndpoint = AppointmentEndpoint + "/delete/{id}";
-            public const string GetConsultantSchedulesEndpoint = AppointmentEndpoint + "/consultant/schedules";
-            public const string GetConsultantSchedulesByIdEndpoint = AppointmentEndpoint + "/consultant/schedules/{id}";
-            public const string CreateConsultantScheduleEndpoint = AppointmentEndpoint + "/consultant/schedule/create";
         }
 
         public static class Feedback

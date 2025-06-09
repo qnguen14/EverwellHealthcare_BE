@@ -2855,39 +2855,23 @@
     ]
   },
   "packageFolders": {
-<<<<<<< HEAD
     "C:\\Users\\Admin\\.nuget\\packages\\": {},
-=======
-    "C:\\Users\\qnguy\\.nuget\\packages\\": {},
->>>>>>> 363c82b402b9fa3334fdcd7dfb03b6316778df65
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
       "projectUniqueName": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.DAL\\Everwell.DAL.csproj",
       "projectName": "Everwell.DAL",
       "projectPath": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.DAL\\Everwell.DAL.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
       "outputPath": "D:\\fpt\\SU25\\SWP391\\GenderManagementSystem_API\\Everwell.DAL\\obj\\",
-=======
-      "projectUniqueName": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.DAL\\Everwell.DAL.csproj",
-      "projectName": "Everwell.DAL",
-      "projectPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.DAL\\Everwell.DAL.csproj",
-      "packagesPath": "C:\\Users\\qnguy\\.nuget\\packages\\",
-      "outputPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.DAL\\obj\\",
->>>>>>> 363c82b402b9fa3334fdcd7dfb03b6316778df65
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-<<<<<<< HEAD
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-=======
-        "C:\\Users\\qnguy\\AppData\\Roaming\\NuGet\\NuGet.Config",
->>>>>>> 363c82b402b9fa3334fdcd7dfb03b6316778df65
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2914,7 +2898,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
@@ -2985,7 +2969,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

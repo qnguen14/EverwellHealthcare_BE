@@ -13,12 +13,11 @@ namespace Everwell.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ILogger<UsersController> _logger;
+        private readonly ILogger _logger;
 
-        public UsersController(IUserService userService, ILogger<UsersController> logger)
+        public UsersController(IUserService userService, ILogger logger)
         {
             _userService = userService;
-            _logger = logger;
         }
 
         [HttpGet(ApiEndpointConstants.User.GetAllUsersEndpoint)]

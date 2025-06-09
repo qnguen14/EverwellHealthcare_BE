@@ -1,7 +1,6 @@
 using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
-using Everwell.DAL.Data.Exceptions;
 using Everwell.DAL.Data.Metadata;
 using Everwell.DAL.Data.Requests.Appointments;
 using Everwell.DAL.Data.Responses.Appointments;
@@ -29,22 +28,8 @@ public class AppointmentsController : ControllerBase
     {
         try
         {
-            var response = await _appointmentService.GetAllAppointmentsAsync();
-            if (response == null || !response.Any())
-            {
-                return NotFound(new { message = "No appointments found" });
-            }
-                
-
-            var apiResponse = new ApiResponse<IEnumerable<CreateAppointmentsResponse>>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment retrieved successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
+            var appointments = await _appointmentService.GetAllAppointmentsAsync();
+            return Ok(appointments);
         }
         catch (Exception ex)
         {
@@ -61,19 +46,11 @@ public class AppointmentsController : ControllerBase
     {
         try
         {
-            var response = await _appointmentService.GetAppointmentByIdAsync(id);
-            if (response == null)
+            var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+            if (appointment == null)
                 return NotFound(new { message = "Appointment not found" });
-
-            var apiResponse = new ApiResponse<CreateAppointmentsResponse>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment retrieved successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
+            
+            return Ok(appointment);
         }
         catch (Exception ex)
         {
@@ -90,19 +67,11 @@ public class AppointmentsController : ControllerBase
     {
         try
         {
-            var response = await _appointmentService.GetAppointmentsByConsultant(id);
-            if (response == null || !response.Any())
+            var appointments = await _appointmentService.GetAppointmentsByConsultant(id);
+            if (appointments == null || !appointments.Any())
                 return NotFound(new { message = "No appointments found for this consultant" });
-
-            var apiResponse = new ApiResponse<IEnumerable<GetAppointmentConsultantResponse>>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment retrieved successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
+            
+            return Ok(appointments);
         }
         catch (Exception ex)
         {
@@ -119,21 +88,13 @@ public class AppointmentsController : ControllerBase
     {
         try
         {
-            var response = await _appointmentService.CreateAppointmentAsync(request);
-            if (response != null)
+            var appointment = await _appointmentService.CreateAppointmentAsync(request);
+            if (appointment != null)
             {
                 return NotFound(new { message = "Appointment is already booked" });
             }
-
-            var apiResponse = new ApiResponse<CreateAppointmentsResponse>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment created successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
+            
+            return Ok(appointment);
         }
         catch (Exception ex)
         {
@@ -150,19 +111,11 @@ public class AppointmentsController : ControllerBase
     {
         try
         {
-            var response = await _appointmentService.UpdateAppointmentAsync(id, appointment);
-            if (response == null)
+            var updatedAppointment = await _appointmentService.UpdateAppointmentAsync(id, appointment);
+            if (updatedAppointment == null)
                 return NotFound(new { message = "Appointment not found" });
-
-            var apiResponse = new ApiResponse<CreateAppointmentsResponse>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment updated successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
+            
+            return Ok(updatedAppointment);
         }
         catch (Exception ex)
         {
@@ -171,7 +124,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpDelete(ApiEndpointConstants.Appointment.DeleteAppointmentEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<DeleteAppointmentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<DeleteAppointmentResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Admin,Consultant")]
@@ -182,106 +135,11 @@ public class AppointmentsController : ControllerBase
         var apiResponse = new ApiResponse<DeleteAppointmentResponse>
         {
             StatusCode = StatusCodes.Status200OK,
-            Message = "Appointment deleted successfully",
+            Message = "Project deleted successfully",
             IsSuccess = true,
             Data = response
         };
 
         return Ok(apiResponse);
     }
-
-    [HttpGet(ApiEndpointConstants.Appointment.GetConsultantSchedulesEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<GetScheduleResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin, Staff, Consultant")]
-    public async Task<IActionResult> GetConsultantSchedules()
-    {
-        try
-        {
-            var response = await _appointmentService.GetConsultantSchedules();
-            if (response == null || !response.Any())
-                return NotFound(new { message = "No schedules found" });
-
-            var apiResponse = new ApiResponse<IEnumerable<GetScheduleResponse>>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment deleted successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
-        }
-    }
-
-    [HttpGet(ApiEndpointConstants.Appointment.GetConsultantSchedulesByIdEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<GetScheduleResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin, Staff, Consultant")]
-    public async Task<IActionResult> GetConsultantSchedulesById(Guid id)
-    {
-        try
-        {
-            var response = await _appointmentService.GetConsultantSchedulesById(id);
-            if (response == null || !response.Any())
-                return NotFound(new { message = "No schedules found" });
-
-            var apiResponse = new ApiResponse<IEnumerable<GetScheduleResponse>>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Appointment deleted successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
-        }
-    }
-
-    [HttpPost(ApiEndpointConstants.Appointment.CreateConsultantScheduleEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<GetScheduleResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin, Staff, Consultant")]
-    public async Task<IActionResult> CreateConsultantSchedule(CreateScheduleRequest request)
-    {
-        try
-        {
-            var response = await _appointmentService.CreateConsultantSchedule(request);
-
-            var apiResponse = new ApiResponse<GetScheduleResponse>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Schedule created successfully",
-                IsSuccess = true,
-                Data = response
-            };
-
-            return Ok(apiResponse);
-        }
-        catch (BadRequestException ex)
-        {
-            return BadRequest(new ApiResponse<object>
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = ex.Message,
-                IsSuccess = false
-            });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
-        }
-    }
-
-}
+} 
