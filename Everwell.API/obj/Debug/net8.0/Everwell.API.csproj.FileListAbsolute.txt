@@ -292,3 +292,27 @@ D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\ru\M
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.API\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.MvcApplicationPartsAssemblyInfo.cs
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\ClosedXML.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\ExcelNumberFormat.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\Irony.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.barcodes.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.bouncy-castle-connector.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.forms.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.io.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.kernel.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.layout.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.pdfa.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.sign.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.styledxmlparser.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.svg.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.commons.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.html2pdf.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\Microsoft.DotNet.PlatformAbstractions.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\Newtonsoft.Json.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\SixLabors.Fonts.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\System.IO.Packaging.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\XLParser.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\bin\Debug\net8.0\itext.bouncy-castle-adapter.dll

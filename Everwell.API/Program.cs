@@ -13,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Everwell.DAL.Repositories.Implements;
 using Everwell.DAL.Repositories.Interfaces;
 using Everwell.DAL.Mappers;
+using Everwell.BLL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDb
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

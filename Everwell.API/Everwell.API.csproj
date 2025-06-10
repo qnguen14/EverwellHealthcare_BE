@@ -23,6 +23,11 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.11.0" />
+    
+    <!-- New packages for reporting -->
+    <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="iText7" Version="8.0.2" />
+    <PackageReference Include="iText7.pdfhtml" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>

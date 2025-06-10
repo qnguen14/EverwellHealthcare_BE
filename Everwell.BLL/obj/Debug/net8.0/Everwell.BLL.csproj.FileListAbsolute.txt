@@ -31,3 +31,5 @@ D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\refint\Ever
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.pdb
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\ref\Everwell.BLL.dll
 D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\bin\Debug\net8.0\Everwell.BLL.runtimeconfig.json
+D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.genruntimeconfig.cache
