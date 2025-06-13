@@ -50,7 +50,7 @@ namespace Everwell.BLL.Infrastructure
                 signingCredentials: credentials
             );
 
-            Console.WriteLine($"User role: {user.Role.ToString()}");
+            // Console.WriteLine($"User role: {user.Role.ToString()}");
 
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);

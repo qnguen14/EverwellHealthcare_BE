@@ -2,7 +2,7 @@
 {
     public class ApiEndpointConstants
     {
-        static ApiEndpointConstants() {  }
+        static ApiEndpointConstants() { }
 
         public const string RootEndpoint = "/api";
         public const string ApiVersion = "/v1";
@@ -22,11 +22,11 @@
         {
             public const string UserEndpoint = ApiEndpoint + "/user";
             public const string GetUserEndpoint = UserEndpoint + "/{id}";
-            public const string GetAllUsersEndpoint = UserEndpoint + "/getall"; 
-            public const string CreateUserEndpoint = UserEndpoint + "/create"; 
+            public const string GetAllUsersEndpoint = UserEndpoint + "/getall";
+            public const string CreateUserEndpoint = UserEndpoint + "/create";
             public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
             public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";
-            
+
             // New endpoints
             public const string SetRoleEndpoint = UserEndpoint + "/set-role/{id}";
             public const string UpdateProfileEndpoint = UserEndpoint + "/profile/{id}";
@@ -124,6 +124,14 @@
             public const string GetDashboardStatsEndpoint = DashboardEndpoint + "/stats";
             public const string GetUsersByRoleEndpoint = DashboardEndpoint + "/users-by-role";
             public const string GetAppointmentsByStatusEndpoint = DashboardEndpoint + "/appointments-by-status";
+        }
+        
+        public static class Notification
+        {
+            public const string NotificationEndpoint = ApiEndpoint + "/notification";
+            public const string GetUserNotifications = NotificationEndpoint + "/user/{userId}";
+            public const string MarkAsRead = NotificationEndpoint + "/mark/{id}";
+            public const string DeleteNotificationEndpoint = NotificationEndpoint + "/delete/{id}";
         }
     }
 }
