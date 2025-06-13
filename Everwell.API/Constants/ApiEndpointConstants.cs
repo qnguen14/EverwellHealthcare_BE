@@ -2,7 +2,7 @@
 {
     public class ApiEndpointConstants
     {
-        static ApiEndpointConstants() { }
+        static ApiEndpointConstants() {  }
 
         public const string RootEndpoint = "/api";
         public const string ApiVersion = "/v1";
@@ -26,11 +26,14 @@
             public const string CreateUserEndpoint = UserEndpoint + "/create";
             public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
             public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";
-
-            // New endpoints
+            
+            // Profile endpoints
+            public const string GetMyProfileEndpoint = UserEndpoint + "/profile/me";
             public const string SetRoleEndpoint = UserEndpoint + "/set-role/{id}";
             public const string UpdateProfileEndpoint = UserEndpoint + "/profile/{id}";
+            public const string UpdateMyProfileEndpoint = UserEndpoint + "/profile/me";
             public const string UpdateAvatarEndpoint = UserEndpoint + "/avatar/{id}";
+            public const string UpdateMyAvatarEndpoint = UserEndpoint + "/avatar/me";
         }
 
         public static class Service

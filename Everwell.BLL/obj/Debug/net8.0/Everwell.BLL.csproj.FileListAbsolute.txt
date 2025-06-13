@@ -30,3 +30,4 @@ D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BL
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\refint\Everwell.BLL.dll
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.pdb
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\ref\Everwell.BLL.dll
+D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.dll

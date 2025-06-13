@@ -408,5 +408,56 @@ namespace Everwell.BLL.Services.Implements
                 throw new Exception($"Failed to update user avatar: {ex.Message}", ex);
             }
         }
+
+        public async Task<UserProfileResponse> GetUserProfile(Guid userId)
+        {
+            try
+            {
+                var user = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(
+                        predicate: u => u.Id == userId && u.IsActive,
+                        include: u => u
+                            .Include(x => x.Posts)
+                            .Include(x => x.STITests)
+                    );
+
+                if (user == null)
+                {
+                    throw new NotFoundException("User not found.");
+                }
+
+                // Get additional statistics
+                var appointmentCount = await _unitOfWork.GetRepository<Appointment>()
+                    .CountAsync(predicate: a => (a.CustomerId == userId || a.ConsultantId == userId) && a.Status != AppointmentStatus.Cancelled);
+
+                // Map to profile response
+                var profile = _mapper.Map<UserProfileResponse>(user);
+                profile.TotalPosts = user.Posts?.Count ?? 0;
+                profile.TotalSTITests = user.STITests?.Count ?? 0;
+                profile.TotalAppointments = appointmentCount;
+
+                return profile;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while retrieving user profile for ID: {UserId}. Error: {Message}", userId, ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<UserProfileResponse> GetCurrentUserProfile(Guid currentUserId)
+        {
+            try
+            {
+                // This method can include additional logic specific to the current user
+                // For now, it's the same as GetUserProfile but can be extended
+                return await GetUserProfile(currentUserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while retrieving current user profile for ID: {UserId}. Error: {Message}", currentUserId, ex.Message);
+                throw;
+            }
+        }
     }
 }
