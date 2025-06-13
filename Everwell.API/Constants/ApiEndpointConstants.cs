@@ -23,6 +23,7 @@
             public const string UserEndpoint = ApiEndpoint + "/user";
             public const string GetUserEndpoint = UserEndpoint + "/{id}";
             public const string GetAllUsersEndpoint = UserEndpoint + "/getall";
+            public const string GetUsersByRoleEndpoint = GetAllUsersEndpoint + "/{role}";
             public const string CreateUserEndpoint = UserEndpoint + "/create";
             public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
             public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";

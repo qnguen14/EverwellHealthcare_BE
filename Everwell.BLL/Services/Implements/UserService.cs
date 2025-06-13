@@ -50,6 +50,40 @@ namespace Everwell.BLL.Services.Implements
                 throw;
             }
         }
+        
+        public async Task<IEnumerable<CreateUserResponse>> GetUsersByRole(string role) 
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(role))
+                {
+                    throw new ArgumentException("Role cannot be null or empty.", nameof(role));
+                }
+
+                if (!Enum.TryParse<Role>(role, true, out var parsedRole))
+                {
+                    throw new ArgumentException($"Invalid role: {role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(Role)))}");
+                }
+
+                var users = await _unitOfWork.GetRepository<User>()
+                    .GetListAsync(
+                        predicate: u => u.Role == parsedRole && u.IsActive,
+                        orderBy: u => u.OrderBy(n => n.Name)
+                    );
+
+                if (users == null || !users.Any())
+                {
+                    throw new NotFoundException($"No active users found with role: {role}");
+                }
+
+                return _mapper.Map<IEnumerable<CreateUserResponse>>(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while retrieving users by role: " + ex.Message);
+                throw;
+            }
+        }
 
 
         public async Task<CreateUserResponse> CreateUser(CreateUserRequest request)
