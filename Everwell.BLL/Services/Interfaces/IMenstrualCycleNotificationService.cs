@@ -8,7 +8,10 @@ namespace Everwell.BLL.Services.Interfaces
         Task ScheduleNotificationsForTrackingAsync(Guid trackingId);
         Task SendPeriodReminderAsync(Guid customerId, DateTime predictedDate);
         Task SendOvulationReminderAsync(Guid customerId, DateTime ovulationDate);
-        Task SendFertilityWindowReminderAsync(Guid customerId, DateTime windowStart, DateTime windowEnd);
-        Task<bool> CreateNotificationAsync(Guid trackingId, MenstrualCyclePhase phase, DateTime scheduledDate, string message);
-    }
+            Task SendFertilityWindowReminderAsync(Guid customerId, DateTime windowStart, DateTime windowEnd);
+    Task<bool> CreateNotificationAsync(Guid trackingId, MenstrualCyclePhase phase, DateTime scheduledDate, string message);
+    
+    // Debug method
+    Task<bool> TestCreateNotificationDirectlyAsync(Guid trackingId);
+}
 }

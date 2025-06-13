@@ -11,9 +11,16 @@ namespace Everwell.BLL.Services.Implements;
 
 public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingService>, IMenstrualCycleTrackingService
 {
-    public MenstrualCycleTrackingService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<MenstrualCycleTrackingService> logger, IMapper mapper)
+    private readonly IMenstrualCycleNotificationService _notificationService;
+
+    public MenstrualCycleTrackingService(
+        IUnitOfWork<EverwellDbContext> unitOfWork, 
+        ILogger<MenstrualCycleTrackingService> logger, 
+        IMapper mapper,
+        IMenstrualCycleNotificationService notificationService)
         : base(unitOfWork, logger, mapper)
     {
+        _notificationService = notificationService;
     }
 
     public async Task<IEnumerable<GetMenstrualCycleResponse>> GetAllMenstrualCycleTrackingsAsync()
@@ -64,12 +71,39 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
                 tracking.CustomerId = customerId;
                 tracking.CreatedAt = DateTime.UtcNow;
                 
+                _logger.LogInformation("Creating tracking with ID {TrackingId}, NotificationEnabled: {NotificationEnabled}, NotifyBeforeDays: {NotifyBeforeDays}", 
+                    tracking.TrackingId, tracking.NotificationEnabled, tracking.NotifyBeforeDays);
+                
                 await _unitOfWork.GetRepository<MenstrualCycleTracking>().InsertAsync(tracking);
+                
+                // Check context state after tracking insertion
+                var contextStateAfterTracking = _unitOfWork.Context.ChangeTracker.Entries().Count();
+                _logger.LogInformation("Context has {Count} tracked entities after adding tracking", contextStateAfterTracking);
                 
                 // Schedule notifications if enabled
                 if (tracking.NotificationEnabled)
                 {
-                    await ScheduleNotificationsAsync(tracking.TrackingId);
+                    _logger.LogInformation("About to schedule notifications for tracking {TrackingId}", tracking.TrackingId);
+                    await _notificationService.ScheduleNotificationsForTrackingAsync(tracking.TrackingId);
+                    _logger.LogInformation("Notifications scheduled for tracking {TrackingId}", tracking.TrackingId);
+                    
+                    // Check context state after notifications
+                    var contextStateAfterNotifications = _unitOfWork.Context.ChangeTracker.Entries().Count();
+                    _logger.LogInformation("Context has {Count} tracked entities after adding notifications", contextStateAfterNotifications);
+                    
+                    // Log all tracked entities
+                    var trackedEntities = _unitOfWork.Context.ChangeTracker.Entries()
+                        .Select(e => new { Type = e.Entity.GetType().Name, State = e.State })
+                        .ToList();
+                    
+                    foreach (var entity in trackedEntities)
+                    {
+                        _logger.LogInformation("Tracked entity: {Type} - {State}", entity.Type, entity.State);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("Notifications disabled for tracking {TrackingId}", tracking.TrackingId);
                 }
                 
                 return _mapper.Map<CreateMenstrualCycleResponse>(tracking);
@@ -276,25 +310,7 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         }
     }
 
-    public async Task<bool> ScheduleNotificationsAsync(Guid trackingId)
-    {
-        try
-        {
-            var tracking = await _unitOfWork.GetRepository<MenstrualCycleTracking>()
-                .FirstOrDefaultAsync(predicate: m => m.TrackingId == trackingId);
 
-            if (tracking == null || !tracking.NotificationEnabled)
-                return false;
-
-            // Implement notification scheduling logic here
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while scheduling notifications for tracking: {TrackingId}", trackingId);
-            throw;
-        }
-    }
 
     public async Task<bool> UpdateNotificationPreferencesAsync(Guid customerId, NotificationPreferencesRequest request)
     {

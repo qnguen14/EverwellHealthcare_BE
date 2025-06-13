@@ -21,7 +21,6 @@ public interface IMenstrualCycleTrackingService
     
     // Notification management
     Task<List<NotificationResponse>> GetUpcomingNotificationsAsync(Guid customerId);
-    Task<bool> ScheduleNotificationsAsync(Guid trackingId);
     Task<bool> UpdateNotificationPreferencesAsync(Guid customerId, NotificationPreferencesRequest request);
     
     // Validation and business rules

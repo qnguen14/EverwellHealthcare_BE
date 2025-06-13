@@ -287,6 +287,100 @@
     ]
   },
   {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "CheckNotifications",
+    "RelativePath": "api/TestEmail/check-notifications",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "ProcessPendingNotifications",
+    "RelativePath": "api/TestEmail/process-pending-notifications",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "SendBasicEmail",
+    "RelativePath": "api/TestEmail/send-basic-email",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.API.Controllers.BasicEmailRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "SendFertilityWindowReminder",
+    "RelativePath": "api/TestEmail/send-fertility-window-reminder",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.API.Controllers.FertilityWindowRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "SendOvulationReminder",
+    "RelativePath": "api/TestEmail/send-ovulation-reminder",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.API.Controllers.OvulationReminderRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "SendPeriodReminder",
+    "RelativePath": "api/TestEmail/send-period-reminder",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.API.Controllers.PeriodReminderRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "TestSmtpConfiguration",
+    "RelativePath": "api/TestEmail/smtp-test",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetAppointmentById",
     "RelativePath": "api/v1/appointment/{id}",
