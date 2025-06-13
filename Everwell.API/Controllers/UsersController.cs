@@ -43,7 +43,7 @@ namespace Everwell.API.Controllers
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateUserResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin, Consultant, Staff, Manager")]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<IEnumerable<CreateUserResponse>>> GetUsersByRole(string role)
         {
             var response = await _userService.GetUsersByRole(role);
@@ -83,7 +83,7 @@ namespace Everwell.API.Controllers
         [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin, Manager, Consultant, Staff")]
+        [Authorize(Roles = "Admin, Manager, Consultant, Staff, Customer")]
         public async Task<ActionResult<GetUserResponse>> GetUserById(Guid id)
         {
             try
@@ -216,7 +216,7 @@ namespace Everwell.API.Controllers
         }
 
         [HttpPut(ApiEndpointConstants.User.UpdateProfileEndpoint)]
-        [Authorize]
+        [Authorize("Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UpdateUserResponse>> UpdateProfile(Guid id, UpdateProfileRequest request)
         {
             try
@@ -257,7 +257,7 @@ namespace Everwell.API.Controllers
         }
 
         [HttpPut(ApiEndpointConstants.User.UpdateAvatarEndpoint)]
-        [Authorize]
+        [Authorize("Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UpdateUserResponse>> UpdateAvatar(Guid id, UpdateAvatarRequest request)
         {
             try
@@ -303,7 +303,7 @@ namespace Everwell.API.Controllers
         [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize]
+        [Authorize("Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UserProfileResponse>> GetMyProfile()
         {
             try
