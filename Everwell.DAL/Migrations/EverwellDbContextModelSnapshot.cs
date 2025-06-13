@@ -73,40 +73,9 @@ namespace Everwell.DAL.Migrations
                     b.ToTable("Appointment", "EverWellDB_v1");
                 });
 
-            modelBuilder.Entity("Everwell.DAL.Data.Entities.BlacklistedToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("BlacklistedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("blacklistedAt");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expiresAt");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("tokenHash");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExpiresAt");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.ToTable("BlacklistedTokens", "EverWellDB_v1");
-                });
-
             modelBuilder.Entity("Everwell.DAL.Data.Entities.ConsultantSchedule", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ScheduleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("schedule_id");
@@ -115,15 +84,11 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("consultant_id");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean")
                         .HasColumnName("is_available");
 
-                    b.Property<int>("Slot")
+                    b.Property<int>("ShiftSlot")
                         .HasColumnType("integer")
                         .HasColumnName("shift_slot");
 
@@ -131,9 +96,9 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("date")
                         .HasColumnName("work_date");
 
-                    b.HasKey("Id");
+                    b.HasKey("ScheduleId");
 
-                    b.HasIndex("ConsultantId", "WorkDate", "Slot")
+                    b.HasIndex("ConsultantId", "WorkDate", "ShiftSlot")
                         .IsUnique();
 
                     b.ToTable("ConsultantSchedule", "EverWellDB_v1");

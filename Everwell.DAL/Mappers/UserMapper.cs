@@ -86,6 +86,22 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.STITests, opt => opt.Ignore())
                 .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore())
                 .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore());
+
+            // User to UserProfileResponse
+            CreateMap<User, UserProfileResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow)) // Default value, can be updated if you add CreatedAt to User entity
+                .ForMember(dest => dest.LastLoginAt, opt => opt.MapFrom(src => (DateTime?)null)) // Default null, can be updated if you track last login
+                .ForMember(dest => dest.TotalPosts, opt => opt.Ignore()) // Will be set manually in service
+                .ForMember(dest => dest.TotalAppointments, opt => opt.Ignore()) // Will be set manually in service
+                .ForMember(dest => dest.TotalSTITests, opt => opt.Ignore()); // Will be set manually in service
         }
     }
 }

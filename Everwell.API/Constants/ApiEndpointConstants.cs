@@ -27,10 +27,13 @@
             public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
             public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";
             
-            // New endpoints
+            // Profile endpoints
+            public const string GetMyProfileEndpoint = UserEndpoint + "/profile/me";
             public const string SetRoleEndpoint = UserEndpoint + "/set-role/{id}";
             public const string UpdateProfileEndpoint = UserEndpoint + "/profile/{id}";
+            public const string UpdateMyProfileEndpoint = UserEndpoint + "/profile/me";
             public const string UpdateAvatarEndpoint = UserEndpoint + "/avatar/{id}";
+            public const string UpdateMyAvatarEndpoint = UserEndpoint + "/avatar/me";
         }
 
         public static class Service
@@ -52,9 +55,6 @@
             public const string CreateAppointmentEndpoint = AppointmentEndpoint + "/create";
             public const string UpdateAppointmentEndpoint = AppointmentEndpoint + "/update/{id}";
             public const string DeleteAppointmentEndpoint = AppointmentEndpoint + "/delete/{id}";
-            public const string GetConsultantSchedulesEndpoint = AppointmentEndpoint + "/consultant/schedules";
-            public const string GetConsultantSchedulesByIdEndpoint = AppointmentEndpoint + "/consultant/schedules/{id}";
-            public const string CreateConsultantScheduleEndpoint = AppointmentEndpoint + "/consultant/schedule/create";
         }
 
         public static class Feedback

@@ -18,7 +18,6 @@ namespace Everwell.API.Controllers
         public UsersController(IUserService userService, ILogger<UsersController> logger)
         {
             _userService = userService;
-            _logger = logger;
         }
 
         [HttpGet(ApiEndpointConstants.User.GetAllUsersEndpoint)]
@@ -192,6 +191,106 @@ namespace Everwell.API.Controllers
                 }
 
                 var user = await _userService.UpdateAvatar(id, request);
+                return Ok(user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        // New Profile API Endpoints
+
+        [HttpGet(ApiEndpointConstants.User.GetMyProfileEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        public async Task<ActionResult<UserProfileResponse>> GetMyProfile()
+        {
+            try
+            {
+                // Get current user ID from JWT token
+                var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (currentUserIdClaim == null || !Guid.TryParse(currentUserIdClaim, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid user token." });
+                }
+
+                var profile = await _userService.GetCurrentUserProfile(currentUserId);
+                return Ok(profile);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpPut(ApiEndpointConstants.User.UpdateMyProfileEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<UpdateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        public async Task<ActionResult<UpdateUserResponse>> UpdateMyProfile(UpdateProfileRequest request)
+        {
+            try
+            {
+                // Get current user ID from JWT token
+                var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (currentUserIdClaim == null || !Guid.TryParse(currentUserIdClaim, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid user token." });
+                }
+
+                var user = await _userService.UpdateProfile(currentUserId, request);
+                return Ok(user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpPut(ApiEndpointConstants.User.UpdateMyAvatarEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<UpdateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        public async Task<ActionResult<UpdateUserResponse>> UpdateMyAvatar(UpdateAvatarRequest request)
+        {
+            try
+            {
+                // Get current user ID from JWT token
+                var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (currentUserIdClaim == null || !Guid.TryParse(currentUserIdClaim, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid user token." });
+                }
+
+                var user = await _userService.UpdateAvatar(currentUserId, request);
                 return Ok(user);
             }
             catch (InvalidOperationException ex)
