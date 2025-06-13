@@ -53,7 +53,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.Appointment.GetAppointmentEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateAppointmentsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles =  "Admin,Customer,Consultant")]
@@ -111,7 +111,7 @@ public class AppointmentsController : ControllerBase
     }
     
     [HttpPost(ApiEndpointConstants.Appointment.CreateAppointmentEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateAppointmentsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles =  "Admin,Customer,Consultant")]
@@ -120,7 +120,7 @@ public class AppointmentsController : ControllerBase
         try
         {
             var response = await _appointmentService.CreateAppointmentAsync(request);
-            if (response != null)
+            if (response == null)
             {
                 return NotFound(new { message = "Appointment is already booked" });
             }
@@ -142,7 +142,7 @@ public class AppointmentsController : ControllerBase
     }
     
     [HttpPut(ApiEndpointConstants.Appointment.UpdateAppointmentEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateAppointmentsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles =  "Admin,Consultant")]

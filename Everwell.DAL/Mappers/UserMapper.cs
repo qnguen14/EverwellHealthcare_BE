@@ -41,7 +41,7 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Password, opt => opt.Ignore()) // Don't return password in response
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore());
 
             // User to UpdateUserResponse
             CreateMap<User, UpdateUserResponse>()
@@ -50,8 +50,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
+                // .ForMember(dest => dest.IsActive, opt => opt.Ignore());
 
             // User to GetUserResponse
             CreateMap<User, GetUserResponse>()
@@ -61,8 +61,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
-                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl));
+                // .ForMember(dest => dest.IsActive, opt => opt.Ignore());
 
             // CreateUserResponse to GetUserResponse
             CreateMap<CreateUserResponse, GetUserResponse>()
@@ -72,11 +72,11 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
-                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => (string)null)) // Default null since CreateUserResponse doesn't have this
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => (string)null)); // Default null since CreateUserResponse doesn't have this
+                // .ForMember(dest => dest.IsActive, opt => opt.Ignore());
 
             // UpdateProfileRequest to User (partial mapping)
-            CreateMap<UpdateProfileRequest, Data.Entities.User>()
+            CreateMap<UpdateProfileRequest, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Role, opt => opt.Ignore())
                 .ForMember(dest => dest.Password, opt => opt.Ignore())

@@ -249,7 +249,7 @@ namespace Everwell.BLL.Services.Implements
                     Address = userResponse.Address,
                     Role = userResponse.Role,
                     AvatarUrl = null, // Default for new users
-                    IsActive = userResponse.IsActive
+                    // IsActive = userResponse.IsActive
                 };
 
                 return new RegisterResponse

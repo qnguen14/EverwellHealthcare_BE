@@ -134,7 +134,16 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 
                 await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
                 
-                return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
+                // Reload the appointment with navigation properties
+                var insertedAppointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == newAppointment.Id,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant)
+                            .Include(ap => ap.Service)
+                    );
+                
+                return _mapper.Map<CreateAppointmentsResponse>(insertedAppointment);
             });
         }
         catch (Exception ex)

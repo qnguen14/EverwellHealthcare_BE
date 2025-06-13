@@ -56,7 +56,7 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
                 .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl));
-            // .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+                // .ForMember(dest => dest.IsActive, opt => opt.Ignore());
             
             // Appointment to GetAppointmentConsultantResponse
             CreateMap<Appointment, GetAppointmentConsultantResponse>()
