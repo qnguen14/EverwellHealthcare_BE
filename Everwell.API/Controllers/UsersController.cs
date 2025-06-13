@@ -94,9 +94,9 @@ namespace Everwell.API.Controllers
         }
 
         [HttpDelete(ApiEndpointConstants.User.DeleteUserEndpoint)]
-        // [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteUser(Guid id)
         {

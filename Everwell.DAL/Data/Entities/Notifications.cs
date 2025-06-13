@@ -8,9 +8,7 @@ namespace Everwell.DAL.Data.Entities
     {
         Appointment,
         TestResult,
-        HealthUpdate,
-        Payment,
-        MedicationAlert
+        Payment
     }
 
     public enum NotificationPriority

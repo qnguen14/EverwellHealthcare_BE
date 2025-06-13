@@ -20,6 +20,36 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         _mapper = mapper;
     }
 
+    // Helper method to create appointment notifications
+
+    private async Task CreateAppointmentNotification(Appointment appointment, string title, string message, NotificationPriority priority = NotificationPriority.Medium)
+    {
+        try
+        {
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                UserId = appointment.CustomerId,
+                Title = title,
+                Message = message,
+                Type = NotificationType.Appointment,
+                Priority = priority,
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false,
+                AppointmentId = appointment.Id
+            };
+
+            await _unitOfWork.GetRepository<Notification>().InsertAsync(notification);
+            _logger.LogInformation("Created appointment notification for user {UserId}, appointment {AppointmentId}",
+                appointment.CustomerId, appointment.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create appointment notification for appointment {AppointmentId}", appointment.Id);
+            // Don't throw - notification creation shouldn't block the main operation
+        }
+    }
+
     public async Task<IEnumerable<CreateAppointmentsResponse>> GetAllAppointmentsAsync()
     {
         try
@@ -131,9 +161,15 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 }
                 
                 var newAppointment = _mapper.Map<Appointment>(request);
-                
+
                 await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
-                
+
+                await CreateAppointmentNotification(newAppointment, 
+                    "Appointment Created", 
+                    $"Your appointment with {newAppointment.Consultant.Name} " +
+                    $"on {newAppointment.AppointmentDate} " +
+                    $"at {newAppointment.Slot} has been successfully booked.");
+
                 return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
             });
         }
@@ -163,7 +199,13 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 existingAppointment.Notes = appointment.Notes;
                 
                 _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
-                
+
+                await CreateAppointmentNotification(existingAppointment, 
+                    "Appointment Updated", 
+                    $"Your appointment with {existingAppointment.Consultant.Name} " +
+                    $"on {existingAppointment.AppointmentDate} " +
+                    $"at {existingAppointment.Slot} has been successfully updated.");
+
                 return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
             });
         }
@@ -188,7 +230,15 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                     throw new NotFoundException($"Appointment with ID {id} not found");
                 };
 
+
                 _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointment);
+
+                await CreateAppointmentNotification(appointment, 
+                    "Appointment Cancelled", 
+                    $"Your appointment with {appointment.Consultant.Name} " +
+                    $"on {appointment.AppointmentDate} " +
+                    $"at {appointment.Slot} has been cancelled.");
+
                 var response = _mapper.Map<DeleteAppointmentResponse>(appointment);
                 response.IsDeleted = true;
                 response.Message = "Appointment deleted successfully";
