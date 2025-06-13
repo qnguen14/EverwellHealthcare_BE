@@ -14,6 +14,7 @@ D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.d
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\refint\Everwell.BLL.dll
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.pdb
 D:\Gender System\GenderMngSystem_BE\Everwell.BLL\obj\Debug\net8.0\ref\Everwell.BLL.dll
+D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.dll
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.csproj.AssemblyReference.cache
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.GeneratedMSBuildEditorConfig.editorconfig
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.AssemblyInfoInputs.cache
@@ -30,4 +31,3 @@ D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BL
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\refint\Everwell.BLL.dll
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\Everwell.BLL.pdb
 D:\Gender System\EverwellHealthcare_BE\Everwell.BLL\obj\Debug\net8.0\ref\Everwell.BLL.dll
-D:\fpt\SU25\SWP391\GenderManagementSystem_API\Everwell.BLL\bin\Debug\net8.0\Everwell.DAL.dll

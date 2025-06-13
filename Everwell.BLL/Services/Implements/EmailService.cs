@@ -16,7 +16,7 @@ namespace Everwell.BLL.Services.Implements
             _configuration = configuration;
         }
 
-        private async Task SendEmailAsync(string toEmail, string subject, string body)
+        public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
             try
             {

@@ -34,4 +34,7 @@ public class MenstrualCycleNotification
     [Required]
     [Column("message", TypeName = "text")]
     public string Message { get; set; }
+
+    [Column("is_sent")]
+    public bool IsSent { get; set; } = false;
 }

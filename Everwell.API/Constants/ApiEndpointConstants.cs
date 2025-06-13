@@ -106,12 +106,19 @@
 
         public static class MenstrualCycleTracking
         {
-            public const string MenstrualCycleTrackingEndpoint = ApiEndpoint + "/menstrualcycletracking";
-            public const string GetAllMenstrualCycleTrackingsEndpoint = MenstrualCycleTrackingEndpoint + "/getall";
-            public const string GetMenstrualCycleTrackingEndpoint = MenstrualCycleTrackingEndpoint + "/{id}";
-            public const string CreateMenstrualCycleTrackingEndpoint = MenstrualCycleTrackingEndpoint + "/create";
-            public const string UpdateMenstrualCycleTrackingEndpoint = MenstrualCycleTrackingEndpoint + "/update/{id}";
-            public const string DeleteMenstrualCycleTrackingEndpoint = MenstrualCycleTrackingEndpoint + "/delete/{id}";
+            public const string GetAllMenstrualCycleTrackingsEndpoint = "/api/menstrual-cycle-trackings";
+            public const string GetMenstrualCycleTrackingEndpoint = "/api/menstrual-cycle-trackings/{id}";
+            public const string CreateMenstrualCycleTrackingEndpoint = "/api/menstrual-cycle-trackings";
+            public const string UpdateMenstrualCycleTrackingEndpoint = "/api/menstrual-cycle-trackings/{id}";
+            public const string DeleteMenstrualCycleTrackingEndpoint = "/api/menstrual-cycle-trackings/{id}";
+            public const string GetCycleHistoryEndpoint = "/api/menstrual-cycle-trackings/history";
+            public const string PredictNextCycleEndpoint = "/api/menstrual-cycle-trackings/predict-next";
+            public const string GetFertilityWindowEndpoint = "/api/menstrual-cycle-trackings/fertility-window";
+            public const string GetCycleAnalyticsEndpoint = "/api/menstrual-cycle-trackings/analytics";
+            public const string GetCycleInsightsEndpoint = "/api/menstrual-cycle-trackings/insights";
+            public const string GetNotificationsEndpoint = "/api/menstrual-cycle-trackings/notifications";
+            public const string UpdateNotificationPreferencesEndpoint = "/api/menstrual-cycle-trackings/notification-preferences";
+            public const string GetCycleTrendsEndpoint = "/api/menstrual-cycle-trackings/trends";
         }
 
         public static class Dashboard

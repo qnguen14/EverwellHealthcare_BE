@@ -8,5 +8,6 @@ namespace Everwell.BLL.Services.Interfaces
         Task SendPasswordResetCodeAsync(string toEmail, string resetCode, string userName);
         Task SendMenstrualCycleReminderAsync(string toEmail, string userName, DateTime nextCycleDate);
         Task SendAppointmentConfirmationAsync(string toEmail, string userName, DateTime appointmentDate, string serviceName);
+        Task SendEmailAsync(string toEmail, string subject, string body);
     }
 }

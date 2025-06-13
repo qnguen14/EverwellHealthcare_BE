@@ -57,6 +57,7 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ISTITestingService, STITestingService>();
 builder.Services.AddScoped<ITestResultService, TestResultService>();
 builder.Services.AddScoped<IMenstrualCycleTrackingService, MenstrualCycleTrackingService>();
+builder.Services.AddScoped<IMenstrualCycleNotificationService, MenstrualCycleNotificationService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
 builder.Services.AddScoped<IEmailService, EmailService>();

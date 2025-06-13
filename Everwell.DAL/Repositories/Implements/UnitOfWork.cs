@@ -76,6 +76,13 @@ namespace Everwell.DAL.Repositories.Implements
         }
         #endregion
 
+        #region Save Changes
+        public async Task<int> SaveChangesAsync()
+        {
+            return await Context.SaveChangesAsync();
+        }
+        #endregion
+
         #region IDisposable Implementation
         public void Dispose()
         {

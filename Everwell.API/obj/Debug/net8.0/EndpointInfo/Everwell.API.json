@@ -1049,7 +1049,7 @@
         }
       }
     },
-    "/api/v1/menstrualcycletracking/getall": {
+    "/api/menstrual-cycle-trackings": {
       "get": {
         "tags": [
           "MenstrualCycleTrackings"
@@ -1062,7 +1062,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MenstrualCycleTracking"
+                    "$ref": "#/components/schemas/GetMenstrualCycleResponse"
                   }
                 }
               },
@@ -1070,7 +1070,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MenstrualCycleTracking"
+                    "$ref": "#/components/schemas/GetMenstrualCycleResponse"
                   }
                 }
               },
@@ -1078,8 +1078,54 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MenstrualCycleTracking"
+                    "$ref": "#/components/schemas/GetMenstrualCycleResponse"
                   }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMenstrualCycleRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMenstrualCycleRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMenstrualCycleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMenstrualCycleResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMenstrualCycleResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMenstrualCycleResponse"
                 }
               }
             }
@@ -1087,7 +1133,7 @@
         }
       }
     },
-    "/api/v1/menstrualcycletracking/{id}": {
+    "/api/menstrual-cycle-trackings/{id}": {
       "get": {
         "tags": [
           "MenstrualCycleTrackings"
@@ -1109,17 +1155,378 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/MenstrualCycleTracking"
+                  "$ref": "#/components/schemas/GetMenstrualCycleResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MenstrualCycleTracking"
+                  "$ref": "#/components/schemas/GetMenstrualCycleResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MenstrualCycleTracking"
+                  "$ref": "#/components/schemas/GetMenstrualCycleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMenstrualCycleRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMenstrualCycleRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMenstrualCycleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMenstrualCycleResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMenstrualCycleResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMenstrualCycleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/history": {
+      "get": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "parameters": [
+          {
+            "name": "months",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetMenstrualCycleResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetMenstrualCycleResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetMenstrualCycleResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/predict-next": {
+      "get": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CyclePredictionResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CyclePredictionResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CyclePredictionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/fertility-window": {
+      "get": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/FertilityWindowResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FertilityWindowResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FertilityWindowResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/analytics": {
+      "get": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleAnalyticsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleAnalyticsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleAnalyticsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/insights": {
+      "get": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleInsightsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleInsightsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleInsightsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/notifications": {
+      "get": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/notification-preferences": {
+      "post": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencesRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencesRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menstrual-cycle-trackings/trends": {
+      "get": {
+        "tags": [
+          "MenstrualCycleTrackings"
+        ],
+        "parameters": [
+          {
+            "name": "months",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 6
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CycleTrendData"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CycleTrendData"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CycleTrendData"
+                  }
                 }
               }
             }
@@ -2275,6 +2682,87 @@
         },
         "additionalProperties": false
       },
+      "CreateMenstrualCycleRequest": {
+        "required": [
+          "cycleStartDate"
+        ],
+        "type": "object",
+        "properties": {
+          "cycleStartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cycleEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "symptoms": {
+            "maxLength": 1000,
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "maxLength": 2000,
+            "type": "string",
+            "nullable": true
+          },
+          "notifyBeforeDays": {
+            "maximum": 7,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notificationEnabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateMenstrualCycleResponse": {
+        "type": "object",
+        "properties": {
+          "trackingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cycleStartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cycleEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "symptoms": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notificationEnabled": {
+            "type": "boolean"
+          },
+          "notifyBeforeDays": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateUserRequest": {
         "required": [
           "address",
@@ -2403,6 +2891,192 @@
               "$ref": "#/components/schemas/CreateUserResponse"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CycleAnalyticsResponse": {
+        "type": "object",
+        "properties": {
+          "averageCycleLength": {
+            "type": "number",
+            "format": "double"
+          },
+          "averagePeriodLength": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalCyclesTracked": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstCycleDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastCycleDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cycleRegularityScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "commonSymptoms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "symptomFrequency": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "cycleLengthHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CycleLengthData"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CycleInsightsResponse": {
+        "type": "object",
+        "properties": {
+          "overallHealthStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "insights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "healthAlerts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "healthMetrics": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true
+          },
+          "generatedOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CycleLengthData": {
+        "type": "object",
+        "properties": {
+          "cycleStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "length": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isComplete": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CyclePredictionResponse": {
+        "type": "object",
+        "properties": {
+          "predictedNextPeriodStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "predictedNextPeriodEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "predictedCycleLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "predictedPeriodLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "confidenceScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "confidenceLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "factors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "isRegularCycle": {
+            "type": "boolean"
+          },
+          "calculatedOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CycleTrendData": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cycleLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "periodLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "symptoms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2639,6 +3313,46 @@
         },
         "additionalProperties": false
       },
+      "FertilityWindowResponse": {
+        "type": "object",
+        "properties": {
+          "fertileWindowStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fertileWindowEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ovulationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "daysUntilOvulation": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fertilityScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "fertilityPhase": {
+            "type": "string",
+            "nullable": true
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "isHighFertilityPeriod": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "ForgotPasswordRequest": {
         "type": "object",
         "properties": {
@@ -2710,6 +3424,60 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GetAppointmentConsultantResponse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetMenstrualCycleResponse": {
+        "type": "object",
+        "properties": {
+          "trackingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "cycleStartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cycleEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "symptoms": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notificationEnabled": {
+            "type": "boolean"
+          },
+          "notifyBeforeDays": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationResponse"
             },
             "nullable": true
           }
@@ -2813,108 +3581,6 @@
         },
         "additionalProperties": false
       },
-      "MenstrualCycleNotification": {
-        "required": [
-          "message",
-          "phase",
-          "sentAt",
-          "trackingId"
-        ],
-        "type": "object",
-        "properties": {
-          "notificationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "trackingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "tracking": {
-            "$ref": "#/components/schemas/MenstrualCycleTracking"
-          },
-          "phase": {
-            "$ref": "#/components/schemas/MenstrualCyclePhase"
-          },
-          "sentAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "message": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MenstrualCyclePhase": {
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "type": "integer",
-        "format": "int32"
-      },
-      "MenstrualCycleTracking": {
-        "required": [
-          "createdAt",
-          "customerId",
-          "cycleStartDate"
-        ],
-        "type": "object",
-        "properties": {
-          "trackingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "customerId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "customer": {
-            "$ref": "#/components/schemas/User"
-          },
-          "cycleStartDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "cycleEndDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "symptoms": {
-            "type": "string",
-            "nullable": true
-          },
-          "notes": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "notifyBeforeDays": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "notificationEnabled": {
-            "type": "boolean"
-          },
-          "notifications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MenstrualCycleNotification"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "Method": {
         "enum": [
           0,
@@ -2924,6 +3590,73 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "NotificationPreferencesRequest": {
+        "type": "object",
+        "properties": {
+          "enablePeriodReminders": {
+            "type": "boolean"
+          },
+          "enableOvulationReminders": {
+            "type": "boolean"
+          },
+          "enableFertilityReminders": {
+            "type": "boolean"
+          },
+          "enableContraceptiveReminders": {
+            "type": "boolean"
+          },
+          "periodReminderDays": {
+            "maximum": 7,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "ovulationReminderDays": {
+            "maximum": 3,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "notificationTimes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "time"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NotificationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "notificationType": {
+            "type": "string",
+            "nullable": true
+          },
+          "notificationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSent": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
       },
       "ObjectApiResponse": {
         "type": "object",
@@ -3349,6 +4082,44 @@
             "minLength": 1,
             "type": "string",
             "format": "uri"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateMenstrualCycleRequest": {
+        "required": [
+          "cycleStartDate"
+        ],
+        "type": "object",
+        "properties": {
+          "cycleStartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cycleEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "symptoms": {
+            "maxLength": 1000,
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "maxLength": 2000,
+            "type": "string",
+            "nullable": true
+          },
+          "notifyBeforeDays": {
+            "maximum": 7,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "notificationEnabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

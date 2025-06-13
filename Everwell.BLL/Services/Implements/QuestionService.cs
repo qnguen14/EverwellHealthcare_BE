@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
-using Everwell.BLL.Services;
 
 namespace Everwell.BLL.Services.Implements;
 

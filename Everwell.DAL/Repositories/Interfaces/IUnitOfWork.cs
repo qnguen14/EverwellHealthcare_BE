@@ -12,6 +12,7 @@ namespace Everwell.DAL.Repositories.Interfaces
     {
         Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> operation);
         Task ExecuteInTransactionAsync(Func<Task> operation);
+        Task<int> SaveChangesAsync();
     }
 
     public interface IUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
