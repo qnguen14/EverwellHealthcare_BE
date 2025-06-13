@@ -25,5 +25,9 @@ namespace Everwell.BLL.Services.Interfaces
         Task<UpdateUserResponse> SetUserRole(Guid userId, SetUserRoleRequest request);
         Task<UpdateUserResponse> UpdateProfile(Guid userId, UpdateProfileRequest request);
         Task<UpdateUserResponse> UpdateAvatar(Guid userId, UpdateAvatarRequest request);
+        
+        // New profile-specific methods
+        Task<UserProfileResponse> GetUserProfile(Guid userId);
+        Task<UserProfileResponse> GetCurrentUserProfile(Guid currentUserId);
     }
 }
