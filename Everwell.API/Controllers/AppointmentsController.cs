@@ -146,11 +146,11 @@ public class AppointmentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles =  "Admin,Consultant")]
-    public async Task<IActionResult> UpdateAppointment(Guid id, Appointment appointment)
+    public async Task<IActionResult> UpdateAppointment(Guid id, UpdateAppointmentRequest request)
     {
         try
         {
-            var response = await _appointmentService.UpdateAppointmentAsync(id, appointment);
+            var response = await _appointmentService.UpdateAppointmentAsync(id, request);
             if (response == null)
                 return NotFound(new { message = "Appointment not found" });
 

@@ -140,38 +140,40 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request), "request cannot be null.");
+
+            var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
+                .FirstOrDefaultAsync(
+                    predicate: a => a.AppointmentDate == request.AppointmentDate
+                                    && a.Slot == request.Slot
+                                    && a.ConsultantId == request.ConsultantId,
+                    include: a => a.Include(ap => ap.Customer)
+                                   .Include(ap => ap.Consultant)
+                );
+            if (existingAppointment != null &&
+                existingAppointment.Customer.IsActive &&
+                existingAppointment.Consultant.IsActive)
             {
-                if (request == null)
-                {
-                    throw new ArgumentNullException(nameof(request), "request cannot be null.");
-                }
-                
-                var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.AppointmentDate == request.AppointmentDate 
-                                                         && a.Slot == request.Slot 
-                                                         && a.ConsultantId == request.ConsultantId,
-                                        include: a => a.Include(ap => ap.Customer)
-                                            .Include(ap => ap.Consultant)
-                                                         );
-                if (existingAppointment != null &&
-                    existingAppointment.Customer.IsActive &&
-                    existingAppointment.Consultant.IsActive)
-                {
-                    throw new BadRequestException("An appointment already exists for the specified date, slot, and consultant.");
-                }
-                
-                var newAppointment = _mapper.Map<Appointment>(request);
+                throw new BadRequestException(
+                    "An appointment already exists for the specified date, slot, and consultant.");
+            }
 
-                await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
+            var newAppointment = _mapper.Map<Appointment>(request);
+            if (newAppointment.Id == Guid.Empty)
+                newAppointment.Id = Guid.NewGuid(); // Ensure Id is set
 
-                await CreateAppointmentNotification(newAppointment, 
-                    "Appointment Created", 
-                    $"Your appointment with {newAppointment.Consultant.Name} " +
-                    $"on {newAppointment.AppointmentDate} " +
-                    $"at {newAppointment.Slot} has been successfully booked.");
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
 
-                return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
-            });
+            await CreateAppointmentNotification(newAppointment,
+                "Appointment Created",
+                $"Your appointment with {newAppointment.Consultant?.Name} " +
+                $"on {newAppointment.AppointmentDate} " +
+                $"at {newAppointment.Slot} has been successfully booked.");
+
+            return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
+        });
         }
         catch (Exception ex)
         {
@@ -180,25 +182,32 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, Appointment appointment)
+    public async Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, UpdateAppointmentRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.Id == id);
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == id 
+                                        && a.Customer.IsActive == true 
+                                        && a.Consultant.IsActive == true,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant)
+                            .Include(ap => ap.Service));
 
                 if (existingAppointment == null)
                 {
                     throw new NotFoundException($"Appointment with ID {id} not found");
                 }
 
-                existingAppointment.AppointmentDate = appointment.AppointmentDate;
-                existingAppointment.Status = appointment.Status;
-                existingAppointment.Notes = appointment.Notes;
+                existingAppointment.AppointmentDate = request.AppointmentDate;
+                existingAppointment.Status = request.Status;
+                existingAppointment.Notes = request.Notes;
                 
                 _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
+                
 
                 await CreateAppointmentNotification(existingAppointment, 
                     "Appointment Updated", 
@@ -223,25 +232,31 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var appointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.Id == id);
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == id 
+                                        && a.Customer.IsActive == true 
+                                        && a.Consultant.IsActive == true,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant)
+                            .Include(ap => ap.Service));
                 
                 if (appointment == null)
                 {
                     throw new NotFoundException($"Appointment with ID {id} not found");
                 };
 
-
-                _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointment);
-
+                var response = _mapper.Map<DeleteAppointmentResponse>(appointment);
+                response.IsDeleted = true;
+                response.Message = "Appointment deleted successfully";
+                
                 await CreateAppointmentNotification(appointment, 
                     "Appointment Cancelled", 
                     $"Your appointment with {appointment.Consultant.Name} " +
                     $"on {appointment.AppointmentDate} " +
                     $"at {appointment.Slot} has been cancelled.");
+                
+                _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointment);
 
-                var response = _mapper.Map<DeleteAppointmentResponse>(appointment);
-                response.IsDeleted = true;
-                response.Message = "Appointment deleted successfully";
                 return response;
             });
         }
