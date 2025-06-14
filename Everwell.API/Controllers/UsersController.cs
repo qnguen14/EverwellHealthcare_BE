@@ -216,7 +216,7 @@ namespace Everwell.API.Controllers
         }
 
         [HttpPut(ApiEndpointConstants.User.UpdateProfileEndpoint)]
-        [Authorize("Admin, Consultant, Staff, Manager, Customer")]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UpdateUserResponse>> UpdateProfile(Guid id, UpdateProfileRequest request)
         {
             try
@@ -257,7 +257,7 @@ namespace Everwell.API.Controllers
         }
 
         [HttpPut(ApiEndpointConstants.User.UpdateAvatarEndpoint)]
-        [Authorize("Admin, Consultant, Staff, Manager, Customer")]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UpdateUserResponse>> UpdateAvatar(Guid id, UpdateAvatarRequest request)
         {
             try
@@ -303,7 +303,7 @@ namespace Everwell.API.Controllers
         [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize("Admin, Consultant, Staff, Manager, Customer")]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UserProfileResponse>> GetMyProfile()
         {
             try
