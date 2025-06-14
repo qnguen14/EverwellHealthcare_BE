@@ -5,6 +5,8 @@ using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using Everwell.BLL.Services;
+using Everwell.DAL.Data.Responses.TestResult;
+using Everwell.DAL.Data.Requests.TestResult;
 
 namespace Everwell.BLL.Services.Implements;
 
@@ -15,17 +17,25 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
     {
     }
 
-    public async Task<IEnumerable<TestResult>> GetAllTestResultsAsync()
+    public async Task<IEnumerable<CreateTestResultResponse>> GetAllTestResultsAsync()
     {
         try
         {
             var testResults = await _unitOfWork.GetRepository<TestResult>()
                 .GetListAsync(
+                    predicate: t => t.Customer.IsActive == true 
+                                    && t.Staff.IsActive == true,
                     include: t => t.Include(tr => tr.STITesting)
                                    .Include(tr => tr.Customer)
                                    .Include(tr => tr.Staff));
-            
-            return testResults ?? new List<TestResult>();
+
+            if (testResults == null || !testResults.Any())
+            {
+                _logger.LogWarning("No test results found");
+                return Enumerable.Empty<CreateTestResultResponse>();
+            }
+
+            return _mapper.Map<IEnumerable<CreateTestResultResponse>>(testResults);
         }
         catch (Exception ex)
         {
@@ -34,16 +44,26 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         }
     }
 
-    public async Task<TestResult?> GetTestResultByIdAsync(Guid id)
+    public async Task<CreateTestResultResponse> GetTestResultByIdAsync(Guid id)
     {
         try
         {
-            return await _unitOfWork.GetRepository<TestResult>()
+            var testresult = await _unitOfWork.GetRepository<TestResult>()
                 .FirstOrDefaultAsync(
-                    predicate: t => t.Id == id,
+                    predicate: t => t.Id == id &&
+                                    t.Customer.IsActive == true &&
+                                    t.Staff.IsActive == true,
                     include: t => t.Include(tr => tr.STITesting)
                                    .Include(tr => tr.Customer)
                                    .Include(tr => tr.Staff));
+
+            if (testresult == null) 
+            {
+                _logger.LogWarning("Test result with id {Id} not found", id);
+                return null;
+            }
+
+            return _mapper.Map<CreateTestResultResponse>(testresult);
         }
         catch (Exception ex)
         {
@@ -52,16 +72,30 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         }
     }
 
-    public async Task<TestResult> CreateTestResultAsync(TestResult testResult)
+    public async Task<CreateTestResultResponse> CreateTestResultAsync(CreateTestResultRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                testResult.Id = Guid.NewGuid();
-                
-                await _unitOfWork.GetRepository<TestResult>().InsertAsync(testResult);
-                return testResult;
+
+                var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
+                    .FirstOrDefaultAsync(predicate: t => t.STITestingId == request.STITestingId &&
+                                                         t.CustomerId == request.CustomerId &&
+                                                         t.StaffId == request.StaffId,
+                                         include: t => t.Include(tr => tr.STITesting)
+                                                        .Include(tr => tr.Customer)
+                                                        .Include(tr => tr.Staff));
+
+                if (existingTestResult != null)
+                {
+                    _logger.LogWarning("Test result with STITestingId {STITestingId} already exists", request.STITestingId);
+                    return _mapper.Map<CreateTestResultResponse>(request);
+                }
+
+                await _unitOfWork.GetRepository<TestResult>().InsertAsync(existingTestResult);
+
+                return _mapper.Map<CreateTestResultResponse>(request);
             });
         }
         catch (Exception ex)
@@ -71,24 +105,32 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         }
     }
 
-    public async Task<TestResult?> UpdateTestResultAsync(Guid id, TestResult testResult)
+    public async Task<CreateTestResultResponse> UpdateTestResultAsync(Guid id, CreateTestResultRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
-                    .FirstOrDefaultAsync(predicate: t => t.Id == id);
+                    .FirstOrDefaultAsync(predicate: t => t.Id == id &&
+                                                         t.Customer.IsActive == true && 
+                                                         t.Staff.IsActive == true,
+                                         include: t => t.Include(tr => tr.STITesting)
+                                                        .Include(tr => tr.Customer)
+                                                        .Include(tr => tr.Staff));
                 
-                if (existingTestResult == null) return null;
+                if (existingTestResult == null)
+                {
+                    _logger.LogWarning("Test result with id {Id} not found", id);
+                }
 
-                existingTestResult.ResultData = testResult.ResultData;
-                existingTestResult.Status = testResult.Status;
-                existingTestResult.ExaminedAt = testResult.ExaminedAt;
-                existingTestResult.SentAt = testResult.SentAt;
+                existingTestResult.ResultData = request.ResultData;
+                existingTestResult.Status = request.Status;
+                existingTestResult.ExaminedAt = request.ExaminedAt;
+                existingTestResult.SentAt = request.SentAt;
                 
                 _unitOfWork.GetRepository<TestResult>().UpdateAsync(existingTestResult);
-                return existingTestResult;
+                return _mapper.Map<CreateTestResultResponse>(request);
             });
         }
         catch (Exception ex)
@@ -104,12 +146,20 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                var testResult = await _unitOfWork.GetRepository<TestResult>()
-                    .FirstOrDefaultAsync(predicate: t => t.Id == id);
-                
-                if (testResult == null) return false;
+                var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
+                    .FirstOrDefaultAsync(predicate: t => t.Id == id &&
+                                                         t.Customer.IsActive == true &&
+                                                         t.Staff.IsActive == true,
+                                         include: t => t.Include(tr => tr.STITesting)
+                                                        .Include(tr => tr.Customer)
+                                                        .Include(tr => tr.Staff));
 
-                _unitOfWork.GetRepository<TestResult>().DeleteAsync(testResult);
+                if (existingTestResult == null)
+                {
+                    _logger.LogWarning("Test result with id {Id} not found", id);
+                }
+
+                _unitOfWork.GetRepository<TestResult>().DeleteAsync(existingTestResult);
                 return true;
             });
         }
