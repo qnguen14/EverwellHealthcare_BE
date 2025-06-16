@@ -22,7 +22,8 @@ namespace Everwell.DAL.Data.Entities
         Gonorrhea,
         Chlamydia,
         HepatitisB,
-        HepatitisC
+        HepatitisC,
+        FullPanel
     }
     
     public enum Method
@@ -30,7 +31,8 @@ namespace Everwell.DAL.Data.Entities
         BloodTest,
         UrineTest,
         SwabTest,
-        RapidTest
+        RapidTest,
+        FullPanelTest
     }
     
     [Table("STITesting")]

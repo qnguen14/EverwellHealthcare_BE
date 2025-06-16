@@ -9,8 +9,16 @@ namespace Everwell.DAL.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("EverWellDB_v1");
+            modelBuilder.HasDefaultSchema("EverWellDB_v2");
             base.OnModelCreating(modelBuilder);
+            
+            
+            // User - Role relationship
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Role)
+                .WithMany()
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Post - User (Staff)
             modelBuilder.Entity<Post>()
@@ -130,7 +138,7 @@ namespace Everwell.DAL.Data.Entities
                     .HasForeignKey(cs => cs.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasIndex(cs => new { cs.ConsultantId, cs.WorkDate, cs.ShiftSlot })
+                entity.HasIndex(cs => new { cs.ConsultantId, cs.WorkDate, cs.Slot })
                     .IsUnique();
             });
 
@@ -140,6 +148,30 @@ namespace Everwell.DAL.Data.Entities
                 entity.HasKey(bt => bt.Id);
                 entity.HasIndex(bt => bt.TokenHash).IsUnique();
                 entity.HasIndex(bt => bt.ExpiresAt);
+            });
+            
+            // Notification relationships
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasOne(n => n.Customer)
+                    .WithMany(u => u.Notifications)
+                    .HasForeignKey(n => n.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(n => n.Appointment)
+                    .WithMany()
+                    .HasForeignKey(n => n.AppointmentId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(n => n.TestResult)
+                    .WithMany()
+                    .HasForeignKey(n => n.TestResultId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                // Create indexes for common query patterns
+                entity.HasIndex(n => n.UserId);
+                entity.HasIndex(n => n.IsRead);
+                entity.HasIndex(n => n.CreatedAt);
             });
             
             
@@ -157,5 +189,7 @@ namespace Everwell.DAL.Data.Entities
         public DbSet<Question> Questions { get; set; }
         public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
         public DbSet<ConsultantSchedule> ConsultantSchedules { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Role> Roles { get; set; }
     }
 }

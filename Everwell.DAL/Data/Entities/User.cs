@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 namespace Everwell.DAL.Data.Entities
 {
 
-    public enum Role
-    {
-        Customer,
-        Consultant,
-        Staff,
-        Manager,
-        Admin
-    }
+    // public enum Role
+    // {
+    //     Customer,
+    //     Consultant,
+    //     Staff,
+    //     Manager,
+    //     Admin
+    // }
 
 
     [Table("Users")]
@@ -51,8 +51,9 @@ namespace Everwell.DAL.Data.Entities
         public string Password { get; set; }
 
         [Required]
-        [Column("role")]
-        public Role Role { get; set; }
+        [Column("role_id")]
+        public int RoleId { get; set; }
+        public virtual Role Role { get; set; }
 
         [Column("avatar_url")]
         [StringLength(1000)]
@@ -68,5 +69,7 @@ namespace Everwell.DAL.Data.Entities
         public virtual ICollection<TestResult> TestResultsExamined { get; set; } = new List<TestResult>(); // For staff who examine results
         public virtual ICollection<TestResult> TestResultsSent { get; set; } = new List<TestResult>(); // For staff who send results
 
+        // In User.cs - Add this property to the User class
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }

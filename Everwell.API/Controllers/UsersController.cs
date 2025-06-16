@@ -27,8 +27,34 @@ namespace Everwell.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<CreateUserResponse>>> GetUsers()
         {
-            var users = await _userService.GetUsers();
-            return Ok(users);
+            var response = await _userService.GetUsers();
+            
+            var apiResponse = new ApiResponse<IEnumerable<CreateUserResponse>>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Users retrieved successfully",
+                IsSuccess = true,
+                Data = response
+            };
+            return Ok(apiResponse);
+        }
+        
+        [HttpGet(ApiEndpointConstants.User.GetUsersByRoleEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateUserResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
+        public async Task<ActionResult<IEnumerable<CreateUserResponse>>> GetUsersByRole(string role)
+        {
+            var response = await _userService.GetUsersByRole(role);
+            var apiResponse = new ApiResponse<IEnumerable<CreateUserResponse>>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Users retrieved successfully",
+                IsSuccess = true,
+                Data = response
+            };
+            return Ok(apiResponse);
         }
 
         [HttpPost(ApiEndpointConstants.User.CreateUserEndpoint)]
@@ -38,21 +64,40 @@ namespace Everwell.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CreateUserResponse>> CreateUser(CreateUserRequest request)
         {
-            var users = await _userService.CreateUser(request);
-            return Ok(users);
+            var response = await _userService.CreateUser(request);
+            if (response == null)
+            {
+                return NotFound(new { message = "User creation failed" });
+            }
+            var apiResponse = new ApiResponse<CreateUserResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "User created successfully",
+                IsSuccess = true,
+                Data = response
+            };
+            return Ok(apiResponse);
         }
 
         [HttpGet(ApiEndpointConstants.User.GetUserEndpoint)]
         [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin, Manager, Consultant, Staff, Customer")]
         public async Task<ActionResult<GetUserResponse>> GetUserById(Guid id)
         {
             try
             {
-                var user = await _userService.GetUserById(id);
-                return Ok(user);
+                var response = await _userService.GetUserById(id);
+                
+                var apiResponse = new ApiResponse<GetUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User retrieved successfully",
+                    IsSuccess = true,
+                    Data = response
+                };
+                return Ok(apiResponse);
             }
             catch (InvalidOperationException ex)
             {
@@ -75,8 +120,21 @@ namespace Everwell.API.Controllers
         {
             try
             {
-                var user = await _userService.UpdateUser(id, request);
-                return Ok(user);
+                var response = await _userService.UpdateUser(id, request);
+                
+                if (response == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+                
+                var apiResponse = new ApiResponse<UpdateUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User updated successfully",
+                    IsSuccess = true,
+                    Data = response
+                };
+                return Ok(apiResponse);
             }
             catch (InvalidOperationException ex)
             {
@@ -93,9 +151,9 @@ namespace Everwell.API.Controllers
         }
 
         [HttpDelete(ApiEndpointConstants.User.DeleteUserEndpoint)]
-        // [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
-        // [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteUser(Guid id)
         {
@@ -104,7 +162,15 @@ namespace Everwell.API.Controllers
                 var result = await _userService.DeleteUser(id);
                 if (result)
                 {
-                    return NoContent();
+                    var apiResponse = new ApiResponse<CreateUserResponse>
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        Message = "User deleted successfully",
+                        IsSuccess = true,
+                        Data = null // No data to return on delete
+                    };
+                    
+                    return Ok(apiResponse);
                 }
                 return BadRequest(new { message = "Failed to delete user" });
             }
@@ -125,7 +191,15 @@ namespace Everwell.API.Controllers
             try
             {
                 var user = await _userService.SetUserRole(id, request);
-                return Ok(user);
+                
+                var apiResponse = new ApiResponse<UpdateUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User role updated successfully",
+                    IsSuccess = true,
+                    Data = user
+                };
+                return Ok(apiResponse);
             }
             catch (InvalidOperationException ex)
             {
@@ -142,7 +216,7 @@ namespace Everwell.API.Controllers
         }
 
         [HttpPut(ApiEndpointConstants.User.UpdateProfileEndpoint)]
-        [Authorize]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UpdateUserResponse>> UpdateProfile(Guid id, UpdateProfileRequest request)
         {
             try
@@ -158,7 +232,15 @@ namespace Everwell.API.Controllers
                 }
 
                 var user = await _userService.UpdateProfile(id, request);
-                return Ok(user);
+                
+                var apiResponse = new ApiResponse<UpdateUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User profile updated successfully",
+                    IsSuccess = true,
+                    Data = user
+                };
+                return Ok(apiResponse);
             }
             catch (InvalidOperationException ex)
             {
@@ -175,7 +257,7 @@ namespace Everwell.API.Controllers
         }
 
         [HttpPut(ApiEndpointConstants.User.UpdateAvatarEndpoint)]
-        [Authorize]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
         public async Task<ActionResult<UpdateUserResponse>> UpdateAvatar(Guid id, UpdateAvatarRequest request)
         {
             try
@@ -191,7 +273,139 @@ namespace Everwell.API.Controllers
                 }
 
                 var user = await _userService.UpdateAvatar(id, request);
-                return Ok(user);
+                
+                var apiResponse = new ApiResponse<UpdateUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User avatar updated successfully",
+                    IsSuccess = true,
+                    Data = user
+                };
+                return Ok(apiResponse);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        // New Profile API Endpoints
+
+        [HttpGet(ApiEndpointConstants.User.GetMyProfileEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "Admin, Consultant, Staff, Manager, Customer")]
+        public async Task<ActionResult<UserProfileResponse>> GetMyProfile()
+        {
+            try
+            {
+                // Get current user ID from JWT token
+                var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (currentUserIdClaim == null || !Guid.TryParse(currentUserIdClaim, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid user token." });
+                }
+
+                var profile = await _userService.GetCurrentUserProfile(currentUserId);
+                
+                var apiResponse = new ApiResponse<UserProfileResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User profile retrieved successfully",
+                    IsSuccess = true,
+                    Data = profile
+                };
+                return Ok(apiResponse);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpPut(ApiEndpointConstants.User.UpdateMyProfileEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<UpdateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        public async Task<ActionResult<UpdateUserResponse>> UpdateMyProfile(UpdateProfileRequest request)
+        {
+            try
+            {
+                // Get current user ID from JWT token
+                var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (currentUserIdClaim == null || !Guid.TryParse(currentUserIdClaim, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid user token." });
+                }
+
+                var user = await _userService.UpdateProfile(currentUserId, request);
+                
+                var apiResponse = new ApiResponse<UpdateUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User profile updated successfully",
+                    IsSuccess = true,
+                    Data = user
+                };
+                return Ok(apiResponse);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpPut(ApiEndpointConstants.User.UpdateMyAvatarEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<UpdateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        public async Task<ActionResult<UpdateUserResponse>> UpdateMyAvatar(UpdateAvatarRequest request)
+        {
+            try
+            {
+                // Get current user ID from JWT token
+                var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (currentUserIdClaim == null || !Guid.TryParse(currentUserIdClaim, out var currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid user token." });
+                }
+
+                var user = await _userService.UpdateAvatar(currentUserId, request);
+                
+                var apiResponse = new ApiResponse<UpdateUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User avatar updated successfully",
+                    IsSuccess = true,
+                    Data = user
+                };
+                return Ok(apiResponse);
             }
             catch (InvalidOperationException ex)
             {

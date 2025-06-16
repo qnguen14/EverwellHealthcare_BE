@@ -20,6 +20,36 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         _mapper = mapper;
     }
 
+    // Helper method to create appointment notifications
+
+    private async Task CreateAppointmentNotification(Appointment appointment, string title, string message, NotificationPriority priority = NotificationPriority.Medium)
+    {
+        try
+        {
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                UserId = appointment.CustomerId,
+                Title = title,
+                Message = message,
+                Type = NotificationType.Appointment,
+                Priority = priority,
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false,
+                AppointmentId = appointment.Id
+            };
+
+            await _unitOfWork.GetRepository<Notification>().InsertAsync(notification);
+            _logger.LogInformation("Created appointment notification for user {UserId}, appointment {AppointmentId}",
+                appointment.CustomerId, appointment.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create appointment notification for appointment {AppointmentId}", appointment.Id);
+            // Don't throw - notification creation shouldn't block the main operation
+        }
+    }
+
     public async Task<IEnumerable<CreateAppointmentsResponse>> GetAllAppointmentsAsync()
     {
         try
@@ -110,32 +140,40 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request), "request cannot be null.");
+
+            var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
+                .FirstOrDefaultAsync(
+                    predicate: a => a.AppointmentDate == request.AppointmentDate
+                                    && a.Slot == request.Slot
+                                    && a.ConsultantId == request.ConsultantId,
+                    include: a => a.Include(ap => ap.Customer)
+                                   .Include(ap => ap.Consultant)
+                );
+            if (existingAppointment != null &&
+                existingAppointment.Customer.IsActive &&
+                existingAppointment.Consultant.IsActive)
             {
-                if (request == null)
-                {
-                    throw new ArgumentNullException(nameof(request), "request cannot be null.");
-                }
-                
-                var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.AppointmentDate == request.AppointmentDate 
-                                                         && a.Slot == request.Slot 
-                                                         && a.ConsultantId == request.ConsultantId,
-                                        include: a => a.Include(ap => ap.Customer)
-                                            .Include(ap => ap.Consultant)
-                                                         );
-                if (existingAppointment != null &&
-                    existingAppointment.Customer.IsActive &&
-                    existingAppointment.Consultant.IsActive)
-                {
-                    throw new BadRequestException("An appointment already exists for the specified date, slot, and consultant.");
-                }
-                
-                var newAppointment = _mapper.Map<Appointment>(request);
-                
-                await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
-                
-                return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
-            });
+                throw new BadRequestException(
+                    "An appointment already exists for the specified date, slot, and consultant.");
+            }
+
+            var newAppointment = _mapper.Map<Appointment>(request);
+            if (newAppointment.Id == Guid.Empty)
+                newAppointment.Id = Guid.NewGuid(); // Ensure Id is set
+
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
+
+            await CreateAppointmentNotification(newAppointment,
+                "Appointment Created",
+                $"Your appointment with {newAppointment.Consultant?.Name} " +
+                $"on {newAppointment.AppointmentDate} " +
+                $"at {newAppointment.Slot} has been successfully booked.");
+
+            return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
+        });
         }
         catch (Exception ex)
         {
@@ -144,26 +182,39 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, Appointment appointment)
+    public async Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, UpdateAppointmentRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.Id == id);
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == id 
+                                        && a.Customer.IsActive == true 
+                                        && a.Consultant.IsActive == true,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant)
+                            .Include(ap => ap.Service));
 
                 if (existingAppointment == null)
                 {
                     throw new NotFoundException($"Appointment with ID {id} not found");
                 }
 
-                existingAppointment.AppointmentDate = appointment.AppointmentDate;
-                existingAppointment.Status = appointment.Status;
-                existingAppointment.Notes = appointment.Notes;
+                existingAppointment.AppointmentDate = request.AppointmentDate;
+                existingAppointment.Status = request.Status;
+                existingAppointment.Notes = request.Notes;
                 
                 _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
                 
+
+                await CreateAppointmentNotification(existingAppointment, 
+                    "Appointment Updated", 
+                    $"Your appointment with {existingAppointment.Consultant.Name} " +
+                    $"on {existingAppointment.AppointmentDate} " +
+                    $"at {existingAppointment.Slot} has been successfully updated.");
+
                 return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
             });
         }
@@ -181,23 +232,126 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var appointment = await _unitOfWork.GetRepository<Appointment>()
-                    .FirstOrDefaultAsync(predicate: a => a.Id == id);
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == id 
+                                        && a.Customer.IsActive == true 
+                                        && a.Consultant.IsActive == true,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant)
+                            .Include(ap => ap.Service));
                 
                 if (appointment == null)
                 {
                     throw new NotFoundException($"Appointment with ID {id} not found");
                 };
 
-                _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointment);
                 var response = _mapper.Map<DeleteAppointmentResponse>(appointment);
                 response.IsDeleted = true;
                 response.Message = "Appointment deleted successfully";
+                
+                await CreateAppointmentNotification(appointment, 
+                    "Appointment Cancelled", 
+                    $"Your appointment with {appointment.Consultant.Name} " +
+                    $"on {appointment.AppointmentDate} " +
+                    $"at {appointment.Slot} has been cancelled.");
+                
+                _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointment);
+
                 return response;
             });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while deleting appointment with id: {Id}", id);
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedules()
+    {
+        try
+        {
+            var schedules = await _unitOfWork.GetRepository<ConsultantSchedule>()
+                .GetListAsync(
+                    predicate: s => s.Consultant.IsActive,
+                    include: s => s.Include(sc => sc.Consultant),
+                    orderBy: s => s.OrderBy(sc => sc.WorkDate)
+            );
+
+            if (schedules == null)
+            {
+                throw new NotFoundException("No consultant schedules found");
+            }
+
+            return _mapper.Map<IEnumerable<GetScheduleResponse>>(schedules);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting consultant schedules");
+            throw;
+        }
+    }
+
+    // Get Consultant Schedules by Their Id
+
+    public async Task<IEnumerable<GetScheduleResponse>> GetConsultantSchedulesById(Guid id)
+    {
+        try
+        {
+            var schedules = await _unitOfWork.GetRepository<ConsultantSchedule>()
+                .GetListAsync(
+                    predicate: s => s.ConsultantId == id 
+                                    && s.Consultant.IsActive,
+                    include: s => s.Include(sc => sc.Consultant),
+                    orderBy: s => s.OrderBy(sc => sc.WorkDate)
+            );
+
+            if (schedules == null)
+            {
+                throw new NotFoundException("No consultant schedules found");
+            }
+
+            return _mapper.Map<IEnumerable<GetScheduleResponse>>(schedules);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error occurred while getting consultant schedules with {id}");
+            throw;
+        }
+    }
+
+    public async Task<GetScheduleResponse> CreateConsultantSchedule(CreateScheduleRequest request)
+    {
+        try
+        {
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                var existingSchedule = await _unitOfWork.GetRepository<ConsultantSchedule>()
+                    .FirstOrDefaultAsync(
+                        predicate: s => s.ConsultantId == request.ConsultantId
+                                        && s.WorkDate == request.WorkDate
+                                        && s.Slot == request.Slot,
+                        include: s => s.Include(sc => sc.Consultant));
+
+                if (existingSchedule != null)
+                {
+                    throw new BadRequestException("This schedule already exists for this consultant.");
+                }
+
+                var newSchedule = _mapper.Map<ConsultantSchedule>(request);
+
+                // Ensure values are set properly
+                newSchedule.IsAvailable = request.IsAvailable;
+                newSchedule.CreatedAt = DateTime.UtcNow;
+
+                await _unitOfWork.GetRepository<ConsultantSchedule>().InsertAsync(newSchedule);
+
+                return _mapper.Map<GetScheduleResponse>(newSchedule);
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while creating consultant schedule: {@Request}", request);
             throw;
         }
     }

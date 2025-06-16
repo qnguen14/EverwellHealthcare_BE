@@ -50,6 +50,41 @@ namespace Everwell.BLL.Services.Implements
                 throw;
             }
         }
+        
+        public async Task<IEnumerable<CreateUserResponse>> GetUsersByRole(string role) 
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(role))
+                {
+                    throw new ArgumentException("Role cannot be null or empty.", nameof(role));
+                }
+
+                if (!Enum.TryParse<RoleName>(role, true, out var parsedRole))
+                {
+                    throw new ArgumentException($"Invalid role: {role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(RoleName)))}");
+                }
+
+                var users = await _unitOfWork.GetRepository<User>()
+                    .GetListAsync(
+                        predicate: u => u.Role.Name == parsedRole && u.IsActive,
+                        include: u => u.Include(x => x.Role),
+                        orderBy: u => u.OrderBy(n => n.Name)
+                    );
+
+                if (users == null || !users.Any())
+                {
+                    throw new NotFoundException($"No active users found with role: {role}");
+                }
+
+                return _mapper.Map<IEnumerable<CreateUserResponse>>(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while retrieving users by role: " + ex.Message);
+                throw;
+            }
+        }
 
 
         public async Task<CreateUserResponse> CreateUser(CreateUserRequest request)
@@ -84,8 +119,17 @@ namespace Everwell.BLL.Services.Implements
                     newUser.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
                     
                     // 3. Parse and set the role
-                    if (Enum.TryParse<Role>(request.Role, true, out Role role))
+                    if (Enum.TryParse<RoleName>(request.Role, true, out var roleName))
                     {
+                        var role = await _unitOfWork.GetRepository<Role>()
+                            .FirstOrDefaultAsync(predicate: r => r.Name == roleName);
+    
+                        if (role == null)
+                        {
+                            throw new NotFoundException($"Role not found: {roleName}");
+                        }
+    
+                        newUser.RoleId = role.Id;
                         newUser.Role = role;
                     }
                     else
@@ -299,13 +343,22 @@ namespace Everwell.BLL.Services.Implements
                     }
 
                     // Parse and set the role
-                    if (Enum.TryParse<Role>(request.Role, true, out Role role))
+                    if (Enum.TryParse<RoleName>(request.Role, true, out var roleName))
                     {
+                        var role = await _unitOfWork.GetRepository<Role>()
+                            .FirstOrDefaultAsync(predicate: r => r.Name == roleName);
+    
+                        if (role == null)
+                        {
+                            throw new NotFoundException($"Role not found: {roleName}");
+                        }
+    
+                        existingUser.RoleId = role.Id;
                         existingUser.Role = role;
                     }
                     else
                     {
-                        throw new ArgumentException($"Invalid role: {request.Role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(Role)))}");
+                        throw new ArgumentException($"Invalid role: {request.Role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(RoleName)))}");
                     }
 
                     // Update the user
@@ -406,6 +459,57 @@ namespace Everwell.BLL.Services.Implements
             catch (Exception ex)
             {
                 throw new Exception($"Failed to update user avatar: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<UserProfileResponse> GetUserProfile(Guid userId)
+        {
+            try
+            {
+                var user = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(
+                        predicate: u => u.Id == userId && u.IsActive,
+                        include: u => u
+                            .Include(x => x.Posts)
+                            .Include(x => x.STITests)
+                    );
+
+                if (user == null)
+                {
+                    throw new NotFoundException("User not found.");
+                }
+
+                // Get additional statistics
+                var appointmentCount = await _unitOfWork.GetRepository<Appointment>()
+                    .CountAsync(predicate: a => (a.CustomerId == userId || a.ConsultantId == userId) && a.Status != AppointmentStatus.Cancelled);
+
+                // Map to profile response
+                var profile = _mapper.Map<UserProfileResponse>(user);
+                profile.TotalPosts = user.Posts?.Count ?? 0;
+                profile.TotalSTITests = user.STITests?.Count ?? 0;
+                profile.TotalAppointments = appointmentCount;
+
+                return profile;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while retrieving user profile for ID: {UserId}. Error: {Message}", userId, ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<UserProfileResponse> GetCurrentUserProfile(Guid currentUserId)
+        {
+            try
+            {
+                // This method can include additional logic specific to the current user
+                // For now, it's the same as GetUserProfile but can be extended
+                return await GetUserProfile(currentUserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while retrieving current user profile for ID: {UserId}. Error: {Message}", currentUserId, ex.Message);
+                throw;
             }
         }
     }

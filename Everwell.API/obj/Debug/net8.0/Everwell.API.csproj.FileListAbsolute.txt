@@ -293,3 +293,7 @@ D:\Gender System\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\refint\Ever
 D:\Gender System\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.pdb
 D:\Gender System\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.genruntimeconfig.cache
 D:\Gender System\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\ref\Everwell.API.dll
+<<<<<<< HEAD
+=======
+D:\Gender System\EverwellHealthcare_BE\Everwell.API\obj\Debug\net8.0\Everwell.API.MvcApplicationPartsAssemblyInfo.cs
+>>>>>>> dev

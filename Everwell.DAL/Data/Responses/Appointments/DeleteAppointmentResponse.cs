@@ -12,4 +12,6 @@ public class DeleteAppointmentResponse
         IsDeleted = isDeleted;
         Message = message;
     }
+    
+    public DeleteAppointmentResponse() { }
 }

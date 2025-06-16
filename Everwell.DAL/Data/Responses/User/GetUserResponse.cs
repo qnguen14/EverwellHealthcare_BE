@@ -15,6 +15,6 @@ namespace Everwell.DAL.Data.Responses.User
         public string Address { get; set; }
         public string Role { get; set; }
         public string? AvatarUrl { get; set; }
-        public bool IsActive { get; set; }
+        // public bool IsActive { get; set; }
     }
 }

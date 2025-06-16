@@ -28,9 +28,9 @@ namespace Everwell.BLL.Infrastructure
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name),
-                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                    new Claim(ClaimTypes.Role, user.Role.Name.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(60), // Set token expiration time
+                Expires = DateTime.UtcNow.AddMinutes(double.Parse(_config["JWT:ExpirationInMinutes"])), // Set token expiration time
                 SigningCredentials = credentials,
                 Issuer = _config["Jwt:Issuer"],
                 Audience = _config["Jwt:Audience"]
@@ -50,7 +50,7 @@ namespace Everwell.BLL.Infrastructure
                 signingCredentials: credentials
             );
 
-            Console.WriteLine($"User role: {user.Role.ToString()}");
+            // Console.WriteLine($"User role: {user.Role.ToString()}");
 
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);

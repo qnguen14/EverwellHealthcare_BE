@@ -28,7 +28,7 @@ public class TestResult
 
     [Required]
     [Column("status")]
-    public TestResultStatus Status { get; set; } = TestResultStatus.Pending;
+    public Status Status { get; set; } = Status.Pending;
 
     [Column("customer_id")]
     public Guid? CustomerId { get; set; }

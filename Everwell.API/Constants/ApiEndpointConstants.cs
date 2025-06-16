@@ -5,7 +5,7 @@
         static ApiEndpointConstants() {  }
 
         public const string RootEndpoint = "/api";
-        public const string ApiVersion = "/v1";
+        public const string ApiVersion = "/v2";
         public const string ApiEndpoint = RootEndpoint + ApiVersion;
 
         public static class Auth
@@ -22,15 +22,19 @@
         {
             public const string UserEndpoint = ApiEndpoint + "/user";
             public const string GetUserEndpoint = UserEndpoint + "/{id}";
-            public const string GetAllUsersEndpoint = UserEndpoint + "/getall"; 
-            public const string CreateUserEndpoint = UserEndpoint + "/create"; 
+            public const string GetAllUsersEndpoint = UserEndpoint + "/getall";
+            public const string GetUsersByRoleEndpoint = GetAllUsersEndpoint + "/{role}";
+            public const string CreateUserEndpoint = UserEndpoint + "/create";
             public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
             public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";
             
-            // New endpoints
+            // Profile endpoints
+            public const string GetMyProfileEndpoint = UserEndpoint + "/profile/me";
             public const string SetRoleEndpoint = UserEndpoint + "/set-role/{id}";
             public const string UpdateProfileEndpoint = UserEndpoint + "/profile/{id}";
+            public const string UpdateMyProfileEndpoint = UserEndpoint + "/profile/me";
             public const string UpdateAvatarEndpoint = UserEndpoint + "/avatar/{id}";
+            public const string UpdateMyAvatarEndpoint = UserEndpoint + "/avatar/me";
         }
 
         public static class Service
@@ -52,6 +56,9 @@
             public const string CreateAppointmentEndpoint = AppointmentEndpoint + "/create";
             public const string UpdateAppointmentEndpoint = AppointmentEndpoint + "/update/{id}";
             public const string DeleteAppointmentEndpoint = AppointmentEndpoint + "/delete/{id}";
+            public const string GetConsultantSchedulesEndpoint = AppointmentEndpoint + "/consultant/schedules";
+            public const string GetConsultantSchedulesByIdEndpoint = AppointmentEndpoint + "/consultant/schedules/{id}";
+            public const string CreateConsultantScheduleEndpoint = AppointmentEndpoint + "/consultant/schedule/create";
         }
 
         public static class Feedback
@@ -128,6 +135,14 @@
             public const string GetDashboardStatsEndpoint = DashboardEndpoint + "/stats";
             public const string GetUsersByRoleEndpoint = DashboardEndpoint + "/users-by-role";
             public const string GetAppointmentsByStatusEndpoint = DashboardEndpoint + "/appointments-by-status";
+        }
+        
+        public static class Notification
+        {
+            public const string NotificationEndpoint = ApiEndpoint + "/notification";
+            public const string GetUserNotifications = NotificationEndpoint + "/user/{userId}";
+            public const string MarkAsRead = NotificationEndpoint + "/mark/{id}";
+            public const string DeleteNotificationEndpoint = NotificationEndpoint + "/delete/{id}";
         }
     }
 }
