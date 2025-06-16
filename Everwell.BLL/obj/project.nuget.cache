@@ -51,15 +51,5 @@
     "C:\\Users\\qnguy\\.nuget\\packages\\system.text.encodings.web\\8.0.0\\system.text.encodings.web.8.0.0.nupkg.sha512",
     "C:\\Users\\qnguy\\.nuget\\packages\\system.text.json\\8.0.0\\system.text.json.8.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "message": "Problem reading the cache file D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.BLL\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
-      "projectPath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.BLL\\Everwell.BLL.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\coding\\fpt\\SWP391\\EverwellHealthcare_BE\\Everwell.BLL\\Everwell.BLL.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }
