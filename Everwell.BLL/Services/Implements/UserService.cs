@@ -34,6 +34,7 @@ namespace Everwell.BLL.Services.Implements
                 var users = await _unitOfWork.GetRepository<User>()
                     .GetListAsync(
                         predicate: u => u.IsActive,
+                        include: u => u.Include(x => x.Role),
                         orderBy: u => u.OrderBy(n => n.Name)
                     );
 
@@ -173,7 +174,8 @@ namespace Everwell.BLL.Services.Implements
             {
                 var user = await _unitOfWork.GetRepository<User>()
                     .FirstOrDefaultAsync(
-                        predicate: u => u.Id == id && u.IsActive
+                        predicate: u => u.Id == id && u.IsActive,
+                        include: u => u.Include(x => x.Role)
                     );
 
                 if (user == null)
@@ -203,8 +205,8 @@ namespace Everwell.BLL.Services.Implements
 
                     var existingUser = await _unitOfWork.GetRepository<User>()
                         .FirstOrDefaultAsync(
-                            predicate: u => u.Id == id && u.IsActive
-                        );
+                            predicate: u => u.Id == id && u.IsActive,
+                            include: u => u.Include(x => x.Role));
 
                     if (existingUser == null)
                     {
@@ -248,7 +250,8 @@ namespace Everwell.BLL.Services.Implements
                 {
                     var existingUser = await _unitOfWork.GetRepository<User>()
                         .FirstOrDefaultAsync(
-                            predicate: u => u.Id == id && u.IsActive
+                            predicate: u => u.Id == id && u.IsActive,
+                    include: u => u.Include(x => x.Role)
                         );
 
                     if (existingUser == null)
@@ -275,7 +278,8 @@ namespace Everwell.BLL.Services.Implements
             {
                 var user = await _unitOfWork.GetRepository<User>()
                     .FirstOrDefaultAsync(
-                        predicate: u => u.Email == email && u.IsActive
+                        predicate: u => u.Email == email && u.IsActive,
+                        include: u => u.Include(x => x.Role)
                     );
 
                 if (user == null)
@@ -299,7 +303,8 @@ namespace Everwell.BLL.Services.Implements
                 {
                     var existingUser = await _unitOfWork.GetRepository<User>()
                         .FirstOrDefaultAsync(
-                            predicate: u => u.Id == userId && u.IsActive
+                            predicate: u => u.Id == userId && u.IsActive,
+                            include: u => u.Include(x => x.Role)
                         );
 
                     if (existingUser == null)
@@ -386,7 +391,8 @@ namespace Everwell.BLL.Services.Implements
 
                     var existingUser = await _unitOfWork.GetRepository<User>()
                         .FirstOrDefaultAsync(
-                            predicate: u => u.Id == userId && u.IsActive
+                            predicate: u => u.Id == userId && u.IsActive,
+                            include: u => u.Include(x => x.Role)
                         );
 
                     if (existingUser == null)
@@ -439,7 +445,8 @@ namespace Everwell.BLL.Services.Implements
 
                     var existingUser = await _unitOfWork.GetRepository<User>()
                         .FirstOrDefaultAsync(
-                            predicate: u => u.Id == userId && u.IsActive
+                            predicate: u => u.Id == userId && u.IsActive,
+                            include: u => u.Include(x => x.Role)
                         );
 
                     if (existingUser == null)
@@ -472,6 +479,7 @@ namespace Everwell.BLL.Services.Implements
                         include: u => u
                             .Include(x => x.Posts)
                             .Include(x => x.STITests)
+                            .Include(x => x.Role)
                     );
 
                 if (user == null)
