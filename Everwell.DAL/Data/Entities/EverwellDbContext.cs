@@ -9,8 +9,16 @@ namespace Everwell.DAL.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("EverWellDB_v1");
+            modelBuilder.HasDefaultSchema("EverWellDB_v2");
             base.OnModelCreating(modelBuilder);
+            
+            
+            // User - Role relationship
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Role)
+                .WithMany()
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Post - User (Staff)
             modelBuilder.Entity<Post>()
@@ -165,6 +173,8 @@ namespace Everwell.DAL.Data.Entities
                 entity.HasIndex(n => n.IsRead);
                 entity.HasIndex(n => n.CreatedAt);
             });
+            
+            
         }
 
         public DbSet<User> Users { get; set; }
@@ -180,5 +190,6 @@ namespace Everwell.DAL.Data.Entities
         public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
         public DbSet<ConsultantSchedule> ConsultantSchedules { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Role> Roles { get; set; }
     }
 }

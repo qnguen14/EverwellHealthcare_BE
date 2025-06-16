@@ -60,14 +60,15 @@ namespace Everwell.BLL.Services.Implements
                     throw new ArgumentException("Role cannot be null or empty.", nameof(role));
                 }
 
-                if (!Enum.TryParse<Role>(role, true, out var parsedRole))
+                if (!Enum.TryParse<RoleName>(role, true, out var parsedRole))
                 {
-                    throw new ArgumentException($"Invalid role: {role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(Role)))}");
+                    throw new ArgumentException($"Invalid role: {role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(RoleName)))}");
                 }
 
                 var users = await _unitOfWork.GetRepository<User>()
                     .GetListAsync(
-                        predicate: u => u.Role == parsedRole && u.IsActive,
+                        predicate: u => u.Role.Name == parsedRole && u.IsActive,
+                        include: u => u.Include(x => x.Role),
                         orderBy: u => u.OrderBy(n => n.Name)
                     );
 
@@ -118,8 +119,17 @@ namespace Everwell.BLL.Services.Implements
                     newUser.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
                     
                     // 3. Parse and set the role
-                    if (Enum.TryParse<Role>(request.Role, true, out Role role))
+                    if (Enum.TryParse<RoleName>(request.Role, true, out var roleName))
                     {
+                        var role = await _unitOfWork.GetRepository<Role>()
+                            .FirstOrDefaultAsync(predicate: r => r.Name == roleName);
+    
+                        if (role == null)
+                        {
+                            throw new NotFoundException($"Role not found: {roleName}");
+                        }
+    
+                        newUser.RoleId = role.Id;
                         newUser.Role = role;
                     }
                     else
@@ -333,13 +343,22 @@ namespace Everwell.BLL.Services.Implements
                     }
 
                     // Parse and set the role
-                    if (Enum.TryParse<Role>(request.Role, true, out Role role))
+                    if (Enum.TryParse<RoleName>(request.Role, true, out var roleName))
                     {
+                        var role = await _unitOfWork.GetRepository<Role>()
+                            .FirstOrDefaultAsync(predicate: r => r.Name == roleName);
+    
+                        if (role == null)
+                        {
+                            throw new NotFoundException($"Role not found: {roleName}");
+                        }
+    
+                        existingUser.RoleId = role.Id;
                         existingUser.Role = role;
                     }
                     else
                     {
-                        throw new ArgumentException($"Invalid role: {request.Role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(Role)))}");
+                        throw new ArgumentException($"Invalid role: {request.Role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(RoleName)))}");
                     }
 
                     // Update the user

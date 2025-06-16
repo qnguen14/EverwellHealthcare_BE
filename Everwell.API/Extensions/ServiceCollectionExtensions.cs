@@ -38,10 +38,10 @@ namespace Everwell.API.Extensions
                     }
                 }; 
 
-                options.SwaggerDoc("v1", new OpenApiInfo
+                options.SwaggerDoc("v2", new OpenApiInfo
                 {
                     Title = "Everwell.API",
-                    Version = "v1",
+                    Version = "v2",
                     Description = "A Gender Healthcare Service System "
                 });
 

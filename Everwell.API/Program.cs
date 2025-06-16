@@ -98,15 +98,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdminRole", policy =>
-        policy.RequireRole(Role.Admin.ToString()));
+        policy.RequireRole("Admin"));
     options.AddPolicy("RequireManagerRole", policy =>
-        policy.RequireRole(Role.Manager.ToString()));
+        policy.RequireRole("Manager"));
     options.AddPolicy("RequireConsultant", policy =>
-        policy.RequireRole(Role.Consultant.ToString()));
+        policy.RequireRole("Consultant"));
     options.AddPolicy("RequireStaffRole", policy =>
-        policy.RequireRole(Role.Staff.ToString()));
+        policy.RequireRole("Staff"));
     options.AddPolicy("RequireCustomerRole", policy =>
-        policy.RequireRole(Role.Customer.ToString()));
+        policy.RequireRole("Customer"));
 });
 
 var app = builder.Build();
@@ -115,7 +115,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "Everwell.API v2"));
 }
 
 app.UseCors(options =>

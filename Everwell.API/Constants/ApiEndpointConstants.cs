@@ -5,7 +5,7 @@
         static ApiEndpointConstants() {  }
 
         public const string RootEndpoint = "/api";
-        public const string ApiVersion = "/v1";
+        public const string ApiVersion = "/v2";
         public const string ApiEndpoint = RootEndpoint + ApiVersion;
 
         public static class Auth

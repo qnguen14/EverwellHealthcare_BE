@@ -60,7 +60,10 @@ namespace Everwell.BLL.Services.Implements
                 Console.WriteLine($"Login attempt for: {request.Email}");
 
                 // Fetch user from the database
-                var user = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive, null, null);
+                var user = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive, 
+                                        null, 
+                                        include: u => u.Include(u => u.Role));
                 if (user == null)
                 {
                     throw new UnauthorizedException("Invalid email or password.");
@@ -233,7 +236,7 @@ namespace Everwell.BLL.Services.Implements
                     PhoneNumber = request.PhoneNumber,
                     Address = request.Address,
                     Password = request.Password,
-                    Role = Role.Customer.ToString() // Default role for public registration
+                    Role = RoleName.Customer.ToString() // Default role for public registration
                 };
 
                 // Use the existing UserService to create the user

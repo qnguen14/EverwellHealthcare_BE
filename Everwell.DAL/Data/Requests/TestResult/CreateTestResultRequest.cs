@@ -17,7 +17,7 @@ namespace Everwell.DAL.Data.Requests.TestResult
         public string ResultData { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
-        public TestResultStatus Status { get; set; } = TestResultStatus.Pending;
+        public Status Status { get; set; } = Status.Pending;
 
         [Required(ErrorMessage = "Customer Id is required")]
         public Guid? CustomerId { get; set; }
