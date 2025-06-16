@@ -6,6 +6,7 @@ namespace Everwell.BLL.Services.Interfaces
     {
         Task ProcessPendingNotificationsAsync();
         Task ScheduleNotificationsForTrackingAsync(Guid trackingId);
+        Task ScheduleNotificationsForTrackingAsync(MenstrualCycleTracking tracking);
         Task SendPeriodReminderAsync(Guid customerId, DateTime predictedDate);
         Task SendOvulationReminderAsync(Guid customerId, DateTime ovulationDate);
             Task SendFertilityWindowReminderAsync(Guid customerId, DateTime windowStart, DateTime windowEnd);

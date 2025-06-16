@@ -76,15 +76,14 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
                 
                 await _unitOfWork.GetRepository<MenstrualCycleTracking>().InsertAsync(tracking);
                 
-                // Check context state after tracking insertion
-                var contextStateAfterTracking = _unitOfWork.Context.ChangeTracker.Entries().Count();
-                _logger.LogInformation("Context has {Count} tracked entities after adding tracking", contextStateAfterTracking);
+                // Force save to make tracking available for notification service
+                await _unitOfWork.SaveChangesAsync();
                 
                 // Schedule notifications if enabled
                 if (tracking.NotificationEnabled)
                 {
                     _logger.LogInformation("About to schedule notifications for tracking {TrackingId}", tracking.TrackingId);
-                    await _notificationService.ScheduleNotificationsForTrackingAsync(tracking.TrackingId);
+                    await _notificationService.ScheduleNotificationsForTrackingAsync(tracking);
                     _logger.LogInformation("Notifications scheduled for tracking {TrackingId}", tracking.TrackingId);
                     
                     // Check context state after notifications
@@ -105,6 +104,8 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
                 {
                     _logger.LogInformation("Notifications disabled for tracking {TrackingId}", tracking.TrackingId);
                 }
+                
+                _logger.LogInformation("About to commit transaction for tracking {TrackingId}", tracking.TrackingId);
                 
                 return _mapper.Map<CreateMenstrualCycleResponse>(tracking);
             });
@@ -190,27 +191,45 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
             if (!history.Any())
                 throw new InvalidOperationException("Not enough cycle data to make prediction");
 
-            var cycleLengths = history
-                .Where(h => h.CycleEndDate.HasValue)
-                .Select(h => (h.CycleEndDate!.Value - h.CycleStartDate).TotalDays)
-                .ToList();
+            // Calculate cycle lengths correctly (start to start, not start to end)
+            var cycleLengths = new List<double>();
+            var sortedHistory = history.OrderBy(h => h.CycleStartDate).ToList();
+            
+            for (int i = 0; i < sortedHistory.Count - 1; i++)
+            {
+                var currentStart = sortedHistory[i].CycleStartDate;
+                var nextStart = sortedHistory[i + 1].CycleStartDate;
+                var cycleLength = (nextStart - currentStart).TotalDays;
+                
+                // Validate reasonable cycle length
+                if (cycleLength >= 21 && cycleLength <= 45)
+                    cycleLengths.Add(cycleLength);
+            }
 
             if (!cycleLengths.Any())
-                throw new InvalidOperationException("No completed cycles found for prediction");
+                throw new InvalidOperationException("No valid cycle lengths found for prediction");
 
             var averageCycleLength = cycleLengths.Average();
-            var lastCycle = history.OrderByDescending(h => h.CycleStartDate).First();
+            var lastCycle = sortedHistory.OrderByDescending(h => h.CycleStartDate).First();
+            
+            // Calculate next period start correctly
+            var nextPeriodStart = lastCycle.CycleStartDate.AddDays(averageCycleLength);
+            var nextPeriodEnd = nextPeriodStart.AddDays(5); // Average period length
+            
+            // Calculate confidence and regularity
+            var confidenceScore = CalculateConfidenceScore(cycleLengths);
+            var isRegular = IsRegularCycle(cycleLengths);
             
             return new CyclePredictionResponse
             {
-                PredictedNextPeriodStart = lastCycle.CycleEndDate?.AddDays(averageCycleLength) ?? DateTime.UtcNow.AddDays(28),
-                PredictedNextPeriodEnd = lastCycle.CycleEndDate?.AddDays(averageCycleLength + 5) ?? DateTime.UtcNow.AddDays(33),
+                PredictedNextPeriodStart = nextPeriodStart,
+                PredictedNextPeriodEnd = nextPeriodEnd,
                 PredictedCycleLength = (int)Math.Round(averageCycleLength),
                 PredictedPeriodLength = 5,
-                ConfidenceScore = CalculateConfidenceScore(cycleLengths),
-                ConfidenceLevel = GetConfidenceLevel(CalculateConfidenceScore(cycleLengths)),
-                IsRegularCycle = cycleLengths.All(l => Math.Abs(l - averageCycleLength) <= 3),
-                Factors = new List<string> { "Historical cycle data", "Average cycle length calculation" }
+                ConfidenceScore = confidenceScore,
+                ConfidenceLevel = GetConfidenceLevel(confidenceScore),
+                IsRegularCycle = isRegular,
+                Factors = GeneratePredictionFactors(cycleLengths.Count, isRegular, confidenceScore)
             };
         }
         catch (Exception ex)
@@ -225,17 +244,24 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         try
         {
             var prediction = await PredictNextCycleAsync(customerId);
-            var ovulationDate = prediction.PredictedNextPeriodStart.AddDays(-14);
+            
+            // Calculate ovulation date with improved logic
+            var lutealPhaseLength = CalculateLutealPhaseLength(prediction.PredictedCycleLength);
+            var ovulationDate = prediction.PredictedNextPeriodStart.AddDays(-lutealPhaseLength);
+            
+            // Calculate fertility window (5 days before + ovulation day)
+            var fertilityStart = ovulationDate.AddDays(-5);
+            var fertilityEnd = ovulationDate;
             
             return new FertilityWindowResponse
             {
-                FertileWindowStart = ovulationDate.AddDays(-5),
-                FertileWindowEnd = ovulationDate.AddDays(1),
+                FertileWindowStart = fertilityStart,
+                FertileWindowEnd = fertilityEnd,
                 OvulationDate = ovulationDate,
                 DaysUntilOvulation = (ovulationDate - DateTime.UtcNow).Days,
                 FertilityScore = CalculateFertilityScore(ovulationDate),
                 FertilityPhase = GetFertilityPhase(ovulationDate),
-                IsHighFertilityPeriod = Math.Abs((ovulationDate - DateTime.UtcNow).Days) <= 2,
+                IsHighFertilityPeriod = IsHighFertilityPeriod(ovulationDate),
                 Recommendations = GenerateFertilityRecommendations(ovulationDate)
             };
         }
@@ -310,8 +336,6 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         }
     }
 
-
-
     public async Task<bool> UpdateNotificationPreferencesAsync(Guid customerId, NotificationPreferencesRequest request)
     {
         try
@@ -335,34 +359,64 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         }
     }
 
-    public async Task<ValidationResult> ValidateCycleDataAsync(CreateMenstrualCycleRequest request, Guid customerId)
+    public async Task<CycleValidationResult> ValidateCycleDataAsync(CreateMenstrualCycleRequest request, Guid customerId)
     {
         try
         {
-            var result = new ValidationResult { IsValid = true };
+            var result = new CycleValidationResult { IsValid = true };
 
-            if (request.CycleEndDate.HasValue && request.CycleStartDate >= request.CycleEndDate)
+            // Period length validation
+            if (request.CycleEndDate.HasValue)
             {
-                result.IsValid = false;
-                result.Errors.Add("Cycle end date must be after start date");
+                var periodLength = (request.CycleEndDate.Value - request.CycleStartDate).TotalDays;
+                if (periodLength < 1 || periodLength > 10)
+                {
+                    result.IsValid = false;
+                    result.Errors.Add("Period length should be between 1-10 days");
+                }
             }
 
-            if (request.CycleStartDate > DateTime.UtcNow)
+            // Cycle start date validation
+            if (request.CycleStartDate > DateTime.UtcNow.AddDays(1))
             {
                 result.IsValid = false;
                 result.Errors.Add("Cycle start date cannot be in the future");
             }
 
-            var existingCycle = await _unitOfWork.GetRepository<MenstrualCycleTracking>()
-                .FirstOrDefaultAsync(predicate: m =>
-                    m.CustomerId == customerId &&
-                    m.CycleStartDate <= (request.CycleEndDate ?? request.CycleStartDate.AddDays(7)) &&
-                    (m.CycleEndDate == null || m.CycleEndDate >= request.CycleStartDate));
-
-            if (existingCycle != null)
+            // Check if cycle start is too far in the past (1 year)
+            if (request.CycleStartDate < DateTime.UtcNow.AddYears(-1))
             {
                 result.IsValid = false;
-                result.Errors.Add("Cycle dates overlap with existing cycle");
+                result.Errors.Add("Cycle start date cannot be more than 1 year in the past");
+            }
+
+            // Check for overlapping or too close cycles
+            var lastCycle = await GetLastCycleAsync(customerId);
+            if (lastCycle != null)
+            {
+                var daysBetween = (request.CycleStartDate - lastCycle.CycleStartDate).TotalDays;
+                if (Math.Abs(daysBetween) < 15) // Minimum 15 days between cycles
+                {
+                    result.IsValid = false;
+                    result.Errors.Add("Cycles must be at least 15 days apart");
+                }
+                
+                if (daysBetween > 60) // Maximum 60 days between cycles
+                {
+                    result.IsValid = false;
+                    result.Errors.Add("Gap between cycles is too large (>60 days). Please ensure dates are correct.");
+                }
+            }
+
+            // Validate symptoms format
+            if (!string.IsNullOrEmpty(request.Symptoms))
+            {
+                var symptoms = request.Symptoms.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                if (symptoms.Length > 10)
+                {
+                    result.IsValid = false;
+                    result.Errors.Add("Maximum 10 symptoms allowed");
+                }
             }
 
             return result;
@@ -468,63 +522,147 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         }
     }
 
-    // Helper methods
+    private async Task<GetMenstrualCycleResponse?> GetLastCycleAsync(Guid customerId)
+    {
+        var cycles = await GetCycleHistoryAsync(customerId, 1);
+        return cycles.FirstOrDefault();
+    }
+
     private double CalculateConfidenceScore(List<double> cycleLengths)
     {
-        if (cycleLengths.Count < 2) return 0.5;
+        if (cycleLengths.Count < 2) return 30; // Low confidence for insufficient data
         
-        var average = cycleLengths.Average();
-        var variance = cycleLengths.Sum(l => Math.Pow(l - average, 2)) / cycleLengths.Count;
+        var mean = cycleLengths.Average();
+        var variance = cycleLengths.Select(x => Math.Pow(x - mean, 2)).Average();
         var standardDeviation = Math.Sqrt(variance);
         
-        return Math.Max(0.1, Math.Min(1.0, 1.0 - (standardDeviation / average)));
+        // Base confidence on regularity and data points
+        var regularityScore = Math.Max(0, 100 - (standardDeviation * 8));
+        var dataPointBonus = Math.Min(25, cycleLengths.Count * 5);
+        
+        var confidence = regularityScore * 0.75 + dataPointBonus;
+        return Math.Max(30, Math.Min(95, confidence));
     }
 
     private string GetConfidenceLevel(double score)
     {
         return score switch
         {
-            >= 0.8 => "High",
-            >= 0.6 => "Medium",
-            _ => "Low"
+            >= 80 => "High",
+            >= 60 => "Medium",
+            >= 40 => "Low",
+            _ => "Very Low"
         };
+    }
+
+    private bool IsRegularCycle(List<double> cycleLengths)
+    {
+        if (cycleLengths.Count < 3) return false;
+        
+        var mean = cycleLengths.Average();
+        var variance = cycleLengths.Select(x => Math.Pow(x - mean, 2)).Average();
+        var standardDeviation = Math.Sqrt(variance);
+        
+        return standardDeviation <= 6; // Cycles within 6 days variation = regular
+    }
+
+    private int CalculateLutealPhaseLength(int cycleLength)
+    {
+        // Luteal phase is typically 12-16 days (average 14)
+        return cycleLength switch
+        {
+            < 25 => 12, // Shorter cycles have shorter luteal phase
+            > 35 => 16, // Longer cycles might have longer luteal phase
+            _ => 14     // Standard luteal phase
+        };
+    }
+
+    private bool IsHighFertilityPeriod(DateTime ovulationDate)
+    {
+        var daysUntilOvulation = (ovulationDate - DateTime.UtcNow).Days;
+        return Math.Abs(daysUntilOvulation) <= 2; // Within 2 days of ovulation
+    }
+
+    private List<string> GeneratePredictionFactors(int cycleCount, bool isRegular, double confidence)
+    {
+        var factors = new List<string>();
+        
+        factors.Add($"Based on {cycleCount} cycle(s) of data");
+        factors.Add(isRegular ? "Regular cycle pattern detected" : "Irregular cycle pattern");
+        factors.Add($"Prediction confidence: {confidence:F0}%");
+        
+        if (cycleCount >= 6)
+            factors.Add("Sufficient historical data for accurate prediction");
+        else if (cycleCount >= 3)
+            factors.Add("Moderate historical data available");
+        else
+            factors.Add("Limited historical data - predictions may be less accurate");
+        
+        return factors;
     }
 
     private double CalculateFertilityScore(DateTime ovulationDate)
     {
-        var daysFromOvulation = Math.Abs((DateTime.UtcNow - ovulationDate).Days);
-        return Math.Max(0, 1.0 - (daysFromOvulation / 7.0));
+        var daysUntilOvulation = (ovulationDate - DateTime.UtcNow).Days;
+        
+        if (Math.Abs(daysUntilOvulation) <= 1) return 95; // Peak fertility
+        if (Math.Abs(daysUntilOvulation) <= 2) return 85; // High fertility
+        if (Math.Abs(daysUntilOvulation) <= 5) return 60; // Moderate fertility
+        
+        return 20; // Low fertility
     }
 
     private string GetFertilityPhase(DateTime ovulationDate)
     {
-        var daysDiff = (DateTime.UtcNow - ovulationDate).Days;
-        return daysDiff switch
+        var daysUntilOvulation = (ovulationDate - DateTime.UtcNow).Days;
+        
+        return daysUntilOvulation switch
         {
-            < -5 => "Follicular",
-            >= -5 and <= 1 => "Fertile Window",
-            > 1 and <= 14 => "Luteal",
-            _ => "Menstrual"
+            <= -2 => "Luteal Phase",
+            <= 0 => "Ovulation",
+            <= 5 => "Fertile Window",
+            _ => "Follicular Phase"
         };
     }
 
     private List<string> GenerateFertilityRecommendations(DateTime ovulationDate)
     {
         var recommendations = new List<string>();
-        var daysToOvulation = (ovulationDate - DateTime.UtcNow).Days;
-
-        if (daysToOvulation >= -1 && daysToOvulation <= 1)
+        var daysUntilOvulation = (ovulationDate - DateTime.UtcNow).Days;
+        
+        if (daysUntilOvulation >= -1 && daysUntilOvulation <= 1)
         {
-            recommendations.Add("You are in your most fertile period");
-            recommendations.Add("Consider tracking basal body temperature");
+            recommendations.Add("Peak fertility period - ideal time for conception");
+            recommendations.Add("Track cervical mucus and basal body temperature");
         }
-        else if (daysToOvulation > 1 && daysToOvulation <= 5)
+        else if (daysUntilOvulation >= -5 && daysUntilOvulation <= 5)
         {
-            recommendations.Add("Approaching fertile window");
-            recommendations.Add("Start monitoring cervical mucus changes");
+            recommendations.Add("Fertile window - conception is possible");
+            recommendations.Add("Monitor ovulation signs and symptoms");
         }
-
+        else
+        {
+            recommendations.Add("Low fertility period");
+            recommendations.Add("Focus on cycle tracking and health maintenance");
+        }
+        
+        recommendations.Add("Maintain a healthy diet and regular exercise");
+        recommendations.Add("Take prenatal vitamins if trying to conceive");
+        
         return recommendations;
+    }
+
+    private float CalculateCycleRegularity(List<int> cycleLengths)
+    {
+        if (cycleLengths.Count < 2) return 0f;
+        
+        var mean = cycleLengths.Average();
+        var variance = cycleLengths.Select(x => Math.Pow(x - mean, 2)).Average();
+        var standardDeviation = Math.Sqrt(variance);
+        
+        // Convert to percentage (lower deviation = higher regularity)
+        var regularity = Math.Max(0, 100 - (standardDeviation * 10));
+        return (float)Math.Min(100, regularity);
     }
 
     private string GetOverallHealthStatus(CycleAnalyticsResponse analytics)
@@ -543,17 +681,5 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         {
             return "Needs Attention";
         }
-    }
-
-    private float CalculateCycleRegularity(List<int> cycleLengths)
-    {
-        if (cycleLengths.Count < 2)
-            return 1.0f;
-
-        var average = cycleLengths.Average();
-        var variance = cycleLengths.Sum(l => Math.Pow(l - average, 2)) / cycleLengths.Count;
-        var standardDeviation = Math.Sqrt(variance);
-
-        return (float)Math.Max(0.0, Math.Min(1.0, 1.0 - (standardDeviation / average)));
     }
 }

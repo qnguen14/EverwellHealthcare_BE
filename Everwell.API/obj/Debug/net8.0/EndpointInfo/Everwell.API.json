@@ -2868,20 +2868,21 @@
         "properties": {
           "cycleStartDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "cycleEndDate": {
             "type": "string",
-            "format": "date-time",
+            "format": "date",
             "nullable": true
           },
           "symptoms": {
-            "maxLength": 1000,
+            "maxLength": 500,
+            "pattern": "^[a-zA-Z0-9\\s,.-]*$",
             "type": "string",
             "nullable": true
           },
           "notes": {
-            "maxLength": 2000,
+            "maxLength": 1000,
             "type": "string",
             "nullable": true
           },

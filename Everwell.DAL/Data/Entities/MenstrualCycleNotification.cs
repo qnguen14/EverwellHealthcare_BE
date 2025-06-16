@@ -5,10 +5,10 @@ namespace Everwell.DAL.Data.Entities;
 
 public enum MenstrualCyclePhase
 {
-    Menstrual,   // Day 1-7
-    Follicular,  // Day 8-13
-    Ovulation,   // Day 14-15
-    Luteal       // Day 16-28
+    Menstrual,   // Day 1-5 (bleeding phase)
+    Follicular,  // Day 1-13 (egg development - overlaps with menstrual)
+    Ovulation,   // Day 14 ±2 (egg release)
+    Luteal       // Day 15-28 (after ovulation)
 }
 
 [Table("MenstrualCycleNotification")]

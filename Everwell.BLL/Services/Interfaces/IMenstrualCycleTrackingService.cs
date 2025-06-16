@@ -24,7 +24,7 @@ public interface IMenstrualCycleTrackingService
     Task<bool> UpdateNotificationPreferencesAsync(Guid customerId, NotificationPreferencesRequest request);
     
     // Validation and business rules
-    Task<ValidationResult> ValidateCycleDataAsync(CreateMenstrualCycleRequest request, Guid customerId);
+    Task<CycleValidationResult> ValidateCycleDataAsync(CreateMenstrualCycleRequest request, Guid customerId);
     Task<bool> CanCreateNewCycleAsync(Guid customerId, DateTime startDate);
     
     // Statistics and insights
