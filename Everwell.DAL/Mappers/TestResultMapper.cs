@@ -18,7 +18,7 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.STITestingId, opt => opt.MapFrom(src => src.STITestingId))
                 .ForMember(dest => dest.ResultData, opt => opt.MapFrom(src => src.ResultData))   // You can map if needed
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                // .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
                 .ForMember(dest => dest.StaffId, opt => opt.MapFrom(src => src.StaffId))
                 .ForMember(dest => dest.ExaminedAt, opt => opt.MapFrom(src => src.ExaminedAt))
                 .ForMember(dest => dest.SentAt, opt => opt.MapFrom(src => src.SentAt));
@@ -27,11 +27,11 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.STITestingId, opt => opt.MapFrom(src => src.STITestingId))
                 .ForMember(dest => dest.ResultData, opt => opt.MapFrom(src => src.ResultData))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                // .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
                 .ForMember(dest => dest.StaffId, opt => opt.MapFrom(src => src.StaffId))
                 .ForMember(dest => dest.ExaminedAt, opt => opt.MapFrom(src => src.ExaminedAt))
                 .ForMember(dest => dest.SentAt, opt => opt.MapFrom(src => src.SentAt))
-                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                // .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
                 .ForMember(dest => dest.Staff, opt => opt.MapFrom(src => src.Staff));
 
         }

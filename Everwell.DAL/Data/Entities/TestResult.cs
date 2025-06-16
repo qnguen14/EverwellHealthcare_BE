@@ -30,10 +30,6 @@ public class TestResult
     [Column("status")]
     public Status Status { get; set; } = Status.Pending;
 
-    [Column("customer_id")]
-    public Guid? CustomerId { get; set; }
-    public virtual User Customer { get; set; }
-
     [Column("staff_id")]
     public Guid? StaffId { get; set; }
     public virtual User Staff { get; set; }

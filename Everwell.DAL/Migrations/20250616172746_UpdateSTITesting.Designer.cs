@@ -3,6 +3,7 @@ using System;
 using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Everwell.DAL.Migrations
 {
     [DbContext(typeof(EverwellDbContext))]
-    partial class EverwellDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250616172746_UpdateSTITesting")]
+    partial class UpdateSTITesting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

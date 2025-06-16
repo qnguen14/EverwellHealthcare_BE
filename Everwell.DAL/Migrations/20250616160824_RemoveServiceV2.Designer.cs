@@ -3,6 +3,7 @@ using System;
 using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Everwell.DAL.Migrations
 {
     [DbContext(typeof(EverwellDbContext))]
-    partial class EverwellDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250616160824_RemoveServiceV2")]
+    partial class RemoveServiceV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -443,6 +446,10 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("date")
                         .HasColumnName("collected_date");
 
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("customer_id");
+
                     b.Property<int>("Method")
                         .HasColumnType("integer")
                         .HasColumnName("method");
@@ -455,14 +462,11 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("test_type");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AppointmentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("STITesting", "EverWellDB_v2");
                 });
@@ -473,6 +477,10 @@ namespace Everwell.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("customer_id");
 
                     b.Property<DateTime?>("ExaminedAt")
                         .HasColumnType("timestamp with time zone")
@@ -506,6 +514,8 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("STITestingId");
 
@@ -715,15 +725,24 @@ namespace Everwell.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Everwell.DAL.Data.Entities.User", null)
+                    b.HasOne("Everwell.DAL.Data.Entities.User", "Customer")
                         .WithMany("STITests")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Appointment");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.TestResult", b =>
                 {
+                    b.HasOne("Everwell.DAL.Data.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Everwell.DAL.Data.Entities.STITesting", "STITesting")
                         .WithMany("TestResults")
                         .HasForeignKey("STITestingId")
@@ -742,6 +761,8 @@ namespace Everwell.DAL.Migrations
                     b.HasOne("Everwell.DAL.Data.Entities.User", null)
                         .WithMany("TestResultsSent")
                         .HasForeignKey("UserId1");
+
+                    b.Navigation("Customer");
 
                     b.Navigation("STITesting");
 

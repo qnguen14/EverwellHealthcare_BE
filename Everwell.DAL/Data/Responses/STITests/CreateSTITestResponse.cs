@@ -15,10 +15,6 @@ namespace Everwell.DAL.Data.Responses.STITests
     {
         public Guid AppointmentId { get; set; }
         public CreateAppointmentsResponse Appointment { get; set; }
-
-        public Guid CustomerId { get; set; }
-        public GetUserResponse Customer { get; set; }
-
         public TestType TestType { get; set; }
 
         public Method Method { get; set; }

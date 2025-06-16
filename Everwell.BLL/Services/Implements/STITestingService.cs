@@ -5,6 +5,8 @@ using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using Everwell.BLL.Services;
+using Everwell.DAL.Data.Requests.STITests;
+using Everwell.DAL.Data.Responses.STITests;
 
 namespace Everwell.BLL.Services.Implements;
 
@@ -15,17 +17,25 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
     {
     }
 
-    public async Task<IEnumerable<STITesting>> GetAllSTITestingsAsync()
+    public async Task<IEnumerable<CreateSTITestResponse>> GetAllSTITestingsAsync()
     {
         try
         {
             var stiTestings = await _unitOfWork.GetRepository<STITesting>()
                 .GetListAsync(
-                    include: s => s.Include(sti => sti.Customer)
-                                   .Include(sti => sti.Appointment)
-                                   .Include(sti => sti.TestResults));
+                    predicate:s => s.Appointment.Customer.IsActive == true &&
+                                             s.Appointment.Consultant.IsActive == true,
+                    include: s => s.Include(sti => sti.Appointment)
+                                                    .Include(sti => sti.TestResults)
+                                                    .Include(sti => sti.Appointment.Customer)
+                                                    .Include(sti => sti.Appointment.Consultant));
+
+            if (stiTestings == null)
+            {
+                _logger.LogError("There are no STI tests available");
+            }
             
-            return stiTestings ?? new List<STITesting>();
+            return _mapper.Map<IEnumerable<CreateSTITestResponse>>(stiTestings);
         }
         catch (Exception ex)
         {
@@ -34,16 +44,27 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         }
     }
 
-    public async Task<STITesting?> GetSTITestingByIdAsync(Guid id)
+    public async Task<CreateSTITestResponse> GetSTITestingByIdAsync(Guid id)
     {
         try
         {
-            return await _unitOfWork.GetRepository<STITesting>()
+            var stitest = await _unitOfWork.GetRepository<STITesting>()
                 .FirstOrDefaultAsync(
-                    predicate: s => s.Id == id,
-                    include: s => s.Include(sti => sti.Customer)
-                                   .Include(sti => sti.Appointment)
-                                   .Include(sti => sti.TestResults));
+                    predicate: s => s.Id == id && 
+                                    s.Appointment.Customer.IsActive == true &&
+                                   s.Appointment.Consultant.IsActive == true,
+                    include: s => s.Include(sti => sti.Appointment)
+                                   .Include(sti => sti.TestResults)
+                                   .Include(sti => sti.Appointment.Customer)
+                                   .Include(sti => sti.Appointment.Consultant));
+            
+            if (stitest == null)
+            {
+                _logger.LogWarning("STI testing with id {Id} not found", id);
+                return null;
+            }
+            
+            return _mapper.Map<CreateSTITestResponse>(stitest);
         }
         catch (Exception ex)
         {
@@ -52,16 +73,33 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         }
     }
 
-    public async Task<STITesting> CreateSTITestingAsync(STITesting stiTesting)
+    public async Task<CreateSTITestResponse> CreateSTITestingAsync(CreateSTITestRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                stiTesting.Id = Guid.NewGuid();
+                if (request == null)
+                {
+                    _logger.LogError("Create request is null");
+                    throw new ArgumentNullException(nameof(request), "Request cannot be null");
+                }
                 
-                await _unitOfWork.GetRepository<STITesting>().InsertAsync(stiTesting);
-                return stiTesting;
+                var existingSTITest = await _unitOfWork.GetRepository<STITesting>()
+                    .FirstOrDefaultAsync(predicate: s => s.AppointmentId == request.AppointmentId &&
+                                                         s.TestType == request.TestType &&
+                                                         s.Method == request.Method,
+                                         include: s => s.Include(sti => sti.Appointment));
+                
+                if (existingSTITest != null && existingSTITest.Status != Enum.Parse<Status>("Completed"))
+                {
+                    _logger.LogWarning("An STI testing with the same appointment and test type already exists");
+                }
+                
+                var newSTITest = _mapper.Map<STITesting>(request);
+                
+                await _unitOfWork.GetRepository<STITesting>().InsertAsync(newSTITest);
+                return _mapper.Map<CreateSTITestResponse>(newSTITest);
             });
         }
         catch (Exception ex)
@@ -71,24 +109,31 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         }
     }
 
-    public async Task<STITesting?> UpdateSTITestingAsync(Guid id, STITesting stiTesting)
+    public async Task<CreateSTITestResponse> UpdateSTITestingAsync(Guid id, CreateSTITestRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                var existingSTITesting = await _unitOfWork.GetRepository<STITesting>()
-                    .FirstOrDefaultAsync(predicate: s => s.Id == id);
+                var existingSTITest = await _unitOfWork.GetRepository<STITesting>()
+                    .FirstOrDefaultAsync(predicate: s => s.AppointmentId == request.AppointmentId &&
+                                                         s.TestType == request.TestType &&
+                                                         s.Method == request.Method,
+                        include: s => s.Include(sti => sti.Appointment));
                 
-                if (existingSTITesting == null) return null;
-
-                existingSTITesting.TestType = stiTesting.TestType;
-                existingSTITesting.Method = stiTesting.Method;
-                existingSTITesting.Status = stiTesting.Status;
-                existingSTITesting.CollectedDate = stiTesting.CollectedDate;
+                if (existingSTITest == null )
+                {
+                    _logger.LogWarning("STI testing with id {Id} not found", id);
+                    throw new KeyNotFoundException($"STI testing with id {id} not found");
+                }
                 
-                _unitOfWork.GetRepository<STITesting>().UpdateAsync(existingSTITesting);
-                return existingSTITesting;
+                existingSTITest.TestType = request.TestType;
+                existingSTITest.Method = request.Method;
+                existingSTITest.Status = request.Status;
+                existingSTITest.CollectedDate = request.CollectedDate;
+                
+                _unitOfWork.GetRepository<STITesting>().UpdateAsync(existingSTITest);
+                return _mapper.Map<CreateSTITestResponse>(existingSTITest);
             });
         }
         catch (Exception ex)
@@ -104,12 +149,17 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                var stiTesting = await _unitOfWork.GetRepository<STITesting>()
-                    .FirstOrDefaultAsync(predicate: s => s.Id == id);
+                var existingSTITest = await _unitOfWork.GetRepository<STITesting>()
+                    .FirstOrDefaultAsync(predicate: s => s.Id == id,
+                        include: s => s.Include(sti => sti.Appointment));
                 
-                if (stiTesting == null) return false;
+                if (existingSTITest == null )
+                {
+                    _logger.LogWarning("STI testing with id {Id} not found", id);
+                    throw new KeyNotFoundException($"STI testing with id {id} not found");
+                }
 
-                _unitOfWork.GetRepository<STITesting>().DeleteAsync(stiTesting);
+                _unitOfWork.GetRepository<STITesting>().DeleteAsync(existingSTITest);
                 return true;
             });
         }

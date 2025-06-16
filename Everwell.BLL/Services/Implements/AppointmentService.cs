@@ -59,8 +59,8 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                     predicate: a => a.Customer.IsActive == true 
                                     && a.Consultant.IsActive == true,
                     include: a => a.Include(ap => ap.Customer)
-                                  .Include(ap => ap.Consultant)
-                                  .Include(ap => ap.Service),
+                                  .Include(ap => ap.Consultant),
+                                  // .Include(ap => ap.Service),
                     orderBy: a => a.OrderBy(ap => ap.AppointmentDate));
             
             if (appointments != null && appointments.Any())
@@ -90,8 +90,8 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                                     && a.Customer.IsActive == true 
                                     && a.Consultant.IsActive == true,
                     include: a => a.Include(ap => ap.Customer)
-                                  .Include(ap => ap.Consultant)
-                                  .Include(ap => ap.Service));
+                                  .Include(ap => ap.Consultant));
+                                  // .Include(ap => ap.Service));
             
             if (appointment == null)
             {
@@ -117,8 +117,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                                     a.Customer.IsActive &&
                                     a.Consultant.IsActive,
                     include: a => a.Include(ap => ap.Customer)
-                        .Include(ap => ap.Consultant)
-                        .Include(ap => ap.Service),
+                        .Include(ap => ap.Consultant),
                     orderBy: a => a.OrderBy(ap => ap.AppointmentDate));
 
             if (appointments == null || !appointments.Any())
@@ -194,8 +193,8 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                                         && a.Customer.IsActive == true 
                                         && a.Consultant.IsActive == true,
                         include: a => a.Include(ap => ap.Customer)
-                            .Include(ap => ap.Consultant)
-                            .Include(ap => ap.Service));
+                            .Include(ap => ap.Consultant));
+                            // .Include(ap => ap.Service));
 
                 if (existingAppointment == null)
                 {
@@ -233,12 +232,12 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             {
                 var appointment = await _unitOfWork.GetRepository<Appointment>()
                     .FirstOrDefaultAsync(
-                        predicate: a => a.Id == id 
-                                        && a.Customer.IsActive == true 
+                        predicate: a => a.Id == id
+                                        && a.Customer.IsActive == true
                                         && a.Consultant.IsActive == true,
                         include: a => a.Include(ap => ap.Customer)
-                            .Include(ap => ap.Consultant)
-                            .Include(ap => ap.Service));
+                            .Include(ap => ap.Consultant));
+                            // .Include(ap => ap.Service));
                 
                 if (appointment == null)
                 {

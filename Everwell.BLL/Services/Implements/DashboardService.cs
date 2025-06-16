@@ -182,8 +182,8 @@ namespace Everwell.BLL.Services.Implements
                 var recentAppointments = await _unitOfWork.GetRepository<Appointment>()
                     .GetListAsync(
                         include: a => a.Include(ap => ap.Customer)
-                                     .Include(ap => ap.Consultant)
-                                     .Include(ap => ap.Service),
+                                     .Include(ap => ap.Consultant),
+                                     // .Include(ap => ap.Service),
                         orderBy: a => a.OrderByDescending(x => x.CreatedAt),
                         take: 10
                     );

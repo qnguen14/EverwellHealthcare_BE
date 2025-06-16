@@ -48,11 +48,6 @@ namespace Everwell.DAL.Data.Entities
         public virtual Appointment Appointment { get; set; }
 
         [Required]
-        [Column("customer_id")]
-        public Guid CustomerId { get; set; }
-        public virtual User Customer { get; set; }
-
-        [Required]
         [Column("test_type")]
         public TestType TestType { get; set; }
         
@@ -62,7 +57,7 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("status")]
-        public Status Status { get; set; } = Status.Pending;
+        public Status Status { get; set; }
 
         [Column("collected_date", TypeName = "date")]
         public DateOnly? CollectedDate { get; set; }

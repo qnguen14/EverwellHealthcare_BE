@@ -40,10 +40,10 @@ namespace Everwell.DAL.Data.Entities
                     .HasForeignKey(a => a.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(a => a.Service)
-                    .WithMany()
-                    .HasForeignKey(a => a.ServiceId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                // entity.HasOne(a => a.Service)
+                //     .WithMany()
+                //     .HasForeignKey(a => a.ServiceId)
+                //     .OnDelete(DeleteBehavior.Restrict);
             });
 
             // Feedback relationships
@@ -57,10 +57,10 @@ namespace Everwell.DAL.Data.Entities
                     .WithMany()
                     .HasForeignKey(f => f.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(f => f.Service)
-                    .WithMany()
-                    .HasForeignKey(f => f.ServiceId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                // entity.HasOne(f => f.Service)
+                //     .WithMany()
+                //     .HasForeignKey(f => f.ServiceId)
+                //     .OnDelete(DeleteBehavior.Restrict);
             });
 
             // STITesting relationships
@@ -70,10 +70,10 @@ namespace Everwell.DAL.Data.Entities
                     .WithMany()
                     .HasForeignKey(s => s.AppointmentId)
                     .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(s => s.Customer)
-                    .WithMany(u => u.STITests)
-                    .HasForeignKey(s => s.CustomerId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                // entity.HasOne(s => s.Customer)
+                //     .WithMany(u => u.STITests)
+                //     .HasForeignKey(s => s.CustomerId)
+                //     .OnDelete(DeleteBehavior.Restrict);
             });
 
             // TestResult relationships
@@ -84,10 +84,10 @@ namespace Everwell.DAL.Data.Entities
                     .HasForeignKey(tr => tr.STITestingId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(tr => tr.Customer)
-                    .WithMany()
-                    .HasForeignKey(tr => tr.CustomerId)
-                    .OnDelete(DeleteBehavior.SetNull);
+                // entity.HasOne(tr => tr.Customer)
+                //     .WithMany()
+                //     .HasForeignKey(tr => tr.CustomerId)
+                //     .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasOne(tr => tr.Staff)
                     .WithMany()
@@ -178,7 +178,7 @@ namespace Everwell.DAL.Data.Entities
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Service> Services { get; set; }
+        // public DbSet<Service> Services { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }

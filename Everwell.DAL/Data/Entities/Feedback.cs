@@ -25,11 +25,11 @@ public class Feedback
     public Guid ConsultantId { get; set; }
     public virtual User Consultant { get; set; }
     
-    [Required]
-    [Column("service_id")]
-    [ForeignKey("Service")]
-    public Guid ServiceId { get; set; }
-    public virtual Service Service { get; set; }
+    // [Required]
+    // [Column("service_id")]
+    // [ForeignKey("Service")]
+    // public Guid ServiceId { get; set; }
+    // public virtual Service Service { get; set; }
     
     [Required]
     [Column("appointment_id")]

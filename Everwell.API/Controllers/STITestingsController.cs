@@ -1,6 +1,9 @@
 using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
+using Everwell.DAL.Data.Metadata;
+using Everwell.DAL.Data.Requests.STITests;
+using Everwell.DAL.Data.Responses.STITests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,14 +19,30 @@ public class STITestingsController : ControllerBase
         _stiTestingService = stiTestingService;
     }
 
+    
     [HttpGet(ApiEndpointConstants.STITesting.GetAllSTITestingsEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateSTITestResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<STITesting>>> GetAllSTITestings()
+    public async Task<IActionResult> GetAllSTITestings()
     {
         try
         {
             var stiTestings = await _stiTestingService.GetAllSTITestingsAsync();
-            return Ok(stiTestings);
+            
+            if (stiTestings == null || !stiTestings.Any())
+                return NotFound(new { message = "No STI Testings found" });
+
+            var apiResponse = new ApiResponse<IEnumerable<CreateSTITestResponse>>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "STI Testings retrieved successfully",
+                IsSuccess = true,
+                Data = stiTestings
+            };
+            
+            return Ok(apiResponse);
         }
         catch (Exception ex)
         {
@@ -32,8 +51,11 @@ public class STITestingsController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.STITesting.GetSTITestingEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CreateSTITestResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize]
-    public async Task<ActionResult<STITesting>> GetSTITestingById(Guid id)
+    public async Task<IActionResult> GetSTITestingById(Guid id)
     {
         try
         {
@@ -41,11 +63,114 @@ public class STITestingsController : ControllerBase
             if (stiTesting == null)
                 return NotFound(new { message = "STI Testing not found" });
             
-            return Ok(stiTesting);
+            var apiResponse = new ApiResponse<CreateSTITestResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "STI Testings retrieved successfully",
+                IsSuccess = true,
+                Data = stiTesting
+            };
+            
+            return Ok(apiResponse);
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
+    
+    [HttpPost(ApiEndpointConstants.STITesting.CreateSTITestingEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CreateSTITestResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize]
+    public async Task<IActionResult> CreateSTITesting(CreateSTITestRequest request)
+    {
+        try
+        {
+            if (request == null)
+                return BadRequest(new { message = "Invalid request data" });
+
+            var createdTesting = await _stiTestingService.CreateSTITestingAsync(request);
+            if (createdTesting == null)
+                return NotFound(new { message = "Failed to create STI Testing" });
+            
+            var apiResponse = new ApiResponse<CreateSTITestResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "STI Testing created successfully",
+                IsSuccess = true,
+                Data = createdTesting
+            };
+            
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+    
+    [HttpPut(ApiEndpointConstants.STITesting.UpdateSTITestingEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CreateSTITestResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize]
+    public async Task<IActionResult> UpdateSTITesting(Guid id, CreateSTITestRequest request)
+    {
+        try
+        {
+            if (request == null)
+                return BadRequest(new { message = "Invalid request data" });
+
+            var updatedTesting = await _stiTestingService.UpdateSTITestingAsync(id, request);
+            if (updatedTesting == null)
+                return NotFound(new { message = "Failed to update STI Testing" });
+            
+            var apiResponse = new ApiResponse<CreateSTITestResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "STI Testing updated successfully",
+                IsSuccess = true,
+                Data = updatedTesting
+            };
+            
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+    
+    [HttpDelete(ApiEndpointConstants.STITesting.DeleteSTITestingEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CreateSTITestResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize]
+    public async Task<IActionResult> DeleteSTITesting(Guid id)
+    {
+        try
+        {
+            var isDeleted = await _stiTestingService.DeleteSTITestingAsync(id);
+            if (!isDeleted)
+                return NotFound(new { message = "Failed to delete STI Testing" });
+            
+            var apiResponse = new ApiResponse<CreateSTITestResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "STI Testing deleted successfully",
+                IsSuccess = true,
+                Data = null
+            };
+            
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+    
+
 } 

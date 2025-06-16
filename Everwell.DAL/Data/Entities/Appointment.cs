@@ -41,10 +41,9 @@ public class Appointment
     public virtual User Consultant { get; set; }
 
     // [Required]
-    [Column("service_id")]
-    [ForeignKey("Service")]
-    public Guid ServiceId { get; set; }
-    public virtual Service Service { get; set; }
+    // [Column("service_id")]
+    // [ForeignKey("Service")]
+    // public Guid ServiceId { get; set; }
 
     [Required]
     [Column("appointment_date")]

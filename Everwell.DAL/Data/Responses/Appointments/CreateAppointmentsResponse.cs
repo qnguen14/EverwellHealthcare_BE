@@ -13,7 +13,7 @@ public class CreateAppointmentsResponse
     public Guid ConsultantId { get; set; }
     public GetUserResponse Consultant { get; set; }
 
-    public Guid ServiceId { get; set; } // to do: GetServiceResponse
+    // public Guid ServiceId { get; set; } // to do: GetServiceResponse
 
     public DateOnly AppointmentDate { get; set; }
 

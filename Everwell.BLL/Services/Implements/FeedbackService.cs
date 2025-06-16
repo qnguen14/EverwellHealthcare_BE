@@ -23,7 +23,7 @@ public class FeedbackService : BaseService<FeedbackService>, IFeedbackService
                 .GetListAsync(
                     include: f => f.Include(fb => fb.Customer)
                                   .Include(fb => fb.Consultant)
-                                  .Include(fb => fb.Service)
+                                  // .Include(fb => fb.Service)
                                   .Include(fb => fb.Appointment));
             
             return feedbacks ?? new List<Feedback>();
@@ -44,7 +44,7 @@ public class FeedbackService : BaseService<FeedbackService>, IFeedbackService
                     predicate: f => f.Id == id,
                     include: f => f.Include(fb => fb.Customer)
                                   .Include(fb => fb.Consultant)
-                                  .Include(fb => fb.Service)
+                                  // .Include(fb => fb.Service)
                                   .Include(fb => fb.Appointment));
         }
         catch (Exception ex)

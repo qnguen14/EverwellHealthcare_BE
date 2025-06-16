@@ -23,10 +23,8 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         {
             var testResults = await _unitOfWork.GetRepository<TestResult>()
                 .GetListAsync(
-                    predicate: t => t.Customer.IsActive == true 
-                                    && t.Staff.IsActive == true,
+                    predicate: t =>t.Staff.IsActive == true,
                     include: t => t.Include(tr => tr.STITesting)
-                                   .Include(tr => tr.Customer)
                                    .Include(tr => tr.Staff));
 
             if (testResults == null || !testResults.Any())
@@ -51,10 +49,8 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
             var testresult = await _unitOfWork.GetRepository<TestResult>()
                 .FirstOrDefaultAsync(
                     predicate: t => t.Id == id &&
-                                    t.Customer.IsActive == true &&
                                     t.Staff.IsActive == true,
                     include: t => t.Include(tr => tr.STITesting)
-                                   .Include(tr => tr.Customer)
                                    .Include(tr => tr.Staff));
 
             if (testresult == null) 
@@ -81,10 +77,8 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
 
                 var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
                     .FirstOrDefaultAsync(predicate: t => t.STITestingId == request.STITestingId &&
-                                                         t.CustomerId == request.CustomerId &&
                                                          t.StaffId == request.StaffId,
                                          include: t => t.Include(tr => tr.STITesting)
-                                                        .Include(tr => tr.Customer)
                                                         .Include(tr => tr.Staff));
 
                 if (existingTestResult != null)
@@ -113,10 +107,8 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
             {
                 var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
                     .FirstOrDefaultAsync(predicate: t => t.Id == id &&
-                                                         t.Customer.IsActive == true && 
                                                          t.Staff.IsActive == true,
                                          include: t => t.Include(tr => tr.STITesting)
-                                                        .Include(tr => tr.Customer)
                                                         .Include(tr => tr.Staff));
                 
                 if (existingTestResult == null)
@@ -148,10 +140,8 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
             {
                 var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
                     .FirstOrDefaultAsync(predicate: t => t.Id == id &&
-                                                         t.Customer.IsActive == true &&
                                                          t.Staff.IsActive == true,
                                          include: t => t.Include(tr => tr.STITesting)
-                                                        .Include(tr => tr.Customer)
                                                         .Include(tr => tr.Staff));
 
                 if (existingTestResult == null)

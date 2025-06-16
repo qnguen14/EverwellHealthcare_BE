@@ -50,7 +50,7 @@ builder.Services.AddAutoMapper(typeof(UserMapper));
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IServiceService, ServiceService>();
+// builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IPostService, PostService>();
