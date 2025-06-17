@@ -308,6 +308,16 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.TestEmailController",
+    "Method": "QuickEmailTest",
+    "RelativePath": "api/TestEmail/quick-email-test",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestEmailController",
     "Method": "SendBasicEmail",
     "RelativePath": "api/TestEmail/send-basic-email",
     "HttpMethod": "POST",
@@ -383,7 +393,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetAppointmentById",
-    "RelativePath": "api/v1/appointment/{id}",
+    "RelativePath": "api/v2/appointment/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -427,7 +437,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetAppointmentsByConsultant",
-    "RelativePath": "api/v1/appointment/consultant/{id}",
+    "RelativePath": "api/v2/appointment/consultant/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -471,7 +481,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "CreateConsultantSchedule",
-    "RelativePath": "api/v1/appointment/consultant/schedule/create",
+    "RelativePath": "api/v2/appointment/consultant/schedule/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -515,7 +525,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetConsultantSchedules",
-    "RelativePath": "api/v1/appointment/consultant/schedules",
+    "RelativePath": "api/v2/appointment/consultant/schedules",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -553,7 +563,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetConsultantSchedulesById",
-    "RelativePath": "api/v1/appointment/consultant/schedules/{id}",
+    "RelativePath": "api/v2/appointment/consultant/schedules/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -597,7 +607,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "CreateAppointment",
-    "RelativePath": "api/v1/appointment/create",
+    "RelativePath": "api/v2/appointment/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -641,7 +651,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "DeleteAppointment",
-    "RelativePath": "api/v1/appointment/delete/{id}",
+    "RelativePath": "api/v2/appointment/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -685,7 +695,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetAllAppointments",
-    "RelativePath": "api/v1/appointment/getall",
+    "RelativePath": "api/v2/appointment/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -723,7 +733,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "UpdateAppointment",
-    "RelativePath": "api/v1/appointment/update/{id}",
+    "RelativePath": "api/v2/appointment/update/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -772,7 +782,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetAppointmentsByStatus",
-    "RelativePath": "api/v1/dashboard/appointments-by-status",
+    "RelativePath": "api/v2/dashboard/appointments-by-status",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -810,7 +820,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetDashboardData",
-    "RelativePath": "api/v1/dashboard/data",
+    "RelativePath": "api/v2/dashboard/data",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -848,7 +858,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetDashboardStats",
-    "RelativePath": "api/v1/dashboard/stats",
+    "RelativePath": "api/v2/dashboard/stats",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -886,7 +896,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetUsersByRole",
-    "RelativePath": "api/v1/dashboard/users-by-role",
+    "RelativePath": "api/v2/dashboard/users-by-role",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -924,7 +934,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.FeedbacksController",
     "Method": "GetFeedbackById",
-    "RelativePath": "api/v1/feedback/{id}",
+    "RelativePath": "api/v2/feedback/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -950,7 +960,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.FeedbacksController",
     "Method": "GetAllFeedbacks",
-    "RelativePath": "api/v1/feedback/getall",
+    "RelativePath": "api/v2/feedback/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -970,7 +980,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AuthController",
     "Method": "Login",
-    "RelativePath": "api/v1/login",
+    "RelativePath": "api/v2/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1014,7 +1024,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AuthController",
     "Method": "Logout",
-    "RelativePath": "api/v1/logout",
+    "RelativePath": "api/v2/logout",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1022,57 +1032,9 @@
     "ReturnTypes": []
   },
   {
-<<<<<<< HEAD
-=======
-    "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
-    "Method": "GetMenstrualCycleTrackingById",
-    "RelativePath": "api/v1/menstrualcycletracking/{id}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Guid",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Everwell.DAL.Data.Entities.MenstrualCycleTracking",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
-    "Method": "GetAllMenstrualCycleTrackings",
-    "RelativePath": "api/v1/menstrualcycletracking/getall",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Entities.MenstrualCycleTracking, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
     "ContainingType": "Everwell.API.Controllers.NotificationsController",
     "Method": "DeleteNotification",
-    "RelativePath": "api/v1/notification/delete/{id}",
+    "RelativePath": "api/v2/notification/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -1116,7 +1078,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.NotificationsController",
     "Method": "MarkAsRead",
-    "RelativePath": "api/v1/notification/mark/{id}",
+    "RelativePath": "api/v2/notification/mark/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1160,7 +1122,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.NotificationsController",
     "Method": "GetUserNotifications",
-    "RelativePath": "api/v1/notification/user/{userId}",
+    "RelativePath": "api/v2/notification/user/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1202,10 +1164,9 @@
     ]
   },
   {
->>>>>>> dev
     "ContainingType": "Everwell.API.Controllers.PostsController",
     "Method": "GetPostById",
-    "RelativePath": "api/v1/post/{id}",
+    "RelativePath": "api/v2/post/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1231,7 +1192,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.PostsController",
     "Method": "GetAllPosts",
-    "RelativePath": "api/v1/post/getall",
+    "RelativePath": "api/v2/post/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1251,7 +1212,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.QuestionsController",
     "Method": "GetQuestionById",
-    "RelativePath": "api/v1/question/{id}",
+    "RelativePath": "api/v2/question/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1277,7 +1238,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.QuestionsController",
     "Method": "GetAllQuestions",
-    "RelativePath": "api/v1/question/getall",
+    "RelativePath": "api/v2/question/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1297,7 +1258,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AuthController",
     "Method": "Register",
-    "RelativePath": "api/v1/register",
+    "RelativePath": "api/v2/register",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1313,7 +1274,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.ServicesController",
     "Method": "GetServiceById",
-    "RelativePath": "api/v1/service/{id}",
+    "RelativePath": "api/v2/service/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1339,7 +1300,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.ServicesController",
     "Method": "GetAllServices",
-    "RelativePath": "api/v1/service/getall",
+    "RelativePath": "api/v2/service/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1359,7 +1320,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.STITestingsController",
     "Method": "GetSTITestingById",
-    "RelativePath": "api/v1/stitesting/{id}",
+    "RelativePath": "api/v2/stitesting/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1385,7 +1346,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.STITestingsController",
     "Method": "GetAllSTITestings",
-    "RelativePath": "api/v1/stitesting/getall",
+    "RelativePath": "api/v2/stitesting/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1405,7 +1366,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "GetTestResultById",
-    "RelativePath": "api/v1/testresult/{id}",
+    "RelativePath": "api/v2/testresult/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1449,7 +1410,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "CreateTestResult",
-    "RelativePath": "api/v1/testresult/create",
+    "RelativePath": "api/v2/testresult/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1493,7 +1454,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "DeleteTestResult",
-    "RelativePath": "api/v1/testresult/delete/{id}",
+    "RelativePath": "api/v2/testresult/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -1537,7 +1498,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "GetAllTestResults",
-    "RelativePath": "api/v1/testresult/getall",
+    "RelativePath": "api/v2/testresult/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1575,7 +1536,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "UpdateTestResult",
-    "RelativePath": "api/v1/testresult/update/{id}",
+    "RelativePath": "api/v2/testresult/update/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1624,7 +1585,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetUserById",
-    "RelativePath": "api/v1/user/{id}",
+    "RelativePath": "api/v2/user/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1668,7 +1629,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateAvatar",
-    "RelativePath": "api/v1/user/avatar/{id}",
+    "RelativePath": "api/v2/user/avatar/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1699,7 +1660,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateMyAvatar",
-    "RelativePath": "api/v1/user/avatar/me",
+    "RelativePath": "api/v2/user/avatar/me",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1743,7 +1704,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "CreateUser",
-    "RelativePath": "api/v1/user/create",
+    "RelativePath": "api/v2/user/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1787,7 +1748,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "DeleteUser",
-    "RelativePath": "api/v1/user/delete/{id}",
+    "RelativePath": "api/v2/user/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -1831,7 +1792,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetUsers",
-    "RelativePath": "api/v1/user/getall",
+    "RelativePath": "api/v2/user/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1869,7 +1830,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetUsersByRole",
-    "RelativePath": "api/v1/user/getall/{role}",
+    "RelativePath": "api/v2/user/getall/{role}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1913,7 +1874,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateProfile",
-    "RelativePath": "api/v1/user/profile/{id}",
+    "RelativePath": "api/v2/user/profile/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1944,7 +1905,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetMyProfile",
-    "RelativePath": "api/v1/user/profile/me",
+    "RelativePath": "api/v2/user/profile/me",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1982,7 +1943,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateMyProfile",
-    "RelativePath": "api/v1/user/profile/me",
+    "RelativePath": "api/v2/user/profile/me",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -2026,7 +1987,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "SetUserRole",
-    "RelativePath": "api/v1/user/set-role/{id}",
+    "RelativePath": "api/v2/user/set-role/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -2057,7 +2018,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateUser",
-    "RelativePath": "api/v1/user/update/{id}",
+    "RelativePath": "api/v2/user/update/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,

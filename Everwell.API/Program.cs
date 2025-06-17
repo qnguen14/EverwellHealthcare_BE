@@ -64,6 +64,7 @@ builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDb
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.MenstrualCycleNotificationService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
