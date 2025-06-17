@@ -6,14 +6,15 @@ using Everwell.DAL.Data.Exceptions;
 using Everwell.DAL.Data.Requests.Appointments;
 using Everwell.DAL.Data.Responses.Appointments;
 using Everwell.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Everwell.BLL.Services.Implements;
 
 public class AppointmentService : BaseService<AppointmentService>, IAppointmentService
 {
-    public AppointmentService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<AppointmentService> logger, IMapper mapper)
-        : base(unitOfWork, logger, mapper)
+    public AppointmentService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<AppointmentService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;

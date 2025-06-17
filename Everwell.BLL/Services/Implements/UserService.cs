@@ -13,13 +13,14 @@ using Everwell.DAL.Data.Exceptions;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements
 {
     public class UserService : BaseService<UserService>, IUserService
     {
-        public UserService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<UserService> logger, IMapper mapper)
-            : base(unitOfWork, logger, mapper)
+        public UserService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<UserService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+            : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;

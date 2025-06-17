@@ -52,6 +52,7 @@ namespace Everwell.BLL.Services.Implements
                         Priority = request.Priority,
                         AppointmentId = request.AppointmentId,
                         TestResultId = request.TestResultId,
+                        STITestingId = request.STITestingId,
                         CreatedAt = DateTime.UtcNow,
                         IsRead = false
                     };

@@ -3,14 +3,15 @@ using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Everwell.BLL.Services.Implements;
 
 public class QuestionService : BaseService<QuestionService>, IQuestionService
 {
-    public QuestionService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<QuestionService> logger, IMapper mapper)
-        : base(unitOfWork, logger, mapper)
+    public QuestionService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<QuestionService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
     }
 

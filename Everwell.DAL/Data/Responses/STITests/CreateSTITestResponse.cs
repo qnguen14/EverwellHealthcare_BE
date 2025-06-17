@@ -1,26 +1,33 @@
-﻿using Everwell.DAL.Data.Entities;
-using Everwell.DAL.Data.Responses.Appointments;
+﻿using System;
+using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Data.Responses.User;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Everwell.DAL.Data.Responses.STITests
 {
     public class CreateSTITestResponse
     {
-        public Guid AppointmentId { get; set; }
-        public CreateAppointmentsResponse Appointment { get; set; }
-        public TestType TestType { get; set; }
-
-        public Method Method { get; set; }
-
-        public Status Status { get; set; } 
-
-        public DateOnly? CollectedDate { get; set; }
+        public Guid Id { get; set; }
+        
+        public Guid CustomerId { get; set; }
+        
+        public GetUserResponse Customer { get; set; }
+        
+        public TestPackage TestPackage { get; set; }
+        
+        public TestingStatus Status { get; set; }
+        
+        public DateOnly ScheduleDate { get; set; }
+        
+        public ShiftSlot Slot { get; set; }
+        
+        public string? Notes { get; set; }
+        
+        public DateTime? SampleTakenAt { get; set; }
+        
+        public DateTime? CompletedAt { get; set; }
+        
+        public bool IsCompleted { get; set; }
+        
+        public DateTime CreatedAt { get; set; }
     }
 }

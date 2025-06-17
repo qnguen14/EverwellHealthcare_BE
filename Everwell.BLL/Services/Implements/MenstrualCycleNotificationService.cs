@@ -1,6 +1,7 @@
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -13,9 +14,10 @@ namespace Everwell.BLL.Services.Implements
         public MenstrualCycleNotificationService(
             IUnitOfWork<EverwellDbContext> unitOfWork,
             ILogger<MenstrualCycleNotificationService> logger,
+            IHttpContextAccessor httpContextAccessor,
             AutoMapper.IMapper mapper,
             IEmailService emailService)
-            : base(unitOfWork, logger, mapper)
+            : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
             _emailService = emailService;
         }

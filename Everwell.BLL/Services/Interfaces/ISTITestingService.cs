@@ -9,6 +9,6 @@ public interface ISTITestingService
     Task<IEnumerable<CreateSTITestResponse>> GetAllSTITestingsAsync();
     Task<CreateSTITestResponse> GetSTITestingByIdAsync(Guid id);
     Task<CreateSTITestResponse> CreateSTITestingAsync(CreateSTITestRequest request);
-    Task<CreateSTITestResponse?> UpdateSTITestingAsync(Guid id, CreateSTITestRequest request);
+    Task<CreateSTITestResponse?> UpdateSTITestingAsync(Guid id, UpdateSTITestRequest request);
     Task<bool> DeleteSTITestingAsync(Guid id);
 }

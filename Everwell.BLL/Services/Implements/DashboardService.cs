@@ -7,13 +7,14 @@ using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements
 {
     public class DashboardService : BaseService<DashboardService>, IDashboardService
     {
-        public DashboardService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<DashboardService> logger, IMapper mapper)
-            : base(unitOfWork, logger, mapper)
+        public DashboardService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<DashboardService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+            : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;

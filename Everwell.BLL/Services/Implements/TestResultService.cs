@@ -7,14 +7,24 @@ using Microsoft.Extensions.Logging;
 using Everwell.BLL.Services;
 using Everwell.DAL.Data.Responses.TestResult;
 using Everwell.DAL.Data.Requests.TestResult;
+using Everwell.DAL.Data.Requests.Notifications;
+using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements;
 
 public class TestResultService : BaseService<TestResultService>, ITestResultService
 {
-    public TestResultService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<TestResultService> logger, IMapper mapper)
-        : base(unitOfWork, logger, mapper)
+    private readonly INotificationService _notificationService;
+
+    public TestResultService(
+        IUnitOfWork<EverwellDbContext> unitOfWork, 
+        ILogger<TestResultService> logger, 
+        IMapper mapper,
+        IHttpContextAccessor httpContextAccessor,
+        INotificationService notificationService)
+        : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
+        _notificationService = notificationService;
     }
 
     public async Task<IEnumerable<CreateTestResultResponse>> GetAllTestResultsAsync()
@@ -23,13 +33,10 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         {
             var testResults = await _unitOfWork.GetRepository<TestResult>()
                 .GetListAsync(
-                    predicate: t => t.Staff.IsActive == true && 
-                    t.STITesting.Appointment.Customer.IsActive == true &&
-                    t.STITesting.Appointment.Consultant.IsActive == true,
+                    predicate: t => t.STITesting.Customer.IsActive == true,
                     include: t => t.Include(tr => tr.STITesting)
-                                   .Include(tr => tr.Staff)
-                                   .Include(tr => tr.STITesting.Appointment.Customer)
-                    .Include(tr => tr.STITesting.Appointment.Consultant));  
+                                  .Include(tr => tr.STITesting.Customer)
+                                  .Include(tr => tr.Staff));  
 
             if (testResults == null || !testResults.Any())
             {
@@ -46,16 +53,43 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         }
     }
 
+    public async Task<IEnumerable<CreateTestResultResponse>> GetTestResultsBySTITestingIdAsync(Guid stiTestingId)
+    {
+        try
+        {
+            var testResults = await _unitOfWork.GetRepository<TestResult>()
+                .GetListAsync(
+                    predicate: t => t.STITestingId == stiTestingId && 
+                                   t.STITesting.Customer.IsActive == true,
+                    include: t => t.Include(tr => tr.STITesting)
+                                  .Include(tr => tr.STITesting.Customer)
+                                  .Include(tr => tr.Staff));
+
+            if (testResults == null || !testResults.Any())
+            {
+                _logger.LogWarning("No test results found for STI Testing with ID {StiTestingId}", stiTestingId);
+                return Enumerable.Empty<CreateTestResultResponse>();
+            }
+
+            return _mapper.Map<IEnumerable<CreateTestResultResponse>>(testResults);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting test results for STI Testing with ID {StiTestingId}", stiTestingId);
+            throw;
+        }
+    }
+
     public async Task<CreateTestResultResponse> GetTestResultByIdAsync(Guid id)
     {
         try
         {
             var testresult = await _unitOfWork.GetRepository<TestResult>()
                 .FirstOrDefaultAsync(
-                    predicate: t => t.Id == id &&
-                                    t.Staff.IsActive == true,
+                    predicate: t => t.Id == id,
                     include: t => t.Include(tr => tr.STITesting)
-                                   .Include(tr => tr.Staff));
+                                  .Include(tr => tr.STITesting.Customer)
+                                  .Include(tr => tr.Staff));
 
             if (testresult == null) 
             {
@@ -78,22 +112,47 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-
-                var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
-                    .FirstOrDefaultAsync(predicate: t => t.STITestingId == request.STITestingId &&
-                                                         t.StaffId == request.StaffId,
-                                         include: t => t.Include(tr => tr.STITesting)
-                                                        .Include(tr => tr.Staff));
-
-                if (existingTestResult != null)
+                // Validate STI Testing exists
+                var stiTesting = await _unitOfWork.GetRepository<STITesting>()
+                    .FirstOrDefaultAsync(
+                        predicate: s => s.Id == request.STITestingId,
+                        include: s => s.Include(sti => sti.Customer)
+                    );
+                
+                if (stiTesting == null)
                 {
-                    _logger.LogWarning("Test result with STITestingId {STITestingId} already exists", request.STITestingId);
-                    return _mapper.Map<CreateTestResultResponse>(request);
+                    _logger.LogWarning("STI Testing with id {STITestingId} not found", request.STITestingId);
+                    throw new KeyNotFoundException($"STI Testing with id {request.STITestingId} not found");
                 }
+                
+                // Create test result
+                var testResult = new TestResult
+                {
+                    Id = Guid.NewGuid(),
+                    STITestingId = request.STITestingId,
+                    Parameter = request.Parameter,
+                    Outcome = request.Outcome,
+                    Comments = request.Comments,
+                    StaffId = request.StaffId,
+                    ProcessedAt = request.ProcessedAt ?? DateTime.UtcNow
+                };
 
-                await _unitOfWork.GetRepository<TestResult>().InsertAsync(existingTestResult);
-
-                return _mapper.Map<CreateTestResultResponse>(request);
+                await _unitOfWork.GetRepository<TestResult>().InsertAsync(testResult);
+                
+                // Update STI Testing status if needed
+                if (stiTesting.Status == TestingStatus.SampleTaken || stiTesting.Status == TestingStatus.Processing)
+                {
+                    stiTesting.Status = TestingStatus.Processing;
+                    _unitOfWork.GetRepository<STITesting>().UpdateAsync(stiTesting);
+                }
+                
+                // Send notification if the result is positive
+                if (testResult.Outcome == ResultOutcome.Positive)
+                {
+                    await CreatePositiveResultNotification(stiTesting.CustomerId, testResult.Id);
+                }
+                
+                return _mapper.Map<CreateTestResultResponse>(testResult);
             });
         }
         catch (Exception ex)
@@ -103,30 +162,71 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         }
     }
 
-    public async Task<CreateTestResultResponse> UpdateTestResultAsync(Guid id, CreateTestResultRequest request)
+    public async Task<CreateTestResultResponse> UpdateTestResultAsync(Guid id, UpdateTestResultRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
-                    .FirstOrDefaultAsync(predicate: t => t.Id == id &&
-                                                         t.Staff.IsActive == true,
-                                         include: t => t.Include(tr => tr.STITesting)
-                                                        .Include(tr => tr.Staff));
+                    .FirstOrDefaultAsync(
+                        predicate: t => t.Id == id,
+                        include: t => t.Include(tr => tr.STITesting)
+                                      .Include(tr => tr.STITesting.Customer)
+                                      .Include(tr => tr.Staff));
                 
                 if (existingTestResult == null)
                 {
                     _logger.LogWarning("Test result with id {Id} not found", id);
+                    throw new KeyNotFoundException($"Test result with id {id} not found");
                 }
 
-                existingTestResult.ResultData = request.ResultData;
-                existingTestResult.Status = request.Status;
-                existingTestResult.ExaminedAt = request.ExaminedAt;
-                existingTestResult.SentAt = request.SentAt;
+                // Update fields that can be changed
+                if (request.Outcome == ResultOutcome.Pending)
+                {
+                    // If outcome changed from negative/pending to positive, send notification
+                    if (existingTestResult.Outcome != ResultOutcome.Positive && 
+                        request.Outcome == ResultOutcome.Positive)
+                    {
+                        await CreatePositiveResultNotification(
+                            existingTestResult.STITesting.CustomerId, 
+                            existingTestResult.Id);
+                    }
+                    
+                    // If outcome changed from pending to negative, send notification
+                    if (existingTestResult.Outcome != ResultOutcome.Positive &&
+                        request.Outcome == ResultOutcome.Negative)
+                    {
+                        await CreateNegativeResultNotification(
+                            existingTestResult.STITesting.CustomerId, 
+                            existingTestResult.Id);
+                    }
+                    
+                    existingTestResult.Outcome = request.Outcome;
+                }
+                
+                if (request.Comments != null)
+                {
+                    existingTestResult.Comments = request.Comments;
+                }
+                
+                // Update processed date and staff if provided
+                if (request.ProcessedAt.HasValue)
+                {
+                    existingTestResult.ProcessedAt = request.ProcessedAt.Value;
+                }
+                
+                if (request.StaffId.HasValue)
+                {
+                    existingTestResult.StaffId = request.StaffId.Value;
+                }
                 
                 _unitOfWork.GetRepository<TestResult>().UpdateAsync(existingTestResult);
-                return _mapper.Map<CreateTestResultResponse>(request);
+                
+                // Check if all test results for this STI testing are complete
+                await CheckAndUpdateStiTestingStatus(existingTestResult.STITestingId);
+                
+                return _mapper.Map<CreateTestResultResponse>(existingTestResult);
             });
         }
         catch (Exception ex)
@@ -143,14 +243,12 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
-                    .FirstOrDefaultAsync(predicate: t => t.Id == id &&
-                                                         t.Staff.IsActive == true,
-                                         include: t => t.Include(tr => tr.STITesting)
-                                                        .Include(tr => tr.Staff));
+                    .FirstOrDefaultAsync(predicate: t => t.Id == id);
 
                 if (existingTestResult == null)
                 {
                     _logger.LogWarning("Test result with id {Id} not found", id);
+                    return false;
                 }
 
                 _unitOfWork.GetRepository<TestResult>().DeleteAsync(existingTestResult);
@@ -163,4 +261,101 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
             throw;
         }
     }
-} 
+
+    #region Helper Methods
+    private async Task CheckAndUpdateStiTestingStatus(Guid stiTestingId)
+    {
+        // Get all test results for this STI testing
+        var testResults = await _unitOfWork.GetRepository<TestResult>()
+            .GetListAsync(predicate: tr => tr.STITestingId == stiTestingId);
+        
+        // Get the STI testing record
+        var stiTesting = await _unitOfWork.GetRepository<STITesting>()
+            .FirstOrDefaultAsync(predicate: s => s.Id == stiTestingId);
+            
+        if (stiTesting == null) return;
+        
+        // If no pending results and at least one result exists, mark as completed
+        if (testResults.Any() && !testResults.Any(tr => tr.Outcome == ResultOutcome.Pending))
+        {
+            stiTesting.Status = TestingStatus.Completed;
+            stiTesting.CompletedAt = DateTime.UtcNow;
+            
+            _unitOfWork.GetRepository<STITesting>().UpdateAsync(stiTesting);
+            
+            // Send notification
+            var request = new CreateNotificationRequest
+            {
+                UserId = stiTesting.CustomerId,
+                Title = "Kết quả xét nghiệm đã hoàn thành",
+                Message = "Tất cả kết quả xét nghiệm STI của bạn đã hoàn tất. Vui lòng xem chi tiết trong hồ sơ cá nhân.",
+                Type = NotificationType.TestResult,
+                Priority = NotificationPriority.High,
+                STITestingId = stiTestingId
+            };
+            
+            await _notificationService.CreateNotification(request);
+        }
+    }
+    
+    private async Task CreatePositiveResultNotification(Guid customerId, Guid testResultId)
+    {
+        // Get the test result to include details in notification
+        var testResult = await _unitOfWork.GetRepository<TestResult>()
+            .FirstOrDefaultAsync(
+                predicate: tr => tr.Id == testResultId,
+                include: tr => tr.Include(t => t.STITesting)
+            );
+            
+        if (testResult == null) return;
+        
+        // Create notification for positive result
+        var request = new CreateNotificationRequest
+        {
+            UserId = customerId,
+            Title = "Kết quả xét nghiệm dương tính",
+            Message = $"Kết quả xét nghiệm cho {testResult.Parameter} của bạn cần được theo dõi thêm. Vui lòng liên hệ với bác sĩ để được tư vấn.",
+            Type = NotificationType.TestResult,
+            Priority = NotificationPriority.High,
+            TestResultId = testResultId,
+            STITestingId = testResult.STITestingId
+        };
+        
+        await _notificationService.CreateNotification(request);
+        
+        // Mark notification as sent
+        // testResult.NotificationSent = true;
+        _unitOfWork.GetRepository<TestResult>().UpdateAsync(testResult);
+    }
+    
+    private async Task CreateNegativeResultNotification(Guid customerId, Guid testResultId)
+    {
+        // Get the test result to include details in notification
+        var testResult = await _unitOfWork.GetRepository<TestResult>()
+            .FirstOrDefaultAsync(
+                predicate: tr => tr.Id == testResultId,
+                include: tr => tr.Include(t => t.STITesting)
+            );
+            
+        if (testResult == null) return;
+        
+        // Create notification for positive result
+        var request = new CreateNotificationRequest
+        {
+            UserId = customerId,
+            Title = "Kết quả xét nghiệm âm tính",
+            Message = $"Kết quả xét nghiệm cho {testResult.Parameter} của bạn cho thấy bạn không nhiễm bệnh STI. Tuy nhiên, nếu bạn có triệu chứng hoặc lo ngại, vui lòng liên hệ với bác sĩ để được tư vấn.",
+            Type = NotificationType.TestResult,
+            Priority = NotificationPriority.High,
+            TestResultId = testResultId,
+            STITestingId = testResult.STITestingId
+        };
+        
+        await _notificationService.CreateNotification(request);
+        
+        // Mark notification as sent
+        // testResult.NotificationSent = true;
+        _unitOfWork.GetRepository<TestResult>().UpdateAsync(testResult);
+    }
+    #endregion
+}

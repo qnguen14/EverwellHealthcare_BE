@@ -5,13 +5,14 @@ using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using Everwell.BLL.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements;
 
 public class FeedbackService : BaseService<FeedbackService>, IFeedbackService
 {
-    public FeedbackService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<FeedbackService> logger, IMapper mapper)
-        : base(unitOfWork, logger, mapper)
+    public FeedbackService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<FeedbackService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
     }
 

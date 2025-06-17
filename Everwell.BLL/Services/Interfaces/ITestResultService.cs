@@ -9,7 +9,8 @@ public interface ITestResultService
 {
     Task<IEnumerable<CreateTestResultResponse>> GetAllTestResultsAsync();
     Task<CreateTestResultResponse> GetTestResultByIdAsync(Guid id);
+    Task<IEnumerable<CreateTestResultResponse>> GetTestResultsBySTITestingIdAsync(Guid stiTestingId);
     Task<CreateTestResultResponse> CreateTestResultAsync(CreateTestResultRequest request);
-    Task<CreateTestResultResponse> UpdateTestResultAsync(Guid id, CreateTestResultRequest request);
+    Task<CreateTestResultResponse> UpdateTestResultAsync(Guid id, UpdateTestResultRequest request);
     Task<bool> DeleteTestResultAsync(Guid id);
 }

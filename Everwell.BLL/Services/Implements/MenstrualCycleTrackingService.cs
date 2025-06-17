@@ -6,6 +6,7 @@ using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using Everwell.DAL.Data.Requests.MenstrualCycle;
 using Everwell.DAL.Data.Responses.MenstrualCycle;
+using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements;
 
@@ -17,8 +18,9 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         IUnitOfWork<EverwellDbContext> unitOfWork, 
         ILogger<MenstrualCycleTrackingService> logger, 
         IMapper mapper,
+        IHttpContextAccessor httpContextAccessor,
         IMenstrualCycleNotificationService notificationService)
-        : base(unitOfWork, logger, mapper)
+        : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _notificationService = notificationService;
     }

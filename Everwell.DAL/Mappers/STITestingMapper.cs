@@ -12,22 +12,33 @@ namespace Everwell.DAL.Mappers
             // Map from CreateSTITestRequest to STITesting
             CreateMap<CreateSTITestRequest, STITesting>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
-                .ForMember(dest => dest.TestType, opt => opt.MapFrom(src => src.TestType))
-                .ForMember(dest => dest.Method, opt => opt.MapFrom(src => src.Method))
+                // .ForMember(dest => dest.CustomerId, opt => opt.Ignore())
+                .ForMember(dest => dest.TestPackage, opt => opt.MapFrom(src => src.TestPackage))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.CollectedDate, opt => opt.MapFrom(src => src.CollectedDate))
-                .ForMember(dest => dest.Appointment, opt => opt.Ignore())
+                .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.ScheduleDate))
+                .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.SampleTakenAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CompletedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsCompleted, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Customer, opt => opt.Ignore())
                 .ForMember(dest => dest.TestResults, opt => opt.Ignore());
 
             // Map from STITesting to CreateSTITestResponse
             CreateMap<STITesting, CreateSTITestResponse>()
-                .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
-                .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
-                .ForMember(dest => dest.TestType, opt => opt.MapFrom(src => src.TestType))
-                .ForMember(dest => dest.Method, opt => opt.MapFrom(src => src.Method))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.TestPackage, opt => opt.MapFrom(src => src.TestPackage))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.CollectedDate, opt => opt.MapFrom(src => src.CollectedDate));
+                .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.ScheduleDate))
+                .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
+                .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.SampleTakenAt, opt => opt.MapFrom(src => src.SampleTakenAt))
+                .ForMember(dest => dest.CompletedAt, opt => opt.MapFrom(src => src.CompletedAt))
+                .ForMember(dest => dest.IsCompleted, opt => opt.MapFrom(src => src.IsCompleted))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
         }
     }
 }

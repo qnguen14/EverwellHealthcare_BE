@@ -3,6 +3,7 @@ using System;
 using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Everwell.DAL.Migrations
 {
     [DbContext(typeof(EverwellDbContext))]
-    partial class EverwellDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250617105958_updateSTI_TestResult")]
+    partial class updateSTI_TestResult
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -286,10 +289,6 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("priority");
 
-                    b.Property<Guid?>("STITestingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("stitesting_id");
-
                     b.Property<Guid?>("TestResultId")
                         .HasColumnType("uuid")
                         .HasColumnName("test_result_id");
@@ -315,8 +314,6 @@ namespace Everwell.DAL.Migrations
                     b.HasIndex("CreatedAt");
 
                     b.HasIndex("IsRead");
-
-                    b.HasIndex("STITestingId");
 
                     b.HasIndex("TestResultId");
 
@@ -688,11 +685,6 @@ namespace Everwell.DAL.Migrations
                         .HasForeignKey("AppointmentId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Everwell.DAL.Data.Entities.STITesting", "STITesting")
-                        .WithMany()
-                        .HasForeignKey("STITestingId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Everwell.DAL.Data.Entities.TestResult", "TestResult")
                         .WithMany()
                         .HasForeignKey("TestResultId")
@@ -707,8 +699,6 @@ namespace Everwell.DAL.Migrations
                     b.Navigation("Appointment");
 
                     b.Navigation("Customer");
-
-                    b.Navigation("STITesting");
 
                     b.Navigation("TestResult");
                 });

@@ -5,13 +5,14 @@ using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using Everwell.BLL.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements;
 
 public class PostService : BaseService<PostService>, IPostService
 {
-    public PostService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<PostService> logger, IMapper mapper)
-        : base(unitOfWork, logger, mapper)
+    public PostService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<PostService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
     }
 

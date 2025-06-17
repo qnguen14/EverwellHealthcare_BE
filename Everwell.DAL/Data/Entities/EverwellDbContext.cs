@@ -66,14 +66,15 @@ namespace Everwell.DAL.Data.Entities
             // STITesting relationships
             modelBuilder.Entity<STITesting>(entity =>
             {
-                entity.HasOne(s => s.Appointment)
+                entity.HasOne(s => s.Customer)
                     .WithMany()
-                    .HasForeignKey(s => s.AppointmentId)
+                    .HasForeignKey(s => s.CustomerId)
                     .OnDelete(DeleteBehavior.Restrict);
-                // entity.HasOne(s => s.Customer)
-                //     .WithMany(u => u.STITests)
-                //     .HasForeignKey(s => s.CustomerId)
-                //     .OnDelete(DeleteBehavior.Restrict);
+    
+                entity.HasMany(s => s.TestResults)
+                    .WithOne(tr => tr.STITesting)
+                    .HasForeignKey(tr => tr.STITestingId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // TestResult relationships
@@ -83,11 +84,6 @@ namespace Everwell.DAL.Data.Entities
                     .WithMany(sti => sti.TestResults)
                     .HasForeignKey(tr => tr.STITestingId)
                     .OnDelete(DeleteBehavior.Cascade);
-
-                // entity.HasOne(tr => tr.Customer)
-                //     .WithMany()
-                //     .HasForeignKey(tr => tr.CustomerId)
-                //     .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasOne(tr => tr.Staff)
                     .WithMany()
@@ -166,6 +162,11 @@ namespace Everwell.DAL.Data.Entities
                 entity.HasOne(n => n.TestResult)
                     .WithMany()
                     .HasForeignKey(n => n.TestResultId)
+                    .OnDelete(DeleteBehavior.SetNull);
+                
+                entity.HasOne(n => n.STITesting)
+                    .WithMany()
+                    .HasForeignKey(n => n.STITestingId)
                     .OnDelete(DeleteBehavior.SetNull);
 
                 // Create indexes for common query patterns

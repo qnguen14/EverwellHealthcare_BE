@@ -52,7 +52,7 @@ public class TestResultsController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.TestResult.GetTestResultEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CreateTestResultResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize]
@@ -65,6 +65,36 @@ public class TestResultsController : ControllerBase
                 return NotFound(new { message = "Test Result not found" });
 
             var apiResponse = new ApiResponse<CreateTestResultResponse>
+            {
+                Data = testResult,
+                Message = "Test result retrieved successfully",
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK
+            };
+
+
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+
+    [HttpGet(ApiEndpointConstants.TestResult.GetTestResultsBySTITestsEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CreateTestResultResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize]
+    public async Task<ActionResult<TestResult>> GetTestResultBySTITest(Guid id)
+    {
+        try
+        {
+            var testResult = await _testResultService.GetTestResultsBySTITestingIdAsync(id);
+            if (testResult == null)
+                return NotFound(new { message = "Test Result not found" });
+
+            var apiResponse = new ApiResponse<IEnumerable<CreateTestResultResponse>>
             {
                 Data = testResult,
                 Message = "Test result retrieved successfully",
@@ -112,11 +142,11 @@ public class TestResultsController : ControllerBase
     }
 
     [HttpPut(ApiEndpointConstants.TestResult.UpdateTestResultEndpoint)]
-    [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CreateTestResultResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize]
-    public async Task<ActionResult<TestResult>> UpdateTestResult(Guid id, CreateTestResultRequest request)
+    public async Task<IActionResult> UpdateTestResult(Guid id, UpdateTestResultRequest request)
     {
         try
         {
@@ -132,6 +162,38 @@ public class TestResultsController : ControllerBase
                 StatusCode = StatusCodes.Status200OK
             };
 
+            return Ok(apiResponse);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+
+    [HttpDelete(ApiEndpointConstants.TestResult.DeleteTestResultEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize]
+    public async Task<IActionResult> DeleteTestResult(Guid id)
+    {
+        try
+        {
+            var result = await _testResultService.DeleteTestResultAsync(id);
+            if (!result)
+                return NotFound(new { message = "Test Result not found" });
+
+            var apiResponse = new ApiResponse<bool>
+            {
+                Data = true,
+                Message = "Test result deleted successfully",
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK
+            };
 
             return Ok(apiResponse);
         }
@@ -140,33 +202,4 @@ public class TestResultsController : ControllerBase
             return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
-
-        [HttpDelete(ApiEndpointConstants.TestResult.DeleteTestResultEndpoint)]
-        [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize]
-        public async Task<ActionResult<TestResult>> DeleteTestResult(Guid id)
-        {
-            try
-            {
-                var testResult = await _testResultService.DeleteTestResultAsync(id);
-                if (testResult == null)
-                    return NotFound(new { message = "Test Result not found" });
-
-                var apiResponse = new ApiResponse<CreateTestResultResponse>
-                {
-                    Message = "Test result deleted successfully",
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status200OK
-                };
-
-
-                return Ok(apiResponse);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
-            }
-        }
-    }
+}

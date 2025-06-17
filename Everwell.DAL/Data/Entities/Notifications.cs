@@ -8,7 +8,8 @@ namespace Everwell.DAL.Data.Entities
     {
         Appointment,
         TestResult,
-        Payment
+        STITest,
+        Payment,
     }
 
     public enum NotificationPriority
@@ -64,5 +65,9 @@ namespace Everwell.DAL.Data.Entities
         [Column("test_result_id")]
         public Guid? TestResultId { get; set; }
         public virtual TestResult? TestResult { get; set; }
+        
+        [Column("stitesting_id")]
+        public Guid? STITestingId { get; set; }
+        public virtual STITesting? STITesting { get; set; }
     }
 }   

@@ -116,7 +116,7 @@ public class STITestingsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize]
-    public async Task<IActionResult> UpdateSTITesting(Guid id, CreateSTITestRequest request)
+    public async Task<IActionResult> UpdateSTITesting(Guid id, UpdateSTITestRequest request)
     {
         try
         {
@@ -136,6 +136,14 @@ public class STITestingsController : ControllerBase
             };
             
             return Ok(apiResponse);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -173,4 +181,4 @@ public class STITestingsController : ControllerBase
     }
     
 
-} 
+}

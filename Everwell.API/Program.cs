@@ -44,7 +44,7 @@ builder.Services.AddDbContext<EverwellDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(UserMapper));
 
 builder.Services.AddScoped<INotificationService, NotificationService>();
