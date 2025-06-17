@@ -23,9 +23,13 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         {
             var testResults = await _unitOfWork.GetRepository<TestResult>()
                 .GetListAsync(
-                    predicate: t =>t.Staff.IsActive == true,
+                    predicate: t => t.Staff.IsActive == true && 
+                    t.STITesting.Appointment.Customer.IsActive == true &&
+                    t.STITesting.Appointment.Consultant.IsActive == true,
                     include: t => t.Include(tr => tr.STITesting)
-                                   .Include(tr => tr.Staff));
+                                   .Include(tr => tr.Staff)
+                                   .Include(tr => tr.STITesting.Appointment.Customer)
+                    .Include(tr => tr.STITesting.Appointment.Consultant));  
 
             if (testResults == null || !testResults.Any())
             {
