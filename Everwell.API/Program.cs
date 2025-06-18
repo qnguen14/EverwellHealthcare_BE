@@ -117,7 +117,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(options =>
-        options.SwaggerEndpoint("/swagger/v2/swagger.json", "Everwell.API v2"));
+        options.SwaggerEndpoint("/swagger/v2.5/swagger.json", "Everwell.API v2.5"));
 }
 
 app.UseCors(options =>

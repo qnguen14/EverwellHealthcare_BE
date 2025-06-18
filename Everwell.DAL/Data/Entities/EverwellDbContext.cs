@@ -9,7 +9,7 @@ namespace Everwell.DAL.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("EverWellDB_v2");
+            modelBuilder.HasDefaultSchema("EverWellDB_v2.5");
             base.OnModelCreating(modelBuilder);
             
             
@@ -19,6 +19,15 @@ namespace Everwell.DAL.Data.Entities
                 .WithMany()
                 .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasMany(u => u.STITests)
+                    .WithOne(s => s.Customer)
+                    .HasForeignKey(s => s.CustomerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
 
             // Post - User (Staff)
             modelBuilder.Entity<Post>()
@@ -58,9 +67,9 @@ namespace Everwell.DAL.Data.Entities
             modelBuilder.Entity<STITesting>(entity =>
             {
                 entity.HasOne(s => s.Customer)
-                    .WithMany()
-                    .HasForeignKey(s => s.CustomerId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                      .WithMany(u => u.STITests)
+                      .HasForeignKey(s => s.CustomerId)
+                      .OnDelete(DeleteBehavior.Restrict);
     
                 entity.HasMany(s => s.TestResults)
                     .WithOne(tr => tr.STITesting)
@@ -87,7 +96,7 @@ namespace Everwell.DAL.Data.Entities
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(tr => tr.Staff)
-                    .WithMany()
+                    .WithMany(tr => tr.TestResultsExamined)
                     .HasForeignKey(tr => tr.StaffId)
                     .OnDelete(DeleteBehavior.SetNull);
                 

@@ -18,8 +18,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => (string)null)) // Default null
                 .ForMember(dest => dest.Posts, opt => opt.Ignore()) // Ignore navigation properties
                 .ForMember(dest => dest.STITests, opt => opt.Ignore())
-                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore())
-                .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore());
+                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore());
+                // .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore());
 
             // UpdateUserRequest to User
             CreateMap<UpdateUserRequest, User>()
@@ -29,8 +29,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.AvatarUrl, opt => opt.Ignore()) // Don't update avatar in normal updates
                 .ForMember(dest => dest.Posts, opt => opt.Ignore()) // Don't update related entities
                 .ForMember(dest => dest.STITests, opt => opt.Ignore()) // Don't update related entities
-                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore()) // Don't update related entities
-                .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore()); // Don't update related entities
+                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore()); // Don't update related entities
+                // .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore()); // Don't update related entities
 
             // User to CreateUserResponse
             CreateMap<User, CreateUserResponse>()
@@ -85,8 +85,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
                 .ForMember(dest => dest.Posts, opt => opt.Ignore())
                 .ForMember(dest => dest.STITests, opt => opt.Ignore())
-                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore())
-                .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore());
+                .ForMember(dest => dest.TestResultsExamined, opt => opt.Ignore());
+                // .ForMember(dest => dest.TestResultsSent, opt => opt.Ignore());
 
             // User to UserProfileResponse
             CreateMap<User, UserProfileResponse>()
