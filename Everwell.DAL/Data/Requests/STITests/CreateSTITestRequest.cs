@@ -12,6 +12,8 @@ namespace Everwell.DAL.Data.Requests.STITests
         [Required]
         public TestPackage TestPackage { get; set; }
         
+        public List<TestParameter>? CustomParameters { get; set; }
+        
         [Required]
         public TestingStatus Status { get; set; } = TestingStatus.Scheduled;
 
@@ -20,6 +22,9 @@ namespace Everwell.DAL.Data.Requests.STITests
         
         [Required]
         public ShiftSlot Slot { get; set; }
+        
+        [Required]
+        public decimal TotalPrice { get; set; }
         
         public string? Notes { get; set; }
     }

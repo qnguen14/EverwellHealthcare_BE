@@ -6,30 +6,22 @@ namespace Everwell.DAL.Data.Requests.STITests
 {
     public class UpdateSTITestRequest
     {
-        /// <summary>
-        /// The new status of the STI testing (null if not changing)
-        /// </summary>
+        [Required]
         public TestingStatus Status { get; set; }
-        
-        /// <summary>
-        /// New notes or comments about the STI testing (null if not changing)
-        /// </summary>
-        [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
+
+        [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")] 
         public string? Notes { get; set; }
         
-        /// <summary>
-        /// Update if the STI testing is paid or not (null if not changing)
-        /// </summary>
-        // public bool? IsPaid { get; set; }
+        [Required]
+        public decimal? TotalPrice { get; set; }
         
-        /// <summary>
-        /// Update scheduled date if needed (null if not changing)
-        /// </summary>
+        [Required]
+        public bool? IsPaid { get; set; }
+
+        [Required]
         public DateOnly? ScheduledDate { get; set; }
         
-        /// <summary>
-        /// Update scheduled time slot if needed (null if not changing)
-        /// </summary>
+        [Required]
         public ShiftSlot Slot { get; set; }
     }
 }

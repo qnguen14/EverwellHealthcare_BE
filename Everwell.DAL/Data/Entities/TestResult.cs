@@ -7,22 +7,14 @@ namespace Everwell.DAL.Data.Entities
     public enum TestParameter
     {
         Chlamydia,                  // Vi khuẩn Chlamydia
-        Candida,                    // Nấm Candida
-        Treponema,                  // Xoắn khuẩn gây bệnh giang mai
-        HerpesSimplexType1,         // Virus Herpes Simplex 1
-        HerpesSimplexType2,         // Virus Herpes Simplex 2
-        UreaplasmaParv,             // Vi khuẩn Ureaplasma parvum
-        Trichomonas,                // Trùng roi âm đạo
-        MycoplasmaGenitalium,       // Vi khuẩn Mycoplasma genitalium
-        MycoplasmaHominis,          // Vi khuẩn Mycoplasma hominis
         Gonorrhoeae,                // Vi khuẩn lậu cầu
-        UreaplasmaUrealyticum,      // Vi khuẩn Ureaplasma urealyticum
-        Haemophilus,                // Vi khuẩn gây bệnh hạ cam
-        Gardnerella,                // Vi khuẩn Gardnerella vaginalis
+        Syphilis,                   // Vi khuẩn giang mai
         HIV,                        // HIV 1+2 gộp
-        HIVCombo,                   // HIV Combo Ag + Ab
-        GenitalHPV,                 // Kháng thể kháng đặc hiệu giang mai
-        HPV                         // HPV 40 kiểu từ tự lấy mẫu
+        Herpes,                     // Herpes simplex virus (HSV1 + HSV2)
+        HepatitisB,                 // Viêm gan B
+        HepatitisC,                 // Viêm gan C
+        Trichomonas,                // Ký sinh trùng Trichomonas vaginalis
+        MycoplasmaGenitalium,       // Mycoplasma genitalium
     }
     
     public enum ResultOutcome
@@ -41,12 +33,13 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("sti_testing_id")]
+        [ForeignKey("STITesting")]
         public Guid STITestingId { get; set; }
         public virtual STITesting STITesting { get; set; }
 
         [Required]
         [Column("parameter")]
-        public TestParameter[] Parameter { get; set; } = Array.Empty<TestParameter>();
+        public TestParameter Parameter { get; set; } 
         
         [Required]
         [Column("outcome")]
@@ -57,6 +50,7 @@ namespace Everwell.DAL.Data.Entities
         public string? Comments { get; set; }
 
         [Column("staff_id")]
+        [ForeignKey("Staff")]
         public Guid? StaffId { get; set; }
         public virtual User? Staff { get; set; }
 

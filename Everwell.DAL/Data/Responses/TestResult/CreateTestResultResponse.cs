@@ -13,7 +13,7 @@ namespace Everwell.DAL.Data.Responses.TestResult
         
         public CreateSTITestResponse STITesting { get; set; }
         
-        public TestParameter[] Parameter { get; set; }
+        public TestParameter Parameter { get; set; }
         
         public ResultOutcome Outcome { get; set; }
         

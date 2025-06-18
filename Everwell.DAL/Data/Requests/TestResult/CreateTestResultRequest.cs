@@ -10,7 +10,7 @@ namespace Everwell.DAL.Data.Requests.TestResult
         public Guid STITestingId { get; set; }
 
         [Required]
-        public TestParameter[] Parameter { get; set; }
+        public TestParameter Parameter { get; set; }
         
         [Required]
         public ResultOutcome Outcome { get; set; } = ResultOutcome.Pending;

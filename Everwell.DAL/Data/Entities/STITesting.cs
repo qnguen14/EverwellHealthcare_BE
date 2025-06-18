@@ -19,19 +19,22 @@ namespace Everwell.DAL.Data.Entities
     
     public enum TestPackage
     {
-        Basic,          // Cơ bản - Basic package (17 test parameters)
-        Advanced        // Nâng cao - Advanced package for women (18 test parameters)
+        Basic,          // Cơ bản - Basic package (Chlamydia, Gonorrhea, Syphilis)
+        Advanced,       // Nâng cao - Full package (Basic + HIV, Herpes, Hepatitis)
+        Custom          // Tùy chỉnh - Custom package (User-defined tests)
     }
     
     [Table("STITesting")]
     public class STITesting
     {
         [Key]
+        [Required]
         [Column("id")]
         public Guid Id { get; set; }
 
         [Required]
         [Column("customer_id")]
+        [ForeignKey("Customer")]
         public Guid CustomerId { get; set; }
         public virtual User Customer { get; set; }
 
@@ -44,7 +47,7 @@ namespace Everwell.DAL.Data.Entities
         public TestingStatus Status { get; set; } = TestingStatus.Scheduled;
 
         [Required]
-        [Column("collected_date", TypeName = "date")]
+        [Column("schedule_date", TypeName = "date")]
         public DateOnly? ScheduleDate { get; set; }
 
         [Required]
@@ -61,12 +64,17 @@ namespace Everwell.DAL.Data.Entities
         [Column("completed_at")]
         public DateTime? CompletedAt { get; set; }
 
-        [Column("is_completed")]
-        public bool IsCompleted { get; set; } = false;
-
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+        
+        [Required]
+        [Column("total_price")]
+        public decimal TotalPrice { get; set; }
+        
+        [Required]
+        [Column ("is_paid")]
+        public bool IsPaid { get; set; } = false;
+        
         // Navigation to Test Results
         public virtual ICollection<TestResult> TestResults { get; set; } = new List<TestResult>();
     }

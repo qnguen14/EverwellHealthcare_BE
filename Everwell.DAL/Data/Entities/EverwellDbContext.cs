@@ -39,11 +39,6 @@ namespace Everwell.DAL.Data.Entities
                     .WithMany()
                     .HasForeignKey(a => a.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-                // entity.HasOne(a => a.Service)
-                //     .WithMany()
-                //     .HasForeignKey(a => a.ServiceId)
-                //     .OnDelete(DeleteBehavior.Restrict);
             });
 
             // Feedback relationships
@@ -57,10 +52,6 @@ namespace Everwell.DAL.Data.Entities
                     .WithMany()
                     .HasForeignKey(f => f.ConsultantId)
                     .OnDelete(DeleteBehavior.Restrict);
-                // entity.HasOne(f => f.Service)
-                //     .WithMany()
-                //     .HasForeignKey(f => f.ServiceId)
-                //     .OnDelete(DeleteBehavior.Restrict);
             });
 
             // STITesting relationships
@@ -75,6 +66,16 @@ namespace Everwell.DAL.Data.Entities
                     .WithOne(tr => tr.STITesting)
                     .HasForeignKey(tr => tr.STITestingId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(s => s.TotalPrice)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(s => s.TestPackage)
+                    .HasConversion<string>();
+                
+                entity.Property(s => s.Status)
+                    .HasConversion<string>();
+
             });
 
             // TestResult relationships
@@ -89,6 +90,9 @@ namespace Everwell.DAL.Data.Entities
                     .WithMany()
                     .HasForeignKey(tr => tr.StaffId)
                     .OnDelete(DeleteBehavior.SetNull);
+                
+                entity.Property(tr => tr.Outcome)
+                    .HasConversion<string>();
             });
 
             // MenstrualCycleTracking relationships

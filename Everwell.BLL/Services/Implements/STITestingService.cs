@@ -33,11 +33,11 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         {
             var stiTestings = await _unitOfWork.GetRepository<STITesting>()
                 .GetListAsync(
-                    predicate: s => s.Customer.IsActive == true,
-                    include: s => s.Include(sti => sti.Customer)
-                                 .Include(sti => sti.TestResults)
+                    predicate: null,
+                    include: s => s
+                        .Include(sti => sti.Customer)
+                        .Include(sti => sti.TestResults)
                 );
-
             if (stiTestings == null || !stiTestings.Any())
             {
                 _logger.LogWarning("No STI tests found");
@@ -59,7 +59,7 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         {
             var stitest = await _unitOfWork.GetRepository<STITesting>()
                 .FirstOrDefaultAsync(
-                    predicate: s => s.Id == id && s.Customer.IsActive == true,
+                    predicate: s => s.Id == id,
                     include: s => s.Include(sti => sti.Customer)
                                  .Include(sti => sti.TestResults)
                 );
@@ -80,78 +80,91 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
     }
 
     public async Task<CreateSTITestResponse> CreateSTITestingAsync(CreateSTITestRequest request)
+{
+    try
     {
-        try
+        STITesting newSTITest = null;
+
+        var currentUserId = GetCurrentUserId();
+
+        // Execute database operations in transaction
+        await _unitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            STITesting newSTITest = null;
-            
-            var currentUserId = GetCurrentUserId();
-            
-            // Execute database operations in transaction
-            await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            if (request == null)
             {
-                if (request == null)
-                {
-                    _logger.LogError("Create request is null");
-                    throw new ArgumentNullException(nameof(request), "Request cannot be null");
-                }
-                
-                // Check for duplicate test on same day
-                var existingTest = await _unitOfWork.GetRepository<STITesting>()
-                    .FirstOrDefaultAsync(
-                        predicate: s => s.CustomerId == currentUserId && 
-                                      s.ScheduleDate == request.ScheduleDate &&
-                                      s.Slot == request.Slot &&
-                                      s.TestPackage == request.TestPackage &&
-                                      s.Status != TestingStatus.Cancelled,
-                        include: s => s.Include(sti => sti.Customer)
-                    );
-                
-                if (existingTest != null)
-                {
-                    _logger.LogWarning("A similar STI test is already scheduled for this time slot");
-                    throw new InvalidOperationException("A similar STI test is already scheduled for this time slot");
-                }
-                
-                // Set price based on package
-                decimal price = request.TestPackage == TestPackage.Basic ? 894000 : 1522000;
-                
-                // Create new STI test
-                newSTITest = new STITesting
-                {
-                    Id = Guid.NewGuid(),
-                    CustomerId = currentUserId,
-                    TestPackage = request.TestPackage,
-                    Status = TestingStatus.Scheduled,
-                    ScheduleDate = request.ScheduleDate,
-                    Slot = request.Slot,
-                    Notes = request.Notes,
-                    CreatedAt = DateTime.UtcNow
-                };
-                
-                await _unitOfWork.GetRepository<STITesting>().InsertAsync(newSTITest);
-                
-                // Return true to commit the transaction
-                return true;
-            });
-            
-            // Create notification outside the transaction
-            if (newSTITest != null)
-            {
-                var customer = await _unitOfWork.GetRepository<User>()
-                    .FirstOrDefaultAsync(predicate: u => u.Id == currentUserId);
-                    
-                await CreateSTITestBookingNotification(customer.Id, newSTITest.Id, request.ScheduleDate, request.TestPackage);
+                _logger.LogError("Create request is null");
+                throw new ArgumentNullException(nameof(request), "Request cannot be null");
             }
+
+            // Check for duplicate test on same day and slot
+            var existingTest = await _unitOfWork.GetRepository<STITesting>()
+                .FirstOrDefaultAsync(
+                    predicate: s => s.CustomerId == currentUserId &&
+                                  s.ScheduleDate == request.ScheduleDate &&
+                                  s.Slot == request.Slot &&
+                                  s.Status != TestingStatus.Cancelled,
+                    include: s => s.Include(sti => sti.Customer)
+                );
+
+            if (existingTest != null)
+            {
+                _logger.LogWarning("A similar STI test is already scheduled for this time slot");
+                throw new InvalidOperationException("A similar STI test is already scheduled for this time slot");
+            }
+
+            // Set price based on package
+            decimal price = request.TestPackage switch
+            {
+                TestPackage.Basic => 894000,
+                TestPackage.Advanced => 1522000,
+                TestPackage.Custom => 1522000, // Default to advanced price for custom
+                _ => 1522000
+            };
+ 
+            // Create new STI test
+            newSTITest = _mapper.Map<STITesting>(request);
             
-            return _mapper.Map<CreateSTITestResponse>(newSTITest);
-        }
-        catch (Exception ex)
+            newSTITest.Id = Guid.NewGuid();
+            newSTITest.CustomerId = currentUserId;
+            newSTITest.Status = TestingStatus.Scheduled;
+            newSTITest.TotalPrice = price;
+            newSTITest.IsPaid = false;
+            newSTITest.CreatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.GetRepository<STITesting>().InsertAsync(newSTITest);
+
+            // Create corresponding TestResult records based on the package
+            await CreateTestResultsForPackage(newSTITest.Id, request.TestPackage, request.CustomParameters);
+
+            // Return true to commit the transaction
+            return true;
+        });
+
+        // Create notification outside the transaction
+        if (newSTITest != null)
         {
-            _logger.LogError(ex, "Error occurred while creating STI testing");
-            throw;
+            var customer = await _unitOfWork.GetRepository<User>()
+                .FirstOrDefaultAsync(predicate: u => u.Id == currentUserId);
+
+            await CreateSTITestBookingNotification(customer.Id, newSTITest.Id, request.ScheduleDate, request.TestPackage);
         }
+        
+        // Get the complete STI test with all test results
+        var completeSTITest = await _unitOfWork.GetRepository<STITesting>()
+            .FirstOrDefaultAsync(
+                predicate: s => s.Id == newSTITest.Id,
+                include: s => s.Include(sti => sti.Customer)
+                    .Include(sti => sti.TestResults)
+            );
+
+        return _mapper.Map<CreateSTITestResponse>(completeSTITest);
     }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error occurred while creating STI testing");
+        throw;
+    }
+}
 
     public async Task<CreateSTITestResponse> UpdateSTITestingAsync(Guid id, UpdateSTITestRequest request)
     {
@@ -210,11 +223,10 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
                     existingSTITest.Notes = request.Notes;
                 }
                 
-                // if (request.IsPaid.HasValue)
-                // {
-                //     isPaid = request.IsPaid.Value;
-                //     existingSTITest.IsPaid = request.IsPaid.Value;
-                // }
+                if (request.IsPaid.HasValue)
+                {
+                    existingSTITest.IsPaid = request.IsPaid.Value;
+                }
                 
                 _unitOfWork.GetRepository<STITesting>().UpdateAsync(existingSTITest);
                 return true;
@@ -238,10 +250,10 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
                 }
                 
                 // If payment status changed to paid
-                // if (isPaid.HasValue && isPaid.Value)
-                // {
-                //     await CreatePaymentConfirmationNotification(existingSTITest.CustomerId, existingSTITest.Id);
-                // }
+                if (existingSTITest.IsPaid)
+                {
+                    await CreatePaymentConfirmationNotification(existingSTITest.CustomerId, existingSTITest.Id);
+                }
             }
             
             return _mapper.Map<CreateSTITestResponse>(existingSTITest);
@@ -295,6 +307,78 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
             throw;
         }
     }
+
+    #region Test Package Methods
+    private async Task CreateTestResultsForPackage(Guid stiTestingId, TestPackage package, List<TestParameter> customParameters = null)
+    {
+        // Define which parameters to test based on the package
+        List<TestParameter> parametersToTest = new List<TestParameter>();
+        
+        // Basic package includes these tests
+        if (package == TestPackage.Basic)
+        {
+            parametersToTest.AddRange(new[]
+            {
+                TestParameter.Chlamydia,
+                TestParameter.Gonorrhoeae,
+                TestParameter.Syphilis
+            });
+        }
+        // Advanced package includes all tests
+        else if (package == TestPackage.Advanced)
+        {
+            parametersToTest.AddRange(new[]
+            {
+                TestParameter.Chlamydia,
+                TestParameter.Gonorrhoeae,
+                TestParameter.Syphilis,
+                TestParameter.HIV,
+                TestParameter.Herpes,
+                TestParameter.HepatitisB,
+                TestParameter.HepatitisC,
+                TestParameter.Trichomonas,
+                TestParameter.MycoplasmaGenitalium
+            });
+        }
+        // Custom package would need additional logic to determine which tests to include
+        else if (package == TestPackage.Custom)
+        {
+            if (customParameters != null && customParameters.Count >= 3)
+            {
+                parametersToTest.AddRange(customParameters);
+            }
+            else
+            {
+                _logger.LogWarning("Custom package requires at least 3 parameters, using basic package tests");
+                parametersToTest.AddRange(new[]
+                {
+                    TestParameter.Chlamydia,
+                    TestParameter.Gonorrhoeae,
+                    TestParameter.Syphilis
+                });
+            }
+        }
+
+        // Create a TestResult for each parameter
+        foreach (var parameter in parametersToTest)
+        {
+            var testResult = new TestResult
+            {
+                Id = Guid.NewGuid(),
+                STITestingId = stiTestingId,
+                Parameter = parameter,
+                Outcome = ResultOutcome.Pending,
+                Comments = null,
+                StaffId = null,
+                ProcessedAt = null
+            };
+
+            await _unitOfWork.GetRepository<TestResult>().InsertAsync(testResult);
+        }
+    }
+        
+
+    #endregion
 
     #region Notification Methods
     private async Task CreateSTITestBookingNotification(Guid customerId, Guid stiTestingId, DateOnly scheduledDate, TestPackage testPackage)
@@ -361,7 +445,7 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         {
             UserId = customerId,
             Title = "Thanh toán hóa đơn dịch vụ",
-            // Message = $"Thanh toán thành công hóa đơn dịch vụ xét nghiệm STI với số tiền {stiTesting.Price:N0} đồng. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.",
+            Message = $"Thanh toán thành công hóa đơn dịch vụ xét nghiệm STI với số tiền {stiTesting.TotalPrice:N0} đồng. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.",
             Type = NotificationType.Payment,
             Priority = NotificationPriority.Medium,
             AppointmentId = null,

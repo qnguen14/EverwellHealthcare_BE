@@ -1,5 +1,6 @@
 ﻿using System;
 using Everwell.DAL.Data.Entities;
+using Everwell.DAL.Data.Responses.TestResult;
 using Everwell.DAL.Data.Responses.User;
 
 namespace Everwell.DAL.Data.Responses.STITests
@@ -26,8 +27,11 @@ namespace Everwell.DAL.Data.Responses.STITests
         
         public DateTime? CompletedAt { get; set; }
         
-        public bool IsCompleted { get; set; }
+        public decimal TotalPrice { get; set; }
+        
+        public bool IsPaid { get; set; }
         
         public DateTime CreatedAt { get; set; }
+        public IEnumerable<CreateTestResultResponse> TestResult { get; set; }
     }
 }
