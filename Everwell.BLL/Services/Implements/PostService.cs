@@ -5,6 +5,9 @@ using AutoMapper;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 using Everwell.BLL.Services;
+using Everwell.DAL.Data.Exceptions;
+using Everwell.DAL.Data.Requests.Post;
+using Everwell.DAL.Data.Responses.Post;
 using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements;
@@ -16,7 +19,7 @@ public class PostService : BaseService<PostService>, IPostService
     {
     }
 
-    public async Task<IEnumerable<Post>> GetAllPostsAsync()
+    public async Task<IEnumerable<CreatePostResponse>> GetAllPostsAsync()
     {
         try
         {
@@ -24,7 +27,13 @@ public class PostService : BaseService<PostService>, IPostService
                 .GetListAsync(
                     include: p => p.Include(post => post.Staff));
             
-            return posts ?? new List<Post>();
+            if (posts == null || !posts.Any())
+            {
+                _logger.LogInformation("No posts found");
+                return Enumerable.Empty<CreatePostResponse>();
+            }
+            
+            return _mapper.Map<IEnumerable<CreatePostResponse>>(posts);
         }
         catch (Exception ex)
         {
@@ -33,14 +42,53 @@ public class PostService : BaseService<PostService>, IPostService
         }
     }
 
-    public async Task<Post?> GetPostByIdAsync(Guid id)
+    public async Task<IEnumerable<CreatePostResponse>> GetFilteredPosts(FilterPostsRequest request)
     {
         try
         {
-            return await _unitOfWork.GetRepository<Post>()
+            var posts = await _unitOfWork.GetRepository<Post>()
+            .GetListAsync(
+                predicate: p => 
+                    (string.IsNullOrEmpty(request.Title) || p.Title.ToLower().Contains(request.Title.ToLower())) && 
+                    (string.IsNullOrEmpty(request.Content) || p.Content.ToLower().Contains(request.Content.ToLower())) &&
+                    (!request.Status.HasValue || p.Status == request.Status) &&
+                    (!request.Category.HasValue || p.Category == request.Category) &&
+                    (!request.Staffid.HasValue || p.StaffId == request.Staffid) &&
+                    (!request.CreatedAt.HasValue || p.CreatedAt.Date == request.CreatedAt.Value.Date),
+                include: p =>p.AsNoTracking() 
+                    .Include(post => post.Staff));
+
+            if (posts == null || !posts.Any())
+            {
+                _logger.LogInformation("No posts found matching the filter criteria");
+                return null;
+            }
+            
+            return _mapper.Map<IEnumerable<CreatePostResponse>>(posts);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while filtering posts");
+            throw;
+        }
+    }
+
+    public async Task<CreatePostResponse> GetPostByIdAsync(Guid id)
+    {
+        try
+        {
+            var post = await _unitOfWork.GetRepository<Post>()
                 .FirstOrDefaultAsync(
                     predicate: p => p.Id == id,
                     include: p => p.Include(post => post.Staff));
+
+            if (post == null)
+            {
+                _logger.LogInformation("No post found");
+                return null;
+            }
+            
+            return _mapper.Map<CreatePostResponse>(post);
         }
         catch (Exception ex)
         {
@@ -49,17 +97,32 @@ public class PostService : BaseService<PostService>, IPostService
         }
     }
 
-    public async Task<Post> CreatePostAsync(Post post)
+    public async Task<CreatePostResponse> CreatePostAsync(CreatePostRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                post.Id = Guid.NewGuid();
-                post.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                var existingPost = await _unitOfWork.GetRepository<Post>()
+                    .FirstOrDefaultAsync(predicate: p => p.Title == request.Title,
+                        include: p => p.Include(post => post.Staff));
+
+                if (existingPost != null)
+                {
+                    _logger.LogWarning("Post with title {Title} already exists", request.Title);
+                }
                 
+                if (request == null)
+                {
+                    _logger.LogWarning("request is null");
+                    throw new ArgumentNullException(nameof(request), "request cannot be null");
+                }
+                
+                var post = _mapper.Map<Post>(request);
+
                 await _unitOfWork.GetRepository<Post>().InsertAsync(post);
-                return post;
+
+                return _mapper.Map<CreatePostResponse>(post);
             });
         }
         catch (Exception ex)
@@ -69,24 +132,26 @@ public class PostService : BaseService<PostService>, IPostService
         }
     }
 
-    public async Task<Post?> UpdatePostAsync(Guid id, Post post)
+    public async Task<CreatePostResponse> UpdatePostAsync(Guid id, UpdatePostRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var existingPost = await _unitOfWork.GetRepository<Post>()
-                    .FirstOrDefaultAsync(predicate: p => p.Id == id);
-                
-                if (existingPost == null) return null;
+                    .FirstOrDefaultAsync(predicate: p => p.Id == id,
+                        include: p => p.Include(post => post.Staff));
 
-                existingPost.Title = post.Title;
-                existingPost.Content = post.Content;
-                existingPost.Status = post.Status;
-                existingPost.Category = post.Category;
+                if (existingPost == null)
+                {
+                    _logger.LogInformation("No post found");
+                    throw new ArgumentNullException(nameof(existingPost), "Post not found");
+                }
                 
-                _unitOfWork.GetRepository<Post>().UpdateAsync(existingPost);
-                return existingPost;
+                var updatedPost = _mapper.Map<Post>(request);
+                
+                _unitOfWork.GetRepository<Post>().UpdateAsync(updatedPost);
+                return _mapper.Map<CreatePostResponse>(updatedPost);
             });
         }
         catch (Exception ex)
@@ -103,7 +168,8 @@ public class PostService : BaseService<PostService>, IPostService
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var post = await _unitOfWork.GetRepository<Post>()
-                    .FirstOrDefaultAsync(predicate: p => p.Id == id);
+                    .FirstOrDefaultAsync(predicate: p => p.Id == id,
+                        include: p => p.Include(post => post.Staff));
                 
                 if (post == null) return false;
 

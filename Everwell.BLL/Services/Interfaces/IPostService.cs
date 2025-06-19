@@ -1,12 +1,15 @@
  using Everwell.DAL.Data.Entities;
+ using Everwell.DAL.Data.Requests.Post;
+ using Everwell.DAL.Data.Responses.Post;
 
-namespace Everwell.BLL.Services.Interfaces;
+ namespace Everwell.BLL.Services.Interfaces;
 
 public interface IPostService
 {
-    Task<IEnumerable<Post>> GetAllPostsAsync();
-    Task<Post?> GetPostByIdAsync(Guid id);
-    Task<Post> CreatePostAsync(Post post);
-    Task<Post?> UpdatePostAsync(Guid id, Post post);
+    Task<IEnumerable<CreatePostResponse>> GetAllPostsAsync();
+    Task<IEnumerable<CreatePostResponse>> GetFilteredPosts(FilterPostsRequest request);
+    Task<CreatePostResponse> GetPostByIdAsync(Guid id);
+    Task<CreatePostResponse> CreatePostAsync(CreatePostRequest request);
+    Task<CreatePostResponse> UpdatePostAsync(Guid id, UpdatePostRequest request);
     Task<bool> DeletePostAsync(Guid id);
 }

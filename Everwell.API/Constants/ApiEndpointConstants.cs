@@ -75,6 +75,7 @@
         {
             public const string PostEndpoint = ApiEndpoint + "/post";
             public const string GetAllPostsEndpoint = PostEndpoint + "/getall";
+            public const string GetFilteredPostsEndpoint = PostEndpoint + "/filter";
             public const string GetPostEndpoint = PostEndpoint + "/{id}";
             public const string CreatePostEndpoint = PostEndpoint + "/create";
             public const string UpdatePostEndpoint = PostEndpoint + "/update/{id}";

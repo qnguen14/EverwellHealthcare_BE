@@ -1,0 +1,32 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Everwell.DAL.Data.Entities;
+
+namespace Everwell.DAL.Data.Requests.Post;
+
+public class CreatePostRequest
+{
+    [Required]
+    [StringLength(200, ErrorMessage = "Title cannot exceed 200 characters.")]
+    public string Title { get; set; }
+
+    [Required]
+    [StringLength(10000, ErrorMessage = "Content cannot exceed 10000 characters.")]
+    public string Content { get; set; }
+        
+    [Required(ErrorMessage = "Image URL is required")]
+    public string ImageUrl { get; set; }
+        
+    [Required(ErrorMessage = "Status is required")]
+    [EnumDataType(typeof(PostStatus))]
+    public PostStatus Status { get; set; } = PostStatus.Pending;
+
+    [Required(ErrorMessage = "Category is required")]
+    [EnumDataType(typeof(PostCategory))]
+    public PostCategory Category { get; set; } 
+
+    [Required(ErrorMessage = "Staff ID is required")]
+    public Guid StaffId { get; set; }
+
+    [Required]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}

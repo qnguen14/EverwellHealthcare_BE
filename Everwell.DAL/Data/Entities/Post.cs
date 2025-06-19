@@ -43,7 +43,11 @@ namespace Everwell.DAL.Data.Entities
         [Required]
         [Column("content")]
         public string Content { get; set; }
-
+        
+        [Required]
+        [Column("image_url")]
+        public string ImageUrl { get; set; }
+        
         [Required]
         [Column("PostStatus")]
         [EnumDataType(typeof(PostStatus))]
@@ -56,13 +60,13 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("staff_id")]
-        [ForeignKey("Customer")]
+        [ForeignKey("Staff")]
         public Guid StaffId { get; set; }
         public virtual User Staff { get; set; }
 
         [Required]
         [Column("created_at")]
-        public DateOnly CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
 
     }
