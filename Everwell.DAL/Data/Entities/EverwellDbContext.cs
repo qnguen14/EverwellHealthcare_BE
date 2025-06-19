@@ -205,5 +205,6 @@ namespace Everwell.DAL.Data.Entities
         public DbSet<ConsultantSchedule> ConsultantSchedules { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; }
     }
 }
