@@ -279,6 +279,8 @@ namespace Everwell.BLL.Services.Implements
                     _logger.LogWarning("Skipping notification scheduled for past date: {ScheduledDate}", scheduledDate);
                     return true; // Return true to not break the flow
                 }
+                
+                scheduledDate = DateTime.SpecifyKind(scheduledDate, DateTimeKind.Utc);
 
                 var notification = new MenstrualCycleNotification
                 {

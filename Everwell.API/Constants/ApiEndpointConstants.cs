@@ -75,6 +75,7 @@
         {
             public const string PostEndpoint = ApiEndpoint + "/post";
             public const string GetAllPostsEndpoint = PostEndpoint + "/getall";
+            public const string GetFilteredPostsEndpoint = PostEndpoint + "/filter";
             public const string GetPostEndpoint = PostEndpoint + "/{id}";
             public const string CreatePostEndpoint = PostEndpoint + "/create";
             public const string UpdatePostEndpoint = PostEndpoint + "/update/{id}";
@@ -96,6 +97,7 @@
             public const string STITestingEndpoint = ApiEndpoint + "/stitesting";
             public const string GetAllSTITestingsEndpoint = STITestingEndpoint + "/getall";
             public const string GetSTITestingEndpoint = STITestingEndpoint + "/{id}";
+            public const string GetSTITestingsByCustomerEndpoint = STITestingEndpoint + "/customer/";
             public const string CreateSTITestingEndpoint = STITestingEndpoint + "/create";
             public const string UpdateSTITestingEndpoint = STITestingEndpoint + "/update/{id}";
             public const string DeleteSTITestingEndpoint = STITestingEndpoint + "/delete/{id}";

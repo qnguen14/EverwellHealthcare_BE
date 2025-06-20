@@ -182,7 +182,7 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
                 }
 
                 // Update fields that can be changed
-                if (request.Outcome == ResultOutcome.Pending)
+                if (request.Outcome.HasValue)
                 {
                     // If outcome changed from negative/pending to positive, send notification
                     if (existingTestResult.Outcome != ResultOutcome.Positive && 

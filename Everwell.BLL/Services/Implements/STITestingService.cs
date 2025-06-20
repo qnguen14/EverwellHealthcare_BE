@@ -79,6 +79,40 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         }
     }
 
+    public async Task<IEnumerable<CreateSTITestResponse>> GetCurrentUserSTITests()
+    {
+        try
+        {
+            var customerId = GetCurrentUserId();
+            
+            if (customerId == Guid.Empty)
+            {
+                _logger.LogError("Customer ID is empty");
+                throw new ArgumentException("Customer ID cannot be empty", nameof(customerId));
+            }
+
+            var stiTests = await _unitOfWork.GetRepository<STITesting>()
+                .GetListAsync(
+                    predicate: s => s.CustomerId == customerId,
+                    include: s => s.Include(sti => sti.Customer)
+                                 .Include(sti => sti.TestResults)
+                );
+            
+            if (stiTests == null)
+            {
+                _logger.LogWarning("STI tests with customer {Id} not found", customerId);
+                return null;
+            }
+
+            return _mapper.Map<IEnumerable<CreateSTITestResponse>>(stiTests);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting current user's STI tests");
+            throw;
+        }
+    }
+
     public async Task<CreateSTITestResponse> CreateSTITestingAsync(CreateSTITestRequest request)
 {
     try
@@ -115,10 +149,10 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
             // Set price based on package
             decimal price = request.TestPackage switch
             {
-                TestPackage.Basic => 894000,
-                TestPackage.Advanced => 1522000,
-                TestPackage.Custom => 1522000, // Default to advanced price for custom
-                _ => 1522000
+                TestPackage.Basic => 300000,
+                TestPackage.Advanced => 550000,
+                TestPackage.Custom => 330000, // Default to advanced price for custom
+                _ => 550000
             };
  
             // Create new STI test
@@ -201,7 +235,7 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
                 previousStatus = existingSTITest.Status;
                 
                 // Update only allowed fields based on current status
-                if (request.Status == TestingStatus.Scheduled)
+                if (request.Status.HasValue)
                 {
                     existingSTITest.Status = request.Status;
                     

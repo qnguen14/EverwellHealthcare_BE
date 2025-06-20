@@ -7,7 +7,7 @@ namespace Everwell.DAL.Data.Requests.STITests
     public class UpdateSTITestRequest
     {
         [Required]
-        public TestingStatus Status { get; set; }
+        public TestingStatus? Status { get; set; }
 
         [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")] 
         public string? Notes { get; set; }

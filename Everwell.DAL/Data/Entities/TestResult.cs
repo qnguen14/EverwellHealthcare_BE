@@ -43,7 +43,7 @@ namespace Everwell.DAL.Data.Entities
         
         [Required]
         [Column("outcome")]
-        public ResultOutcome Outcome { get; set; } = ResultOutcome.Pending;
+        public ResultOutcome? Outcome { get; set; } = ResultOutcome.Pending;
 
         [Column("comments")]
         [StringLength(500)]
