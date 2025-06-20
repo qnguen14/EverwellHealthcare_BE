@@ -304,6 +304,38 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.PaymentController",
+    "Method": "GetPaymentTransaction",
+    "RelativePath": "api/payment/transaction/{transactionId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "transactionId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.PaymentController",
+    "Method": "ProcessVnPayCallback",
+    "RelativePath": "api/payment/vnpay-callback",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "vnpayParams",
+        "Type": "System.Collections.Generic.Dictionary\u00602[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.PaymentController",
     "Method": "VnPayIpn",
     "RelativePath": "api/payment/vnpay-ipn",
     "HttpMethod": "GET",

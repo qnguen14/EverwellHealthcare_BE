@@ -1,6 +1,8 @@
+using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Data.Requests.Payment;
 using Everwell.DAL.Data.Responses.Payment;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Threading.Tasks;
 
 namespace Everwell.BLL.Services.Interfaces
@@ -9,5 +11,6 @@ namespace Everwell.BLL.Services.Interfaces
     {
         Task<CreatePaymentResponse> CreatePaymentUrl(CreatePaymentRequest request, HttpContext context);
         Task<PaymentIpnResponse> ProcessIpnResponse(IQueryCollection vnpayData);
+        Task<PaymentTransaction> GetPaymentTransaction(Guid transactionId);
     }
 }

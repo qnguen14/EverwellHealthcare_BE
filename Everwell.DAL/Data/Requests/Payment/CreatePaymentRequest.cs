@@ -7,5 +7,7 @@ namespace Everwell.DAL.Data.Requests.Payment
     {
         [Required]
         public Guid StiTestingId { get; set; }
+        
+        public string? PaymentMethod { get; set; } = "VNPay"; // VNPay, MoMo, ZaloPay, etc.
     }
 } 
