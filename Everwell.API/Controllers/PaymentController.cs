@@ -1,6 +1,7 @@
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Requests.Payment;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -91,6 +92,49 @@ namespace Everwell.API.Controllers
                 }
 
                 return Ok(new { is_success = true, data = transaction, message = "Transaction retrieved successfully" });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { is_success = false, message = ex.Message });
+            }
+        }
+
+        // New endpoints for payment history
+        [HttpGet("customer/{customerId}/history")]
+        [Authorize] // Add authorization as needed
+        public async Task<IActionResult> GetCustomerPaymentHistory(Guid customerId)
+        {
+            try
+            {
+                var paymentHistory = await _paymentService.GetCustomerPaymentHistory(customerId);
+                return Ok(new { 
+                    is_success = true, 
+                    data = paymentHistory, 
+                    message = "Customer payment history retrieved successfully" 
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { is_success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet("history")]
+        [Authorize(Roles = "Admin,Staff")] // Only admin and staff can view all payment history
+        public async Task<IActionResult> GetAllPaymentHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        {
+            try
+            {
+                if (pageSize > 100) pageSize = 100; // Limit page size
+                
+                var paymentHistory = await _paymentService.GetAllPaymentHistory(page, pageSize);
+                return Ok(new { 
+                    is_success = true, 
+                    data = paymentHistory, 
+                    page = page,
+                    pageSize = pageSize,
+                    message = "Payment history retrieved successfully" 
+                });
             }
             catch (System.Exception ex)
             {

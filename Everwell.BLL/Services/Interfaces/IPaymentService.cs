@@ -12,5 +12,9 @@ namespace Everwell.BLL.Services.Interfaces
         Task<CreatePaymentResponse> CreatePaymentUrl(CreatePaymentRequest request, HttpContext context);
         Task<PaymentIpnResponse> ProcessIpnResponse(IQueryCollection vnpayData);
         Task<PaymentTransaction> GetPaymentTransaction(Guid transactionId);
+        
+        // New methods for payment history
+        Task<CustomerPaymentHistoryResponse> GetCustomerPaymentHistory(Guid customerId);
+        Task<List<PaymentHistoryResponse>> GetAllPaymentHistory(int page = 1, int pageSize = 20);
     }
 }

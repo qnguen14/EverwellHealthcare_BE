@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using AutoMapper;
 using Everwell.BLL.Infrastructure;
 using Everwell.BLL.Services.Interfaces;
@@ -7,12 +11,9 @@ using Everwell.DAL.Data.Requests.Payment;
 using Everwell.DAL.Data.Responses.Payment;
 using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query; // Required for IIncludableQueryable
 
 namespace Everwell.BLL.Services.Implements
@@ -285,6 +286,89 @@ namespace Everwell.BLL.Services.Implements
                     orderBy: null,
                     include: source => source.Include(p => p.StiTesting)
                 );
+        }
+
+        public async Task<CustomerPaymentHistoryResponse> GetCustomerPaymentHistory(Guid customerId)
+        {
+            // Get customer info
+            var customer = await _unitOfWork.GetRepository<User>()
+                .FirstOrDefaultAsync(predicate: u => u.Id == customerId);
+
+            if (customer == null)
+            {
+                throw new NotFoundException("Customer not found.");
+            }
+
+            // Get all payment transactions for this customer through STI Testing
+            var transactions = await _unitOfWork.GetRepository<PaymentTransaction>()
+                .GetListAsync(
+                    predicate: t => t.StiTesting.CustomerId == customerId,
+                    orderBy: query => query.OrderByDescending(t => t.CreatedAt),
+                    include: source => source.Include(p => p.StiTesting)
+                );
+
+            var paymentHistory = transactions.Select(t => new PaymentHistoryResponse
+            {
+                TransactionId = t.Id,
+                StiTestingId = t.StiTestingId,
+                Amount = t.Amount,
+                Status = t.Status,
+                PaymentMethod = t.PaymentMethod,
+                TransactionReference = t.TransactionId,
+                OrderInfo = t.OrderInfo,
+                CreatedAt = t.CreatedAt,
+                UpdatedAt = t.UpdatedAt,
+                TestPackage = t.StiTesting?.TestPackage.ToString() ?? "Unknown",
+                ScheduleDate = t.StiTesting?.ScheduleDate?.ToDateTime(TimeOnly.MinValue),
+                TestingStatus = t.StiTesting?.Status?.ToString() ?? "Unknown"
+            }).ToList();
+
+            var totalAmount = transactions.Sum(t => t.Amount);
+            var totalSuccessfulAmount = transactions
+                .Where(t => t.Status == PaymentStatus.Success)
+                .Sum(t => t.Amount);
+
+            return new CustomerPaymentHistoryResponse
+            {
+                CustomerId = customerId,
+                CustomerName = customer.Name,
+                CustomerEmail = customer.Email,
+                TotalTransactions = transactions.Count,
+                TotalAmount = totalAmount,
+                TotalSuccessfulAmount = totalSuccessfulAmount,
+                PaymentHistory = paymentHistory
+            };
+        }
+
+        public async Task<List<PaymentHistoryResponse>> GetAllPaymentHistory(int page = 1, int pageSize = 20)
+        {
+            // Get all transactions first, then apply pagination manually
+            var allTransactions = await _unitOfWork.GetRepository<PaymentTransaction>()
+                .GetListAsync(
+                    predicate: null,
+                    orderBy: query => query.OrderByDescending(t => t.CreatedAt),
+                    include: source => source.Include(p => p.StiTesting).ThenInclude(s => s.Customer)
+                );
+
+            // Apply pagination manually
+            var skip = (page - 1) * pageSize;
+            var transactions = allTransactions.Skip(skip).Take(pageSize).ToList();
+
+            return transactions.Select(t => new PaymentHistoryResponse
+            {
+                TransactionId = t.Id,
+                StiTestingId = t.StiTestingId,
+                Amount = t.Amount,
+                Status = t.Status,
+                PaymentMethod = t.PaymentMethod,
+                TransactionReference = t.TransactionId,
+                OrderInfo = t.OrderInfo,
+                CreatedAt = t.CreatedAt,
+                UpdatedAt = t.UpdatedAt,
+                TestPackage = t.StiTesting?.TestPackage.ToString() ?? "Unknown",
+                ScheduleDate = t.StiTesting?.ScheduleDate?.ToDateTime(TimeOnly.MinValue),
+                TestingStatus = t.StiTesting?.Status?.ToString() ?? "Unknown"
+            }).ToList();
         }
     }
 }
