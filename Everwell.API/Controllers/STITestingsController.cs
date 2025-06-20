@@ -79,6 +79,36 @@ public class STITestingsController : ControllerBase
         }
     }
     
+    [HttpGet(ApiEndpointConstants.STITesting.GetSTITestingsByCustomerEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateSTITestResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize]
+    public async Task<IActionResult> GetSTITestsByCurrentUser()
+    {
+        try
+        {
+            var stiTesting = await _stiTestingService.GetCurrentUserSTITests();
+            if (stiTesting == null)
+                return NotFound(new { message = "STI Testing not found" });
+            
+            var apiResponse = new ApiResponse<IEnumerable<CreateSTITestResponse>>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "STI Testings retrieved successfully",
+                IsSuccess = true,
+                Data = stiTesting
+            };
+            
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+    
+    
     [HttpPost(ApiEndpointConstants.STITesting.CreateSTITestingEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<CreateSTITestResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
