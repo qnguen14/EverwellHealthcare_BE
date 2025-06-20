@@ -13,7 +13,7 @@ namespace Everwell.DAL.Mappers
             CreateMap<CreateSTITestRequest, STITesting>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.TestPackage, opt => opt.MapFrom(src => src.TestPackage))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.ScheduleDate))
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))

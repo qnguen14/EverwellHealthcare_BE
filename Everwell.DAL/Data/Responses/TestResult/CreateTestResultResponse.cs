@@ -11,8 +11,6 @@ namespace Everwell.DAL.Data.Responses.TestResult
         
         public Guid STITestingId { get; set; }
         
-        public CreateSTITestResponse STITesting { get; set; }
-        
         public TestParameter Parameter { get; set; }
         
         public ResultOutcome Outcome { get; set; }

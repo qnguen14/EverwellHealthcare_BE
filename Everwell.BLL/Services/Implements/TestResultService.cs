@@ -110,6 +110,8 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
     {
         try
         {
+            TestResult testResult = null;
+
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 // Validate STI Testing exists
@@ -118,40 +120,19 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
                         predicate: s => s.Id == request.STITestingId,
                         include: s => s.Include(sti => sti.Customer)
                     );
-                
+
                 if (stiTesting == null)
                 {
                     _logger.LogWarning("STI Testing with id {STITestingId} not found", request.STITestingId);
                     throw new KeyNotFoundException($"STI Testing with id {request.STITestingId} not found");
                 }
-                
+
                 // Create test result
-                var testResult = new TestResult
-                {
-                    Id = Guid.NewGuid(),
-                    STITestingId = request.STITestingId,
-                    Parameter = request.Parameter,
-                    Outcome = request.Outcome,
-                    Comments = request.Comments,
-                    StaffId = request.StaffId,
-                    ProcessedAt = request.ProcessedAt ?? DateTime.UtcNow
-                };
+                testResult = _mapper.Map<TestResult>(request);
+                testResult.Outcome = ResultOutcome.Pending;
 
                 await _unitOfWork.GetRepository<TestResult>().InsertAsync(testResult);
-                
-                // Update STI Testing status if needed
-                if (stiTesting.Status == TestingStatus.SampleTaken || stiTesting.Status == TestingStatus.Processing)
-                {
-                    stiTesting.Status = TestingStatus.Processing;
-                    _unitOfWork.GetRepository<STITesting>().UpdateAsync(stiTesting);
-                }
-                
-                // Send notification if the result is positive
-                if (testResult.Outcome == ResultOutcome.Positive)
-                {
-                    await CreatePositiveResultNotification(stiTesting.CustomerId, testResult.Id);
-                }
-                
+
                 return _mapper.Map<CreateTestResultResponse>(testResult);
             });
         }
@@ -166,68 +147,73 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
     {
         try
         {
-            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            TestResult existingTestResult = null;
+            ResultOutcome? previousOutcome = null;
+
+
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                var existingTestResult = await _unitOfWork.GetRepository<TestResult>()
+                existingTestResult = await _unitOfWork.GetRepository<TestResult>()
                     .FirstOrDefaultAsync(
                         predicate: t => t.Id == id,
                         include: t => t.Include(tr => tr.STITesting)
-                                      .Include(tr => tr.STITesting.Customer)
-                                      .Include(tr => tr.Staff));
-                
+                            .Include(tr => tr.STITesting.Customer)
+                            .Include(tr => tr.Staff));
+
                 if (existingTestResult == null)
                 {
                     _logger.LogWarning("Test result with id {Id} not found", id);
                     throw new KeyNotFoundException($"Test result with id {id} not found");
                 }
 
-                // Update fields that can be changed
-                if (request.Outcome.HasValue)
-                {
-                    // If outcome changed from negative/pending to positive, send notification
-                    if (existingTestResult.Outcome != ResultOutcome.Positive && 
-                        request.Outcome == ResultOutcome.Positive)
-                    {
-                        await CreatePositiveResultNotification(
-                            existingTestResult.STITesting.CustomerId, 
-                            existingTestResult.Id);
-                    }
-                    
-                    // If outcome changed from pending to negative, send notification
-                    if (existingTestResult.Outcome != ResultOutcome.Positive &&
-                        request.Outcome == ResultOutcome.Negative)
-                    {
-                        await CreateNegativeResultNotification(
-                            existingTestResult.STITesting.CustomerId, 
-                            existingTestResult.Id);
-                    }
-                    
-                    existingTestResult.Outcome = request.Outcome;
-                }
-                
+                previousOutcome = existingTestResult.Outcome;
+
                 if (request.Comments != null)
                 {
                     existingTestResult.Comments = request.Comments;
                 }
-                
-                // Update processed date and staff if provided
-                if (request.ProcessedAt.HasValue)
-                {
-                    existingTestResult.ProcessedAt = request.ProcessedAt.Value;
-                }
-                
+
                 if (request.StaffId.HasValue)
                 {
                     existingTestResult.StaffId = request.StaffId.Value;
                 }
+
+                if (request.Outcome.HasValue)
+                {
+                    existingTestResult.Outcome = request.Outcome;
+
+                    if (request.Outcome == ResultOutcome.Positive || request.Outcome == ResultOutcome.Negative)
+                    {
+                        existingTestResult.ProcessedAt = DateTime.UtcNow;
+                    }
+                }
                 
-                _unitOfWork.GetRepository<TestResult>().UpdateAsync(existingTestResult);
-                
+
                 // Check if all test results for this STI testing are complete
                 await CheckAndUpdateStiTestingStatus(existingTestResult.STITestingId);
-                
-                return _mapper.Map<CreateTestResultResponse>(existingTestResult);
+
+                _unitOfWork.GetRepository<TestResult>().UpdateAsync(existingTestResult);
+                return true;
             });
+
+            // Check if the outcome has changed
+            if (existingTestResult != null)
+            {
+                if (previousOutcome != existingTestResult.Outcome)
+                {
+                    // If the outcome is positive, create a notification
+                    if (existingTestResult.Outcome == ResultOutcome.Positive)
+                    {
+                        await CreatePositiveResultNotification(existingTestResult.STITesting.CustomerId, existingTestResult.Id);
+                    }
+                    else if (existingTestResult.Outcome == ResultOutcome.Negative)
+                    {
+                        await CreateNegativeResultNotification(existingTestResult.STITesting.CustomerId, existingTestResult.Id);
+                    }
+                }
+            }
+                
+            return _mapper.Map<CreateTestResultResponse>(existingTestResult);
         }
         catch (Exception ex)
         {

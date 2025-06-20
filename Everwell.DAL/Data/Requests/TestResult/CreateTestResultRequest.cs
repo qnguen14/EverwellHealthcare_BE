@@ -8,17 +8,11 @@ namespace Everwell.DAL.Data.Requests.TestResult
     {
         [Required]
         public Guid STITestingId { get; set; }
-
+        
+        public Guid StaffId { get; set; }
         [Required]
         public TestParameter Parameter { get; set; }
-        
-        [Required]
-        public ResultOutcome Outcome { get; set; } = ResultOutcome.Pending;
-        
         public string? Comments { get; set; }
-        
-        public Guid? StaffId { get; set; }
-        
         public DateTime? ProcessedAt { get; set; }
     }
 }

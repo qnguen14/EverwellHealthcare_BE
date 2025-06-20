@@ -8,6 +8,7 @@ using Everwell.BLL.Services;
 using Everwell.DAL.Data.Requests.STITests;
 using Everwell.DAL.Data.Responses.STITests;
 using Everwell.DAL.Data.Requests.Notifications;
+using Everwell.DAL.Data.Requests.TestResult;
 using Microsoft.AspNetCore.Http;
 
 namespace Everwell.BLL.Services.Implements;
@@ -15,16 +16,22 @@ namespace Everwell.BLL.Services.Implements;
 public class STITestingService : BaseService<STITestingService>, ISTITestingService
 {
     private readonly INotificationService _notificationService;
-
+    private readonly IUserService _userService;
+    private readonly ITestResultService _testResultService;
+    
     public STITestingService(
         IUnitOfWork<EverwellDbContext> unitOfWork, 
         ILogger<STITestingService> logger, 
         IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IUserService userService,
+        ITestResultService testResultService)
         : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _notificationService = notificationService;
+        _userService = userService;
+        _testResultService = testResultService;
     }
 
     public async Task<IEnumerable<CreateSTITestResponse>> GetAllSTITestingsAsync()
@@ -166,10 +173,6 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
             newSTITest.CreatedAt = DateTime.UtcNow;
 
             await _unitOfWork.GetRepository<STITesting>().InsertAsync(newSTITest);
-
-            // Create corresponding TestResult records based on the package
-            await CreateTestResultsForPackage(newSTITest.Id, request.TestPackage, request.CustomParameters);
-
             // Return true to commit the transaction
             return true;
         });
@@ -177,6 +180,10 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         // Create notification outside the transaction
         if (newSTITest != null)
         {
+            // Create corresponding TestResult records based on the package
+            await CreateTestResultsForPackage(newSTITest.Id, request.TestPackage, request.CustomParameters);
+            
+            
             var customer = await _unitOfWork.GetRepository<User>()
                 .FirstOrDefaultAsync(predicate: u => u.Id == currentUserId);
 
@@ -206,7 +213,7 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         {
             STITesting existingSTITest = null;
             TestingStatus? previousStatus = null;
-            // bool? isPaid = null;
+            bool? isPaid = null;
             
             var currentUserId = GetCurrentUserId();
                 
@@ -343,6 +350,7 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
     }
 
     #region Test Package Methods
+     
     private async Task CreateTestResultsForPackage(Guid stiTestingId, TestPackage package, List<TestParameter> customParameters = null)
     {
         // Define which parameters to test based on the package
@@ -396,18 +404,16 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
         // Create a TestResult for each parameter
         foreach (var parameter in parametersToTest)
         {
-            var testResult = new TestResult
+            var createRequest = new CreateTestResultRequest()
             {
-                Id = Guid.NewGuid(),
                 STITestingId = stiTestingId,
                 Parameter = parameter,
-                Outcome = ResultOutcome.Pending,
                 Comments = null,
-                StaffId = null,
-                ProcessedAt = null
+                StaffId = Guid.Empty,
+                ProcessedAt = null, // ProcessedAt will be set when the test is processed
             };
 
-            await _unitOfWork.GetRepository<TestResult>().InsertAsync(testResult);
+            await _testResultService.CreateTestResultAsync(createRequest);
         }
     }
         

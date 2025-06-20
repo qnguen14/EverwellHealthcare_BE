@@ -13,9 +13,6 @@ namespace Everwell.DAL.Data.Requests.STITests
         public TestPackage TestPackage { get; set; }
         
         public List<TestParameter>? CustomParameters { get; set; }
-        
-        [Required]
-        public TestingStatus Status { get; set; } = TestingStatus.Scheduled;
 
         [Required]
         public DateOnly ScheduleDate { get; set; }
