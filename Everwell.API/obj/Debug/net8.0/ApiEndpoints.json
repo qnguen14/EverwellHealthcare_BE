@@ -383,7 +383,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetAppointmentById",
-    "RelativePath": "api/v1/appointment/{id}",
+    "RelativePath": "api/v2.5/appointment/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -427,7 +427,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetAppointmentsByConsultant",
-    "RelativePath": "api/v1/appointment/consultant/{id}",
+    "RelativePath": "api/v2.5/appointment/consultant/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -471,7 +471,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "CreateConsultantSchedule",
-    "RelativePath": "api/v1/appointment/consultant/schedule/create",
+    "RelativePath": "api/v2.5/appointment/consultant/schedule/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -515,7 +515,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetConsultantSchedules",
-    "RelativePath": "api/v1/appointment/consultant/schedules",
+    "RelativePath": "api/v2.5/appointment/consultant/schedules",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -553,7 +553,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetConsultantSchedulesById",
-    "RelativePath": "api/v1/appointment/consultant/schedules/{id}",
+    "RelativePath": "api/v2.5/appointment/consultant/schedules/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -597,7 +597,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "CreateAppointment",
-    "RelativePath": "api/v1/appointment/create",
+    "RelativePath": "api/v2.5/appointment/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -641,7 +641,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "DeleteAppointment",
-    "RelativePath": "api/v1/appointment/delete/{id}",
+    "RelativePath": "api/v2.5/appointment/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -685,7 +685,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "GetAllAppointments",
-    "RelativePath": "api/v1/appointment/getall",
+    "RelativePath": "api/v2.5/appointment/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -723,7 +723,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "UpdateAppointment",
-    "RelativePath": "api/v1/appointment/update/{id}",
+    "RelativePath": "api/v2.5/appointment/update/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -772,7 +772,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetAppointmentsByStatus",
-    "RelativePath": "api/v1/dashboard/appointments-by-status",
+    "RelativePath": "api/v2.5/dashboard/appointments-by-status",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -810,7 +810,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetDashboardData",
-    "RelativePath": "api/v1/dashboard/data",
+    "RelativePath": "api/v2.5/dashboard/data",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -848,7 +848,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetDashboardStats",
-    "RelativePath": "api/v1/dashboard/stats",
+    "RelativePath": "api/v2.5/dashboard/stats",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -886,7 +886,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetUsersByRole",
-    "RelativePath": "api/v1/dashboard/users-by-role",
+    "RelativePath": "api/v2.5/dashboard/users-by-role",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -924,7 +924,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.FeedbacksController",
     "Method": "GetFeedbackById",
-    "RelativePath": "api/v1/feedback/{id}",
+    "RelativePath": "api/v2.5/feedback/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -950,7 +950,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.FeedbacksController",
     "Method": "GetAllFeedbacks",
-    "RelativePath": "api/v1/feedback/getall",
+    "RelativePath": "api/v2.5/feedback/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -970,7 +970,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AuthController",
     "Method": "Login",
-    "RelativePath": "api/v1/login",
+    "RelativePath": "api/v2.5/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1014,7 +1014,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AuthController",
     "Method": "Logout",
-    "RelativePath": "api/v1/logout",
+    "RelativePath": "api/v2.5/logout",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1022,57 +1022,9 @@
     "ReturnTypes": []
   },
   {
-<<<<<<< HEAD
-=======
-    "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
-    "Method": "GetMenstrualCycleTrackingById",
-    "RelativePath": "api/v1/menstrualcycletracking/{id}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Guid",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Everwell.DAL.Data.Entities.MenstrualCycleTracking",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
-    "Method": "GetAllMenstrualCycleTrackings",
-    "RelativePath": "api/v1/menstrualcycletracking/getall",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Entities.MenstrualCycleTracking, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
     "ContainingType": "Everwell.API.Controllers.NotificationsController",
     "Method": "DeleteNotification",
-    "RelativePath": "api/v1/notification/delete/{id}",
+    "RelativePath": "api/v2.5/notification/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -1116,7 +1068,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.NotificationsController",
     "Method": "MarkAsRead",
-    "RelativePath": "api/v1/notification/mark/{id}",
+    "RelativePath": "api/v2.5/notification/mark/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1160,7 +1112,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.NotificationsController",
     "Method": "GetUserNotifications",
-    "RelativePath": "api/v1/notification/user/{userId}",
+    "RelativePath": "api/v2.5/notification/user/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1202,10 +1154,9 @@
     ]
   },
   {
->>>>>>> dev
     "ContainingType": "Everwell.API.Controllers.PostsController",
     "Method": "GetPostById",
-    "RelativePath": "api/v1/post/{id}",
+    "RelativePath": "api/v2.5/post/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1218,40 +1169,291 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Everwell.DAL.Data.Entities.Post",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Post.CreatePostResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.PostsController",
+    "Method": "CreatePost",
+    "RelativePath": "api/v2.5/post/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.Post.CreatePostRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Post.CreatePostResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 201
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.PostsController",
+    "Method": "DeletePost",
+    "RelativePath": "api/v2.5/post/delete/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.PostsController",
+    "Method": "GetFilteredPosts",
+    "RelativePath": "api/v2.5/post/filter",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "title",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "content",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "category",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "staffid",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "createdAt",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Responses.Post.CreatePostResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
       }
     ]
   },
   {
     "ContainingType": "Everwell.API.Controllers.PostsController",
     "Method": "GetAllPosts",
-    "RelativePath": "api/v1/post/getall",
+    "RelativePath": "api/v2.5/post/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Entities.Post, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Responses.Post.CreatePostResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.PostsController",
+    "Method": "UpdatePost",
+    "RelativePath": "api/v2.5/post/update/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.Post.UpdatePostRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Post.CreatePostResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
       }
     ]
   },
   {
     "ContainingType": "Everwell.API.Controllers.QuestionsController",
     "Method": "GetQuestionById",
-    "RelativePath": "api/v1/question/{id}",
+    "RelativePath": "api/v2.5/question/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1277,7 +1479,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.QuestionsController",
     "Method": "GetAllQuestions",
-    "RelativePath": "api/v1/question/getall",
+    "RelativePath": "api/v2.5/question/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1297,7 +1499,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.AuthController",
     "Method": "Register",
-    "RelativePath": "api/v1/register",
+    "RelativePath": "api/v2.5/register",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1311,9 +1513,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Everwell.API.Controllers.ServicesController",
-    "Method": "GetServiceById",
-    "RelativePath": "api/v1/service/{id}",
+    "ContainingType": "Everwell.API.Controllers.STITestingsController",
+    "Method": "GetSTITestingById",
+    "RelativePath": "api/v2.5/stitesting/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1326,41 +1528,121 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Everwell.DAL.Data.Entities.Service",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.STITests.CreateSTITestResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
       }
     ]
   },
   {
-    "ContainingType": "Everwell.API.Controllers.ServicesController",
-    "Method": "GetAllServices",
-    "RelativePath": "api/v1/service/getall",
+    "ContainingType": "Everwell.API.Controllers.STITestingsController",
+    "Method": "CreateSTITesting",
+    "RelativePath": "api/v2.5/stitesting/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.STITests.CreateSTITestRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.STITests.CreateSTITestResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.STITestingsController",
+    "Method": "GetSTITestsByCurrentUser",
+    "RelativePath": "api/v2.5/stitesting/customer",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Entities.Service, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Responses.STITests.CreateSTITestResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
       }
     ]
   },
   {
     "ContainingType": "Everwell.API.Controllers.STITestingsController",
-    "Method": "GetSTITestingById",
-    "RelativePath": "api/v1/stitesting/{id}",
-    "HttpMethod": "GET",
+    "Method": "DeleteSTITesting",
+    "RelativePath": "api/v2.5/stitesting/delete/{id}",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
@@ -1372,40 +1654,125 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Everwell.DAL.Data.Entities.STITesting",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.STITests.CreateSTITestResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
       }
     ]
   },
   {
     "ContainingType": "Everwell.API.Controllers.STITestingsController",
     "Method": "GetAllSTITestings",
-    "RelativePath": "api/v1/stitesting/getall",
+    "RelativePath": "api/v2.5/stitesting/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Entities.STITesting, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Responses.STITests.CreateSTITestResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.STITestingsController",
+    "Method": "UpdateSTITesting",
+    "RelativePath": "api/v2.5/stitesting/update/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Everwell.DAL.Data.Requests.STITests.UpdateSTITestRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.STITests.CreateSTITestResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
       }
     ]
   },
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "GetTestResultById",
-    "RelativePath": "api/v1/testresult/{id}",
+    "RelativePath": "api/v2.5/testresult/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1418,7 +1785,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Appointments.CreateAppointmentsResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.TestResult.CreateTestResultResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1449,7 +1816,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "CreateTestResult",
-    "RelativePath": "api/v1/testresult/create",
+    "RelativePath": "api/v2.5/testresult/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1493,7 +1860,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "DeleteTestResult",
-    "RelativePath": "api/v1/testresult/delete/{id}",
+    "RelativePath": "api/v2.5/testresult/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -1506,7 +1873,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Appointments.CreateAppointmentsResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1537,7 +1904,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "GetAllTestResults",
-    "RelativePath": "api/v1/testresult/getall",
+    "RelativePath": "api/v2.5/testresult/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1574,8 +1941,57 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.TestResultsController",
+    "Method": "GetTestResultBySTITest",
+    "RelativePath": "api/v2.5/testresult/testing/{stiTestingId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "stiTestingId",
+        "Type": "",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.TestResult.CreateTestResultResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.TestResultsController",
     "Method": "UpdateTestResult",
-    "RelativePath": "api/v1/testresult/update/{id}",
+    "RelativePath": "api/v2.5/testresult/update/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1587,13 +2003,13 @@
       },
       {
         "Name": "request",
-        "Type": "Everwell.DAL.Data.Requests.TestResult.CreateTestResultRequest",
+        "Type": "Everwell.DAL.Data.Requests.TestResult.UpdateTestResultRequest",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Appointments.CreateAppointmentsResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.TestResult.CreateTestResultResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1624,7 +2040,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetUserById",
-    "RelativePath": "api/v1/user/{id}",
+    "RelativePath": "api/v2.5/user/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1668,7 +2084,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateAvatar",
-    "RelativePath": "api/v1/user/avatar/{id}",
+    "RelativePath": "api/v2.5/user/avatar/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1699,7 +2115,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateMyAvatar",
-    "RelativePath": "api/v1/user/avatar/me",
+    "RelativePath": "api/v2.5/user/avatar/me",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1743,7 +2159,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "CreateUser",
-    "RelativePath": "api/v1/user/create",
+    "RelativePath": "api/v2.5/user/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1787,7 +2203,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "DeleteUser",
-    "RelativePath": "api/v1/user/delete/{id}",
+    "RelativePath": "api/v2.5/user/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -1831,7 +2247,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetUsers",
-    "RelativePath": "api/v1/user/getall",
+    "RelativePath": "api/v2.5/user/getall",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1869,7 +2285,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetUsersByRole",
-    "RelativePath": "api/v1/user/getall/{role}",
+    "RelativePath": "api/v2.5/user/getall/{role}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1913,7 +2329,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateProfile",
-    "RelativePath": "api/v1/user/profile/{id}",
+    "RelativePath": "api/v2.5/user/profile/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -1944,7 +2360,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "GetMyProfile",
-    "RelativePath": "api/v1/user/profile/me",
+    "RelativePath": "api/v2.5/user/profile/me",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1982,7 +2398,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateMyProfile",
-    "RelativePath": "api/v1/user/profile/me",
+    "RelativePath": "api/v2.5/user/profile/me",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -2026,7 +2442,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "SetUserRole",
-    "RelativePath": "api/v1/user/set-role/{id}",
+    "RelativePath": "api/v2.5/user/set-role/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -2057,7 +2473,7 @@
   {
     "ContainingType": "Everwell.API.Controllers.UsersController",
     "Method": "UpdateUser",
-    "RelativePath": "api/v1/user/update/{id}",
+    "RelativePath": "api/v2.5/user/update/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,

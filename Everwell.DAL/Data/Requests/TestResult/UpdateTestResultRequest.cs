@@ -9,7 +9,7 @@ namespace Everwell.DAL.Data.Requests.TestResult
         /// <summary>
         /// Update the outcome of the test (null if not changing)
         /// </summary>
-        public ResultOutcome Outcome { get; set; }
+        public ResultOutcome? Outcome { get; set; }
         
         /// <summary>
         /// Update comments on the test result (null if not changing)

@@ -44,7 +44,7 @@ namespace Everwell.DAL.Data.Entities
 
         [Required]
         [Column("status")]
-        public TestingStatus Status { get; set; } = TestingStatus.Scheduled;
+        public TestingStatus? Status { get; set; } = TestingStatus.Scheduled;
 
         [Required]
         [Column("schedule_date", TypeName = "date")]
