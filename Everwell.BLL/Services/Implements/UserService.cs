@@ -106,7 +106,7 @@ namespace Everwell.BLL.Services.Implements
                                 predicate: u => u.Email == request.Email && u.IsActive);
                     if (existingUser != null)
                     {
-                        throw new BadRequestException("A user with this email already exists.");
+                        return null;
                     }
 
                     // Map the basic fields

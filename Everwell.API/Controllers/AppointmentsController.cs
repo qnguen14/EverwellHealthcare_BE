@@ -32,7 +32,7 @@ public class AppointmentsController : ControllerBase
             var response = await _appointmentService.GetAllAppointmentsAsync();
             if (response == null || !response.Any())
             {
-                return NotFound(new { message = "No appointments found" });
+                return NotFound(new { message = "Không tìm thấy cuộc hẹn nào" });
             }
                 
 
@@ -63,7 +63,7 @@ public class AppointmentsController : ControllerBase
         {
             var response = await _appointmentService.GetAppointmentByIdAsync(id);
             if (response == null)
-                return NotFound(new { message = "Appointment not found" });
+                return NotFound(new { message = "Cuộc hẹn không tồn tại" });
 
             var apiResponse = new ApiResponse<CreateAppointmentsResponse>
             {
@@ -92,7 +92,7 @@ public class AppointmentsController : ControllerBase
         {
             var response = await _appointmentService.GetAppointmentsByConsultant(id);
             if (response == null || !response.Any())
-                return NotFound(new { message = "No appointments found for this consultant" });
+                return NotFound(new { message = "Không cuộc hẹn nào đã được đặt với tư vấn viên này." });
 
             var apiResponse = new ApiResponse<IEnumerable<GetAppointmentConsultantResponse>>
             {
@@ -122,7 +122,7 @@ public class AppointmentsController : ControllerBase
             var response = await _appointmentService.CreateAppointmentAsync(request);
             if (response == null)
             {
-                return NotFound(new { message = "Appointment is already booked" });
+                return NotFound(new { message = "Cuộc hẹn này đã được đặt với ngày và giờ này." });
             }
 
             var apiResponse = new ApiResponse<CreateAppointmentsResponse>
@@ -152,7 +152,7 @@ public class AppointmentsController : ControllerBase
         {
             var response = await _appointmentService.UpdateAppointmentAsync(id, request);
             if (response == null)
-                return NotFound(new { message = "Appointment not found" });
+                return NotFound(new { message = "Cuộc hẹn không tồn tại." });
 
             var apiResponse = new ApiResponse<CreateAppointmentsResponse>
             {
@@ -201,7 +201,7 @@ public class AppointmentsController : ControllerBase
         {
             var response = await _appointmentService.GetConsultantSchedules();
             if (response == null || !response.Any())
-                return NotFound(new { message = "No schedules found" });
+                return NotFound(new { message = "Không lịch nào tồn tại trong hệ thống." });
 
             var apiResponse = new ApiResponse<IEnumerable<GetScheduleResponse>>
             {
@@ -230,7 +230,7 @@ public class AppointmentsController : ControllerBase
         {
             var response = await _appointmentService.GetConsultantSchedulesById(id);
             if (response == null || !response.Any())
-                return NotFound(new { message = "No schedules found" });
+                return NotFound(new { message = "Không lịch nào tồn tại trong hệ thống." });
 
             var apiResponse = new ApiResponse<IEnumerable<GetScheduleResponse>>
             {
@@ -262,7 +262,7 @@ public class AppointmentsController : ControllerBase
             var apiResponse = new ApiResponse<GetScheduleResponse>
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = "Schedule created successfully",
+                Message = "Cuộc hẹn được tạo thành công",
                 IsSuccess = true,
                 Data = response
             };

@@ -44,7 +44,7 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
 
             if (testResults == null || !testResults.Any())
             {
-                _logger.LogWarning("No test results found");
+                _logger.LogWarning("Không tìm thấy kết quả nào trong hệ thống.");
                 return Enumerable.Empty<CreateTestResultResponse>();
             }
 
@@ -71,7 +71,7 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
 
             if (testResults == null || !testResults.Any())
             {
-                _logger.LogWarning("No test results found for STI Testing with ID {StiTestingId}", stiTestingId);
+                _logger.LogWarning("Không tìm thấy kết quả nào cho STI Test với ID {StiTestingId}", stiTestingId);
                 return Enumerable.Empty<CreateTestResultResponse>();
             }
 
@@ -97,7 +97,7 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
 
             if (testresult == null) 
             {
-                _logger.LogWarning("Test result with id {Id} not found", id);
+                _logger.LogWarning("Kết quả với ID: {Id} not found", id);
                 return null;
             }
 
@@ -116,14 +116,14 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         {
             if (customerId == Guid.Empty)
             {
-                _logger.LogWarning("Customer ID is empty");
+                _logger.LogWarning("Khách hang không hợp lệ: {CustomerId}", customerId);
                 return null;
             }
 
             var customer = await _userService.GetUserById(customerId);
             if (customer.Role != "Customer")
             {
-                _logger.LogWarning("User with ID {CustomerId} is not a customer", customerId);
+                _logger.LogWarning("Tài khoản với ID: {CustomerId} không phải là khách hàng", customerId);
                 return null;
             }
 
@@ -233,10 +233,6 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
                         existingTestResult.ProcessedAt = DateTime.UtcNow;
                     }
                 }
-                
-
-                // Check if all test results for this STI testing are complete
-                await CheckAndUpdateStiTestingStatus(existingTestResult.STITestingId);
 
                 _unitOfWork.GetRepository<TestResult>().UpdateAsync(existingTestResult);
                 return true;
@@ -247,6 +243,9 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
             {
                 if (previousOutcome != existingTestResult.Outcome)
                 {
+                    // Check if all test results for this STI testing are complete
+                    await CheckAndUpdateStiTestingStatus(existingTestResult.STITestingId);
+                    
                     // If the outcome is positive, create a notification
                     if (existingTestResult.Outcome == ResultOutcome.Positive)
                     {

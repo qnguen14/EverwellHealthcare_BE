@@ -11,9 +11,6 @@ public class CreateAppointmentRequest
     [Required(ErrorMessage = "Consultant is required")]
     public Guid ConsultantId { get; set; }
     
-    // [Required]
-    public Guid ServiceId { get; set; }
-    
     [Required(ErrorMessage = "Appointment date is required")]
     public DateOnly AppointmentDate { get; set; }
     

@@ -119,7 +119,7 @@ public class STITestingsController : ControllerBase
         {
             var stiTesting = await _stiTestingService.GetSTITestsByCustomer(customerId);
             if (stiTesting == null)
-                return NotFound(new { message = "STI Testing not found" });
+                return NotFound(new { message = "Không tìm thấy STI Tests nào trong hệ thống." });
             
             var apiResponse = new ApiResponse<IEnumerable<CreateSTITestResponse>>
             {
@@ -148,16 +148,16 @@ public class STITestingsController : ControllerBase
         try
         {
             if (request == null)
-                return BadRequest(new { message = "Invalid request data" });
+                return BadRequest(new { message = "Dữ liệu yêu cầu không hợp lệ." });
 
             var createdTesting = await _stiTestingService.CreateSTITestingAsync(request);
             if (createdTesting == null)
-                return NotFound(new { message = "Failed to create STI Testing" });
+                return NotFound(new { message = "Đã xảy ra lỗi tạo STI Test." });
             
             var apiResponse = new ApiResponse<CreateSTITestResponse>
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = "STI Testing created successfully",
+                Message = "Đơn STI Test đã được tạo thành công.",
                 IsSuccess = true,
                 Data = createdTesting
             };
@@ -180,11 +180,11 @@ public class STITestingsController : ControllerBase
         try
         {
             if (request == null)
-                return BadRequest(new { message = "Invalid request data" });
+                return BadRequest(new { message = "Dữ liệu yêu cầu không hợp lệ." });
 
             var updatedTesting = await _stiTestingService.UpdateSTITestingAsync(id, request);
             if (updatedTesting == null)
-                return NotFound(new { message = "Failed to update STI Testing" });
+                return NotFound(new { message = "Đã xảy ra lỗi cập nhật STI Test." });
             
             var apiResponse = new ApiResponse<CreateSTITestResponse>
             {
@@ -221,7 +221,7 @@ public class STITestingsController : ControllerBase
         {
             var isDeleted = await _stiTestingService.DeleteSTITestingAsync(id);
             if (!isDeleted)
-                return NotFound(new { message = "Failed to delete STI Testing" });
+                return NotFound(new { message = "Đã xảy ra lỗi xoá STI Test" });
             
             var apiResponse = new ApiResponse<CreateSTITestResponse>
             {

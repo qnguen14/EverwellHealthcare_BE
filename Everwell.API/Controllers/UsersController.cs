@@ -67,7 +67,7 @@ namespace Everwell.API.Controllers
             var response = await _userService.CreateUser(request);
             if (response == null)
             {
-                return NotFound(new { message = "User creation failed" });
+                return NotFound(new { message = "Tài khoản với email này đã tồn tại." });
             }
             var apiResponse = new ApiResponse<CreateUserResponse>
             {
@@ -124,7 +124,7 @@ namespace Everwell.API.Controllers
                 
                 if (response == null)
                 {
-                    return NotFound(new { message = "User not found" });
+                    return NotFound(new { message = "Không tìm thấy người dùng." });
                 }
                 
                 var apiResponse = new ApiResponse<UpdateUserResponse>

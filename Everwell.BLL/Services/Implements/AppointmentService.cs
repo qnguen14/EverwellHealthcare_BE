@@ -21,8 +21,20 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         _mapper = mapper;
     }
 
-    // Helper method to create appointment notifications
+    #region Helper method to create appointment notifications
 
+    private string GetReadableTimeSlot(ShiftSlot slot)
+    {
+        return slot switch
+        {
+            ShiftSlot.Morning1 => "8:00 - 10:00",
+            ShiftSlot.Morning2 => "10:00 - 12:00",
+            ShiftSlot.Afternoon1 => "13:00 - 15:00",
+            ShiftSlot.Afternoon2 => "15:00 - 17:00",
+            _ => slot.ToString()
+        };
+    }
+    
     private async Task CreateAppointmentNotification(Appointment appointment, string title, string message, NotificationPriority priority = NotificationPriority.Medium)
     {
         try
@@ -50,6 +62,9 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             // Don't throw - notification creation shouldn't block the main operation
         }
     }
+    
+    
+    #endregion 
 
     public async Task<IEnumerable<CreateAppointmentsResponse>> GetAllAppointmentsAsync()
     {
@@ -167,10 +182,10 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
 
             await CreateAppointmentNotification(newAppointment,
-                "Appointment Created",
-                $"Your appointment with {newAppointment.Consultant?.Name} " +
-                $"on {newAppointment.AppointmentDate} " +
-                $"at {newAppointment.Slot} has been successfully booked.");
+                "Cuộc hẹn đã được đặt",
+                $"Cuộc hẹn của bạn với {newAppointment.Consultant?.Name} " +
+                $"vào ngày {newAppointment.AppointmentDate} " +
+                $"lúc {GetReadableTimeSlot(newAppointment.Slot)} đã được đặt thành công.");
 
             return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
         });
@@ -210,10 +225,10 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 
 
                 await CreateAppointmentNotification(existingAppointment, 
-                    "Appointment Updated", 
-                    $"Your appointment with {existingAppointment.Consultant.Name} " +
-                    $"on {existingAppointment.AppointmentDate} " +
-                    $"at {existingAppointment.Slot} has been successfully updated.");
+                    "Cuộc hẹn đã được cập nhật", 
+                    $"Cuộc hẹn của bạn với {existingAppointment.Consultant.Name} " +
+                    $"vào ngày {existingAppointment.AppointmentDate} " +
+                    $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã đuợc cập nhật.");
 
                 return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
             });

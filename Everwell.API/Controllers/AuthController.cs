@@ -52,7 +52,7 @@ namespace Everwell.API.Controllers
             
             var apiResponse = new ApiResponse<LoginResponse>
             {
-                Message = "Logged in successfully.",
+                Message = "Đăng nhập thành công.",
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
                 Data = response
