@@ -34,7 +34,7 @@ namespace Everwell.API.Controllers
             {
                 return NotFound(new ApiResponse<LoginResponse>
                 {
-                    Message = "Login failed. User not found.",
+                    Message = "Tài khoản không tồn tại.",
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound
                 });
@@ -44,7 +44,7 @@ namespace Everwell.API.Controllers
             {
                 return Unauthorized(new ApiResponse<LoginResponse>
                 {
-                    Message = "Login failed. Invalid credentials.",
+                    Message = "Mật khẩu không đúng.",
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status401Unauthorized
                 });
