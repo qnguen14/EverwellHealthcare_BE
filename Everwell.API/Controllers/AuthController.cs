@@ -29,11 +29,37 @@ namespace Everwell.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var response = await _authService.Login(request);
-            return Ok(ApiResponseBuilder.BuildResponse(
-                StatusCodes.Status200OK,
-                "Login successful",
-                response
-            ));
+            
+            if (response == null)
+            {
+                return NotFound(new ApiResponse<LoginResponse>
+                {
+                    Message = "Login failed. User not found.",
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound
+                });
+            }
+            
+            if (response.IsUnauthorized)
+            {
+                return Unauthorized(new ApiResponse<LoginResponse>
+                {
+                    Message = "Login failed. Invalid credentials.",
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status401Unauthorized
+                });
+            } 
+            
+            var apiResponse = new ApiResponse<LoginResponse>
+            {
+                Message = "Logged in successfully.",
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Data = response
+            };
+            
+            return Ok(apiResponse);
+            
         }
 
  [HttpPost("send-reset-code")]

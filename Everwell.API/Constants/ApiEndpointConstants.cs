@@ -97,7 +97,8 @@
             public const string STITestingEndpoint = ApiEndpoint + "/stitesting";
             public const string GetAllSTITestingsEndpoint = STITestingEndpoint + "/getall";
             public const string GetSTITestingEndpoint = STITestingEndpoint + "/{id}";
-            public const string GetSTITestingsByCustomerEndpoint = STITestingEndpoint + "/customer/";
+            public const string GetSTITestingsByCurrentUserEndpoint = STITestingEndpoint + "/currentuser";
+            public const string GetSTITestingsByCustomerEndpoint = STITestingEndpoint + "/customer/{customerId}";
             public const string CreateSTITestingEndpoint = STITestingEndpoint + "/create";
             public const string UpdateSTITestingEndpoint = STITestingEndpoint + "/update/{id}";
             public const string DeleteSTITestingEndpoint = STITestingEndpoint + "/delete/{id}";

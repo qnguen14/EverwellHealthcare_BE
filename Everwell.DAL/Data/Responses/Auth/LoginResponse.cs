@@ -13,5 +13,6 @@ namespace Everwell.DAL.Data.Responses.Auth
         public string FullName { get; set; }
         public string Email { get; set; }
         public DateTime Expiration { get; set; }
+        public bool IsUnauthorized { get; set; }
     }
 }

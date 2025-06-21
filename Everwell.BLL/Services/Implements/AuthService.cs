@@ -66,7 +66,7 @@ namespace Everwell.BLL.Services.Implements
                                         include: u => u.Include(u => u.Role));
                 if (user == null)
                 {
-                    throw new UnauthorizedException("Invalid email or password.");
+                    return null;
                 }
 
                 Console.WriteLine($"User found: {user.Email}");
@@ -76,7 +76,7 @@ namespace Everwell.BLL.Services.Implements
                 if (!isPasswordValid)
                 {
                     Console.WriteLine("Password verification failed");
-                    throw new UnauthorizedException("Invalid email or password.");
+                    return new LoginResponse { IsUnauthorized = true };
                 }
 
                 Console.WriteLine("Password verified successfully");
@@ -111,6 +111,7 @@ namespace Everwell.BLL.Services.Implements
                     Token = token,
                     FullName = userResponse.Name,
                     Email = userResponse.Email,
+                    IsUnauthorized = false,
                     Expiration = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["Jwt:ExpirationInMinutes"]))
                 };
 
