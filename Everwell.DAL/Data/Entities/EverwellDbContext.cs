@@ -14,11 +14,23 @@ namespace Everwell.DAL.Data.Entities
             
             
             // User - Role relationship
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany()
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity
+                    .HasOne(u => u.Role)
+                    .WithMany()
+                    .HasForeignKey(u => u.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.Name)
+                    .HasConversion<string>()
+                    .IsRequired();
+            });
+                
             
             modelBuilder.Entity<User>(entity =>
             {
@@ -101,6 +113,9 @@ namespace Everwell.DAL.Data.Entities
                     .OnDelete(DeleteBehavior.SetNull);
                 
                 entity.Property(tr => tr.Outcome)
+                    .HasConversion<string>();
+                
+                entity.Property(tr => tr.Parameter)
                     .HasConversion<string>();
             });
 

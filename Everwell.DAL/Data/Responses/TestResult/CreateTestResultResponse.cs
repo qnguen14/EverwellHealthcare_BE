@@ -9,6 +9,8 @@ namespace Everwell.DAL.Data.Responses.TestResult
     {
         public Guid Id { get; set; }
         
+        public DateOnly? ScheduleDate { get; set; }
+        
         public Guid STITestingId { get; set; }
         
         public TestParameter Parameter { get; set; }

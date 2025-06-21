@@ -407,6 +407,7 @@ public class STITestingService : BaseService<STITestingService>, ISTITestingServ
                 TestParameter.Gonorrhoeae,
                 TestParameter.Syphilis,
                 TestParameter.HIV,
+                TestParameter.HPV,
                 TestParameter.Herpes,
                 TestParameter.HepatitisB,
                 TestParameter.HepatitisC,

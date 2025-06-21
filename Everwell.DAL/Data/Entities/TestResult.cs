@@ -15,6 +15,7 @@ namespace Everwell.DAL.Data.Entities
         HepatitisC,                 // Viêm gan C
         Trichomonas,                // Ký sinh trùng Trichomonas vaginalis
         MycoplasmaGenitalium,       // Mycoplasma genitalium
+        HPV,                        // Human Papillomavirus (HPV)
     }
     
     public enum ResultOutcome

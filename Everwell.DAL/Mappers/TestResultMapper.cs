@@ -29,7 +29,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments))
                 .ForMember(dest => dest.StaffId, opt => opt.MapFrom(src => src.StaffId))
                 .ForMember(dest => dest.Staff, opt => opt.MapFrom(src => src.Staff))
-                .ForMember(dest => dest.ProcessedAt, opt => opt.MapFrom(src => src.ProcessedAt));
+                .ForMember(dest => dest.ProcessedAt, opt => opt.MapFrom(src => src.ProcessedAt))
+                .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.STITesting.ScheduleDate));
         }
     }
 }
