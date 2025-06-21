@@ -15,16 +15,20 @@ namespace Everwell.BLL.Services.Implements;
 public class TestResultService : BaseService<TestResultService>, ITestResultService
 {
     private readonly INotificationService _notificationService;
+    private readonly IUserService _userService;
 
     public TestResultService(
-        IUnitOfWork<EverwellDbContext> unitOfWork, 
-        ILogger<TestResultService> logger, 
+        IUnitOfWork<EverwellDbContext> unitOfWork,
+        ILogger<TestResultService> logger,
         IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IUserService userService)
         : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _notificationService = notificationService;
+        _userService = userService;
+
     }
 
     public async Task<IEnumerable<CreateTestResultResponse>> GetAllTestResultsAsync()
@@ -105,6 +109,46 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
             throw;
         }
     }
+    
+        public async Task<IEnumerable<CreateTestResultResponse>> GetTestResultByCustomerAsync(Guid customerId)
+    {
+        try
+        {
+            if (customerId == Guid.Empty)
+            {
+                _logger.LogWarning("Customer ID is empty");
+                return null;
+            }
+
+            var customer = await _userService.GetUserById(customerId);
+            if (customer.Role != "Customer")
+            {
+                _logger.LogWarning("User with ID {CustomerId} is not a customer", customerId);
+                return null;
+            }
+
+            var testresult = await _unitOfWork.GetRepository<TestResult>()
+                .GetListAsync(
+                    predicate: t => t.STITesting.CustomerId == customerId && 
+                                   t.STITesting.Customer.IsActive == true,
+                    include: t => t.Include(tr => tr.STITesting)
+                                  .Include(tr => tr.STITesting.Customer)
+                                  .Include(tr => tr.Staff));
+
+            if (testresult == null) 
+            {
+                _logger.LogWarning("Test result with customer id {Id} not found", customerId);
+                return null;
+            }
+
+            return _mapper.Map<IEnumerable<CreateTestResultResponse>>(testresult);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting test result by id: {Id}", customerId);
+            throw;
+        }
+    }
 
     public async Task<CreateTestResultResponse> CreateTestResultAsync(CreateTestResultRequest request)
     {
@@ -121,11 +165,13 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
                         include: s => s.Include(sti => sti.Customer)
                     );
 
+
                 if (stiTesting == null)
                 {
                     _logger.LogWarning("STI Testing with id {STITestingId} not found", request.STITestingId);
                     throw new KeyNotFoundException($"STI Testing with id {request.STITestingId} not found");
                 }
+
 
                 // Create test result
                 testResult = _mapper.Map<TestResult>(request);
@@ -343,5 +389,7 @@ public class TestResultService : BaseService<TestResultService>, ITestResultServ
         // testResult.NotificationSent = true;
         _unitOfWork.GetRepository<TestResult>().UpdateAsync(testResult);
     }
+
+
     #endregion
 }

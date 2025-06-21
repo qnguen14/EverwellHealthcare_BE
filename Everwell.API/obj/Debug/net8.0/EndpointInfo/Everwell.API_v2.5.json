@@ -3623,17 +3623,97 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateTestResultResponseApiResponse"
+                  "$ref": "#/components/schemas/CreateTestResultResponseIEnumerableApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateTestResultResponseApiResponse"
+                  "$ref": "#/components/schemas/CreateTestResultResponseIEnumerableApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateTestResultResponseApiResponse"
+                  "$ref": "#/components/schemas/CreateTestResultResponseIEnumerableApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/testresult/customer/{id}": {
+      "get": {
+        "tags": [
+          "TestResults"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTestResultResponseIEnumerableApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTestResultResponseIEnumerableApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTestResultResponseIEnumerableApiResponse"
                 }
               }
             }
@@ -5377,7 +5457,6 @@
         "required": [
           "scheduleDate",
           "slot",
-          "status",
           "testPackage",
           "totalPrice"
         ],
@@ -5392,9 +5471,6 @@
               "$ref": "#/components/schemas/TestParameter"
             },
             "nullable": true
-          },
-          "status": {
-            "$ref": "#/components/schemas/TestingStatus"
           },
           "scheduleDate": {
             "type": "string",
@@ -5550,7 +5626,6 @@
       },
       "CreateTestResultRequest": {
         "required": [
-          "outcome",
           "parameter",
           "stiTestingId"
         ],
@@ -5560,19 +5635,15 @@
             "type": "string",
             "format": "uuid"
           },
+          "staffId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "parameter": {
             "$ref": "#/components/schemas/TestParameter"
           },
-          "outcome": {
-            "$ref": "#/components/schemas/ResultOutcome"
-          },
           "comments": {
             "type": "string",
-            "nullable": true
-          },
-          "staffId": {
-            "type": "string",
-            "format": "uuid",
             "nullable": true
           },
           "processedAt": {
@@ -5593,9 +5664,6 @@
           "stiTestingId": {
             "type": "string",
             "format": "uuid"
-          },
-          "stiTesting": {
-            "$ref": "#/components/schemas/CreateSTITestResponse"
           },
           "parameter": {
             "$ref": "#/components/schemas/TestParameter"
@@ -7461,17 +7529,8 @@
             "format": "uuid",
             "nullable": true
           },
-          "processedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
           "parameter": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TestParameter"
-            },
-            "nullable": true
+            "$ref": "#/components/schemas/TestParameter"
           }
         },
         "additionalProperties": false

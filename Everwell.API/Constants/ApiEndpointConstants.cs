@@ -109,6 +109,7 @@
             public const string GetAllTestResultsEndpoint = TestResultEndpoint + "/getall";
             public const string GetTestResultEndpoint = TestResultEndpoint + "/{id}";
             public const string GetTestResultsBySTITestsEndpoint = TestResultEndpoint + "/testing/{stiTestingId}";
+            public const string GetTestResultByCustomerEndpoint = TestResultEndpoint + "/customer/{id}";
             public const string CreateTestResultEndpoint = TestResultEndpoint + "/create";
             public const string UpdateTestResultEndpoint = TestResultEndpoint + "/update/{id}";
             public const string DeleteTestResultEndpoint = TestResultEndpoint + "/delete/{id}";
