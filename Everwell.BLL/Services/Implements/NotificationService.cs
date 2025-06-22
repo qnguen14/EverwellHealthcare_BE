@@ -35,32 +35,30 @@ namespace Everwell.BLL.Services.Implements
         {
             try
             {
-                return await _unitOfWork.ExecuteInTransactionAsync( async () => 
+                if (request == null)
                 {
-                    if (request == null)
-                    {
-                        _logger.LogError("CreateNotification request is null");
-                        throw new ArgumentNullException(nameof(request), "Request cannot be null");
-                    }
-                    
-                    var notification = new Notification
-                    {
-                        UserId = request.UserId,
-                        Title = request.Title,
-                        Message = request.Message,
-                        Type = request.Type,
-                        Priority = request.Priority,
-                        AppointmentId = request.AppointmentId,
-                        TestResultId = request.TestResultId,
-                        STITestingId = request.STITestingId,
-                        CreatedAt = DateTime.UtcNow,
-                        IsRead = false
-                    };
+                    _logger.LogError("CreateNotification request is null");
+                    throw new ArgumentNullException(nameof(request), "Request cannot be null");
+                }
+                
+                var notification = new Notification
+                {
+                    UserId = request.UserId,
+                    Title = request.Title,
+                    Message = request.Message,
+                    Type = request.Type,
+                    Priority = request.Priority,
+                    AppointmentId = request.AppointmentId,
+                    TestResultId = request.TestResultId,
+                    STITestingId = request.STITestingId,
+                    QuestionId = request.QuestionId,
+                    CreatedAt = DateTime.UtcNow,
+                    IsRead = false
+                };
 
-                    await _unitOfWork.GetRepository<Notification>().InsertAsync(notification);
+                await _unitOfWork.GetRepository<Notification>().InsertAsync(notification);
 
-                    return _mapper.Map<GetNotificationResponse>(notification);
-                });
+                return _mapper.Map<GetNotificationResponse>(notification);
             }
             catch (Exception ex)
             {
@@ -79,12 +77,14 @@ namespace Everwell.BLL.Services.Implements
                         include: a => a.Include(nt => nt.TestResult)
                             .Include(nt => nt.Appointment)
                             .Include(nt => nt.TestResult)
+                            .Include(nt => nt.STITesting)
+                            .Include(nt => nt.Question)
                             .Include(nt => nt.Customer),
                         orderBy: n => n.OrderByDescending(x => x.CreatedAt));
 
                 if (notifications == null || notifications.Count() == 0)
                 {
-                    throw new NotFoundException($"No notifications found for user with ID {userId}");
+                    return new List<GetNotificationResponse>();
                 }
                 
                 return _mapper.Map<List<GetNotificationResponse>>(notifications);
@@ -100,7 +100,7 @@ namespace Everwell.BLL.Services.Implements
         {
             try
             {
-                return _unitOfWork.ExecuteInTransactionAsync(async () =>
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
                 {
                     var notification = await _unitOfWork.GetRepository<Notification>()
                         .FirstOrDefaultAsync(
@@ -120,7 +120,7 @@ namespace Everwell.BLL.Services.Implements
                     _unitOfWork.GetRepository<Notification>().UpdateAsync(notification);
                 
                     return true;
-                }).Result;
+                });
             }
             catch (Exception ex)
             {
@@ -133,7 +133,7 @@ namespace Everwell.BLL.Services.Implements
         {
             try
             {
-                return _unitOfWork.ExecuteInTransactionAsync(async () =>
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
                 {
                     var notification = await _unitOfWork.GetRepository<Notification>()
                         .FirstOrDefaultAsync(
@@ -153,7 +153,7 @@ namespace Everwell.BLL.Services.Implements
                     _unitOfWork.GetRepository<Notification>().DeleteAsync(notification);
                 
                     return true;
-                }).Result;
+                });
             }
             catch (Exception ex)
             {

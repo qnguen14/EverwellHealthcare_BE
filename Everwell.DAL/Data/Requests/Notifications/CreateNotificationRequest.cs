@@ -28,5 +28,7 @@ namespace Everwell.DAL.Data.Requests.Notifications
         public Guid? TestResultId { get; set; }
         
         public Guid? STITestingId { get; set; }
+        
+        public Guid? QuestionId { get; set; }
     }
 }

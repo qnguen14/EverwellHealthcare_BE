@@ -5,9 +5,10 @@ namespace Everwell.DAL.Data.Entities;
 
 public enum QuestionStatus
 {
-    Pending,
-    Answered,
-    Closed
+    Pending,     // Question submitted, waiting for consultant
+    Assigned,    // Question assigned to a consultant
+    Answered,    // Question answered by consultant
+    Closed       // Question closed/resolved
 }
 
 [Table("Questions")]
@@ -23,8 +24,8 @@ public class Question
     public virtual User Customer { get; set; }
 
     [Column("consultant_id")]
-    public Guid ConsultantId { get; set; }
-    public virtual User Consultant { get; set; }
+    public Guid? ConsultantId { get; set; }
+    public virtual User? Consultant { get; set; }
 
     [Required]
     [Column("title")]
