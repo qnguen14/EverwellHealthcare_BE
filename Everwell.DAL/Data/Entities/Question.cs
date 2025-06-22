@@ -36,10 +36,6 @@ public class Question
     [Column("question_text", TypeName = "text")]
     public string QuestionText { get; set; }
 
-    [Column("category")]
-    [MaxLength(500)]
-    public string? Category { get; set; }
-
     [Column("answer_text", TypeName = "text")]
     public string? AnswerText { get; set; }
 

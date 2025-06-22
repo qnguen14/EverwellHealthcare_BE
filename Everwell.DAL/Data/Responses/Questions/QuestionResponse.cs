@@ -13,7 +13,6 @@ public class QuestionResponse
     public string? ConsultantEmail { get; set; }
     public string Title { get; set; }
     public string QuestionText { get; set; }
-    public string? Category { get; set; }
     public string? AnswerText { get; set; }
     public QuestionStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }

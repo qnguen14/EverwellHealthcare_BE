@@ -3,8 +3,10 @@ using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Data.Requests.Questions;
 using Everwell.DAL.Data.Responses.Questions;
+using Everwell.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Everwell.API.Controllers;
 
@@ -88,21 +90,6 @@ public class QuestionsController : ControllerBase
         try
         {
             var questions = await _questionService.GetUnassignedQuestionsAsync();
-            return Ok(questions);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
-        }
-    }
-
-    [HttpGet(ApiEndpointConstants.Question.QuestionEndpoint + "/category/{category}")]
-    [Authorize]
-    public async Task<ActionResult<IEnumerable<QuestionResponse>>> GetQuestionsByCategory(string category)
-    {
-        try
-        {
-            var questions = await _questionService.GetQuestionsByCategoryAsync(category);
             return Ok(questions);
         }
         catch (Exception ex)
@@ -212,6 +199,38 @@ public class QuestionsController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+
+    [HttpGet(ApiEndpointConstants.Question.QuestionEndpoint + "/debug/consultants")]
+    [Authorize]
+    public async Task<ActionResult> DebugConsultants()
+    {
+        try
+        {
+            // This is a temporary debug endpoint
+            var unitOfWork = HttpContext.RequestServices.GetRequiredService<IUnitOfWork<EverwellDbContext>>();
+            
+            var allUsers = await unitOfWork.GetRepository<User>()
+                .GetListAsync(include: u => u.Include(user => user.Role));
+            
+            var consultants = await unitOfWork.GetRepository<User>()
+                .GetListAsync(
+                    predicate: u => u.RoleId == (int)RoleName.Consultant && u.IsActive,
+                    include: u => u.Include(user => user.Role));
+
+            return Ok(new
+            {
+                TotalUsers = allUsers.Count(),
+                AllUsers = allUsers.Select(u => new { u.Id, u.Name, u.Email, u.RoleId, RoleName = u.Role?.Name, u.IsActive }),
+                ConsultantRoleId = (int)RoleName.Consultant,
+                ConsultantsFound = consultants.Count(),
+                Consultants = consultants.Select(c => new { c.Id, c.Name, c.Email, c.RoleId, RoleName = c.Role?.Name, c.IsActive })
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Debug error", details = ex.Message });
         }
     }
 } 

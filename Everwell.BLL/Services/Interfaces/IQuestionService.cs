@@ -10,7 +10,6 @@ public interface IQuestionService
     Task<IEnumerable<QuestionResponse>> GetQuestionsByCustomerAsync(Guid customerId);
     Task<IEnumerable<QuestionResponse>> GetQuestionsByConsultantAsync(Guid consultantId);
     Task<IEnumerable<QuestionResponse>> GetUnassignedQuestionsAsync(); // Questions waiting for consultant assignment
-    Task<IEnumerable<QuestionResponse>> GetQuestionsByCategoryAsync(string category); // Filter by category
     Task<QuestionResponse?> GetQuestionByIdAsync(Guid id);
     Task<CreateQuestionResponse> CreateQuestionAsync(CreateQuestionRequest request);
     Task<QuestionResponse?> UpdateQuestionAsync(Guid id, UpdateQuestionRequest request);

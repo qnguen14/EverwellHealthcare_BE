@@ -1635,32 +1635,6 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.QuestionsController",
-    "Method": "GetQuestionsByCategory",
-    "RelativePath": "api/v2.5/question/category/{category}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "category",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Everwell.DAL.Data.Responses.Questions.QuestionResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "Everwell.API.Controllers.QuestionsController",
     "Method": "GetQuestionsByConsultant",
     "RelativePath": "api/v2.5/question/consultant/{consultantId}",
     "HttpMethod": "GET",
@@ -1736,6 +1710,16 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.QuestionsController",
+    "Method": "DebugConsultants",
+    "RelativePath": "api/v2.5/question/debug/consultants",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "Everwell.API.Controllers.QuestionsController",

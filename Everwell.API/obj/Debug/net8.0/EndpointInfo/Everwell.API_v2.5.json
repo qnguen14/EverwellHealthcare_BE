@@ -2936,54 +2936,6 @@
         }
       }
     },
-    "/api/v2.5/question/category/{category}": {
-      "get": {
-        "tags": [
-          "Questions"
-        ],
-        "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/QuestionResponse"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/QuestionResponse"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/QuestionResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v2.5/question/create": {
       "post": {
         "tags": [
@@ -3214,6 +3166,18 @@
               "format": "uuid"
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v2.5/question/debug/consultants": {
+      "get": {
+        "tags": [
+          "Questions"
         ],
         "responses": {
           "200": {
@@ -5972,12 +5936,6 @@
             "maxLength": 2000,
             "minLength": 0,
             "type": "string"
-          },
-          "category": {
-            "maxLength": 500,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -7350,6 +7308,14 @@
           },
           "stiTesting": {
             "$ref": "#/components/schemas/STITesting"
+          },
+          "questionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "question": {
+            "$ref": "#/components/schemas/Question"
           }
         },
         "additionalProperties": false
@@ -7435,7 +7401,8 @@
           0,
           1,
           2,
-          3
+          3,
+          4
         ],
         "type": "integer",
         "format": "int32"
@@ -7563,6 +7530,63 @@
         "type": "integer",
         "format": "int32"
       },
+      "Question": {
+        "required": [
+          "createdAt",
+          "customerId",
+          "questionText",
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/User"
+          },
+          "consultantId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "consultant": {
+            "$ref": "#/components/schemas/User"
+          },
+          "title": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "questionText": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "answerText": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/QuestionStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "answeredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "QuestionResponse": {
         "type": "object",
         "properties": {
@@ -7600,10 +7624,6 @@
             "nullable": true
           },
           "questionText": {
-            "type": "string",
-            "nullable": true
-          },
-          "category": {
             "type": "string",
             "nullable": true
           },

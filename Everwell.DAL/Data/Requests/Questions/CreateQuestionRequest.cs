@@ -13,7 +13,4 @@ public class CreateQuestionRequest
     [Required(ErrorMessage = "Question text is required")]
     [StringLength(2000, ErrorMessage = "Question text must be at most 2000 characters")]
     public string QuestionText { get; set; }
-
-    [StringLength(500, ErrorMessage = "Category must be at most 500 characters")]
-    public string? Category { get; set; } // Optional category/specialization for better routing
 } 
