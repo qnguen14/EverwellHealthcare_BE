@@ -1,4 +1,4 @@
-using Everwell.API.Constants;
+﻿using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Data.Metadata;
@@ -130,7 +130,7 @@ public class PostsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<CreatePostResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize]
+    [Authorize(Roles = "Staff, Admin")]
     public async Task<IActionResult> CreatePost([FromBody] CreatePostRequest request)
     {
         try
@@ -158,7 +158,7 @@ public class PostsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize]
+    [Authorize(Roles = "Staff, Admin")]
     public async Task<IActionResult> UpdatePost(Guid id, [FromBody] UpdatePostRequest request)
     {
         try
@@ -180,12 +180,41 @@ public class PostsController : ControllerBase
             return BadRequest(new { message = "Error creating post", details = ex.Message });
         }
     }
-    
+
+    [HttpPut(ApiEndpointConstants.Post.ApprovePostEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Manager, Admin")]
+    public async Task<IActionResult> ApprovePost(Guid id, [FromQuery] PostStatus status)
+    {
+        try
+        {
+            var approvedPost = await _postService.ApprovePostAsync(id, status);
+            if (approvedPost == null)
+            {
+                return NotFound(new { message = "Bài đăng không tồn tại hoặc đã được duyệt/không duyệt" });
+            }
+            var apiResponse = new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Bài đăng được duyệt thành công",
+                IsSuccess = true,
+                Data = null
+            };
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+
     [HttpDelete(ApiEndpointConstants.Post.DeletePostEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize]
+    [Authorize(Roles = "Staff, Manager, Admin")]
     public async Task<IActionResult> DeletePost(Guid id)
     {
         try

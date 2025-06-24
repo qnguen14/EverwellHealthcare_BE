@@ -1,4 +1,4 @@
-using Everwell.BLL.Services.Interfaces;
+﻿using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
@@ -138,6 +138,16 @@ public class PostService : BaseService<PostService>, IPostService
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
+                var currentUserId = GetCurrentUserId();
+
+                
+                var userRole = GetCurrentUserRole();
+                if (userRole != "Staff" && userRole != "Admin")
+                {
+                    _logger.LogWarning("Tài khoản này không có quyền hạn sử dụng: {Role}", userRole);
+                    return _mapper.Map<CreatePostResponse>(null);
+                }
+
                 var existingPost = await _unitOfWork.GetRepository<Post>()
                     .FirstOrDefaultAsync(predicate: p => p.Id == id,
                         include: p => p.Include(post => post.Staff));
@@ -149,6 +159,7 @@ public class PostService : BaseService<PostService>, IPostService
                 }
                 
                 var updatedPost = _mapper.Map<Post>(request);
+                updatedPost.StaffId = currentUserId;
                 
                 _unitOfWork.GetRepository<Post>().UpdateAsync(updatedPost);
                 return _mapper.Map<CreatePostResponse>(updatedPost);
@@ -157,6 +168,46 @@ public class PostService : BaseService<PostService>, IPostService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while updating post with id: {Id}", id);
+            throw;
+        }
+    }
+
+    public async Task<CreatePostResponse> ApprovePostAsync(Guid id, PostStatus status)
+    {
+        try
+        {
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                var currentUserRole = GetCurrentUserRole();
+
+                if (currentUserRole != "Manager")
+                {
+                    _logger.LogWarning("Tài khoản này không có quyền hạn sử dụng: {Role}", currentUserRole);
+                }
+
+                var post = await _unitOfWork.GetRepository<Post>()
+                    .FirstOrDefaultAsync(predicate: p => p.Id == id,
+                        include: p => p.Include(post => post.Staff));
+
+                if (status == PostStatus.Approved && post.Status == PostStatus.Approved)
+                {
+                    _logger.LogWarning("Post with id {Id} is already approved", id);
+                }
+
+                if (post == null)
+                {
+                    _logger.LogInformation("No post found for approval");
+                }
+
+                post.Status = status;
+                
+                _unitOfWork.GetRepository<Post>().UpdateAsync(post);
+                return _mapper.Map<CreatePostResponse>(post);
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while approving post with id: {Id}", id);
             throw;
         }
     }

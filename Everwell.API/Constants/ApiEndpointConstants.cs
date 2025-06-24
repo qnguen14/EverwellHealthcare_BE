@@ -80,6 +80,7 @@
             public const string GetPostEndpoint = PostEndpoint + "/{id}";
             public const string CreatePostEndpoint = PostEndpoint + "/create";
             public const string UpdatePostEndpoint = PostEndpoint + "/update/{id}";
+            public const string ApprovePostEndpoint = PostEndpoint + "/approve/{id}";
             public const string DeletePostEndpoint = PostEndpoint + "/delete/{id}";
         }
 

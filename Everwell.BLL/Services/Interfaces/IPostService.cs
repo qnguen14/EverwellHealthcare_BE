@@ -11,5 +11,6 @@ public interface IPostService
     Task<CreatePostResponse> GetPostByIdAsync(Guid id);
     Task<CreatePostResponse> CreatePostAsync(CreatePostRequest request);
     Task<CreatePostResponse> UpdatePostAsync(Guid id, UpdatePostRequest request);
+    Task<CreatePostResponse> ApprovePostAsync(Guid id, PostStatus status);
     Task<bool> DeletePostAsync(Guid id);
 }
