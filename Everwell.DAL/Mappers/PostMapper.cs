@@ -17,7 +17,6 @@ public class PostMapper : Profile
             .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
             .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
-            .ForMember(dest => dest.StaffId, opt => opt.MapFrom(src => src.StaffId))
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
 
         // Mapping from UpdatePostRequest to Post

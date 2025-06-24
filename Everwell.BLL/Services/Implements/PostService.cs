@@ -103,6 +103,14 @@ public class PostService : BaseService<PostService>, IPostService
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
+                var userRole = GetCurrentUserRole();
+                
+                if (userRole != "Staff" && userRole != "Admin")
+                {
+                    _logger.LogWarning("Tài khoản này không có quyền hạn sử dụng: {Role}", userRole);
+                    return _mapper.Map<CreatePostResponse>(null);
+                }
+                
                 var existingPost = await _unitOfWork.GetRepository<Post>()
                     .FirstOrDefaultAsync(predicate: p => p.Title == request.Title,
                         include: p => p.Include(post => post.Staff));
@@ -120,6 +128,7 @@ public class PostService : BaseService<PostService>, IPostService
                 
                 var post = _mapper.Map<Post>(request);
                 post.Status = PostStatus.Pending;
+                post.StaffId = GetCurrentUserId();
 
                 await _unitOfWork.GetRepository<Post>().InsertAsync(post);
 
@@ -159,11 +168,11 @@ public class PostService : BaseService<PostService>, IPostService
                     throw new ArgumentNullException(nameof(existingPost), "Post not found");
                 }
                 
-                var updatedPost = _mapper.Map<Post>(request);
-                updatedPost.StaffId = currentUserId;
+                _mapper.Map(request, existingPost);
+                existingPost.StaffId = GetCurrentUserId();  
                 
-                _unitOfWork.GetRepository<Post>().UpdateAsync(updatedPost);
-                return _mapper.Map<CreatePostResponse>(updatedPost);
+                _unitOfWork.GetRepository<Post>().UpdateAsync(existingPost);
+                return _mapper.Map<CreatePostResponse>(existingPost);
             });
         }
         catch (Exception ex)

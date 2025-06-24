@@ -20,9 +20,6 @@ public class CreatePostRequest
     [EnumDataType(typeof(PostCategory))]
     public PostCategory Category { get; set; } 
 
-    [Required(ErrorMessage = "Staff ID is required")]
-    public Guid StaffId { get; set; }
-
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
