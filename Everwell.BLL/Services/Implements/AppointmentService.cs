@@ -370,4 +370,39 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             throw;
         }
     }
+
+    public async Task<CreateAppointmentsResponse> CancelAppoinemntAsync(Guid id)
+    {
+        try
+        {
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                var appointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == id 
+                                        && a.Customer.IsActive == true 
+                                        && a.Consultant.IsActive == true,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant));
+                if (appointment == null)
+                {
+                    throw new NotFoundException($"Appointment with ID {id} not found");
+                }
+                appointment.Status = AppointmentStatus.Cancelled;
+                
+                _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
+                await CreateAppointmentNotification(appointment, 
+                    "Appointment Cancelled", 
+                    $"Your appointment with {appointment.Consultant.Name} " +
+                    $"on {appointment.AppointmentDate} " +
+                    $"at {GetReadableTimeSlot(appointment.Slot)} has been cancelled.");
+                return _mapper.Map<CreateAppointmentsResponse>(appointment);
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while cancelling appointment with id: {Id}", id);
+            throw;
+        }
+    }
 } 

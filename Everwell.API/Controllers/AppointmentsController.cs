@@ -170,6 +170,33 @@ public class AppointmentsController : ControllerBase
         }
     }
 
+    [HttpPut(ApiEndpointConstants.Appointment.CancelAppointmentEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin,Consultant")]
+    public async Task<IActionResult> CancelAppointment(Guid id)
+    {
+        try
+        {
+            var response = await _appointmentService.CancelAppoinemntAsync(id);
+            if (response == null)
+                return NotFound(new { message = "Cuộc hẹn không tồn tại." });
+            var apiResponse = new ApiResponse<CreateAppointmentsResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Appointment cancelled successfully",
+                IsSuccess = true,
+                Data = response
+            };
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+
     [HttpDelete(ApiEndpointConstants.Appointment.DeleteAppointmentEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<DeleteAppointmentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]

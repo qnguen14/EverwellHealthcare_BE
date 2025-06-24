@@ -55,6 +55,7 @@
             public const string GetAppointmentEndpoint = AppointmentEndpoint + "/{id}";
             public const string CreateAppointmentEndpoint = AppointmentEndpoint + "/create";
             public const string UpdateAppointmentEndpoint = AppointmentEndpoint + "/update/{id}";
+            public const string CancelAppointmentEndpoint = AppointmentEndpoint + "/cancel/{id}";
             public const string DeleteAppointmentEndpoint = AppointmentEndpoint + "/delete/{id}";
             public const string GetConsultantSchedulesEndpoint = AppointmentEndpoint + "/consultant/schedules";
             public const string GetConsultantSchedulesByIdEndpoint = AppointmentEndpoint + "/consultant/schedules/{id}";
