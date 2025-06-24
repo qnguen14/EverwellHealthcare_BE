@@ -20,7 +20,7 @@ public class FeedbacksController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.Feedback.GetAllFeedbacksEndpoint)]
-    [Authorize(Roles = "Admin,Consultant")]
+    [Authorize(Roles = "Admin,Consultant,Customer")]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<FeedbackResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllFeedbacks()
