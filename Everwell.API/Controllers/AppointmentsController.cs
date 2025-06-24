@@ -174,7 +174,7 @@ public class AppointmentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin,Consultant")]
+    [Authorize(Roles = "Admin,Consultant,Customer")]
     public async Task<IActionResult> CancelAppointment(Guid id)
     {
         try

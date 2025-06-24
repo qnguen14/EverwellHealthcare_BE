@@ -119,6 +119,7 @@ public class PostService : BaseService<PostService>, IPostService
                 }
                 
                 var post = _mapper.Map<Post>(request);
+                post.Status = PostStatus.Pending;
 
                 await _unitOfWork.GetRepository<Post>().InsertAsync(post);
 

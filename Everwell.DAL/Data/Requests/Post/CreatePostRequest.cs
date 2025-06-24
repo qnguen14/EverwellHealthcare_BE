@@ -15,10 +15,6 @@ public class CreatePostRequest
         
     [Required(ErrorMessage = "Image URL is required")]
     public string ImageUrl { get; set; }
-        
-    [Required(ErrorMessage = "Status is required")]
-    [EnumDataType(typeof(PostStatus))]
-    public PostStatus Status { get; set; } = PostStatus.Pending;
 
     [Required(ErrorMessage = "Category is required")]
     [EnumDataType(typeof(PostCategory))]
