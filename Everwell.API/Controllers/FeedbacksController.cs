@@ -382,4 +382,36 @@ public class FeedbacksController : ControllerBase
             return StatusCode(500, response);
         }
     }
+
+    // Public consultant reviews endpoint for customers
+    [HttpGet(ApiEndpointConstants.Feedback.GetPublicConsultantReviewsEndpoint)]
+    [Authorize(Roles = "Customer,Admin")]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<FeedbackResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetPublicConsultantReviews(Guid consultantId)
+    {
+        try
+        {
+            var feedbacks = await _feedbackService.GetFeedbacksByConsultantAsync(consultantId);
+            var response = new ApiResponse<IEnumerable<FeedbackResponse>>
+            {
+                Message = "Public consultant reviews retrieved successfully",
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Data = feedbacks
+            };
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            var response = new ApiResponse<object>
+            {
+                Message = "Internal server error",
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Data = new { details = ex.Message }
+            };
+            return StatusCode(500, response);
+        }
+    }
 } 

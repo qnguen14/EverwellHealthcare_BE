@@ -69,6 +69,7 @@
             public const string CreateFeedbackEndpoint = FeedbackEndpoint + "/create";
             public const string UpdateFeedbackEndpoint = FeedbackEndpoint + "/update/{id}";
             public const string DeleteFeedbackEndpoint = FeedbackEndpoint + "/delete/{id}";
+            public const string GetPublicConsultantReviewsEndpoint = FeedbackEndpoint + "/consultant/{consultantId}/public";
         }
 
         public static class Post
