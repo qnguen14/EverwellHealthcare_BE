@@ -4009,6 +4009,577 @@
         }
       }
     },
+    "/api/v2.5/reports/generate": {
+      "post": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/daily/{date}": {
+      "get": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/monthly/{year}/{month}": {
+      "get": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/yearly/{year}": {
+      "get": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/export/pdf": {
+      "post": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/export/excel": {
+      "post": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/export-report/pdf": {
+      "post": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticalReportResponse"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticalReportResponse"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticalReportResponse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/export-report/excel": {
+      "post": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticalReportResponse"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticalReportResponse"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatisticalReportResponse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/templates": {
+      "get": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringListApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringListApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringListApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/generate-from-template": {
+      "post": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "parameters": [
+          {
+            "name": "templateName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticalReportResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/monthly/{year}/{month}/pdf": {
+      "get": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2.5/reports/monthly/{year}/{month}/excel": {
+      "get": {
+        "tags": [
+          "StatisticalReport"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2.5/stitesting/getall": {
       "get": {
         "tags": [
@@ -6235,6 +6806,113 @@
   },
   "components": {
     "schemas": {
+      "AppointmentByConsultant": {
+        "type": "object",
+        "properties": {
+          "consultantName": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalAppointments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedAppointments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completionRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppointmentByTimeSlot": {
+        "type": "object",
+        "properties": {
+          "timeSlot": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppointmentMonthlyCount": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cancelledCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppointmentStatistics": {
+        "type": "object",
+        "properties": {
+          "appointmentsByStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppointmentStatusCount"
+            },
+            "nullable": true
+          },
+          "appointmentsByConsultant": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppointmentByConsultant"
+            },
+            "nullable": true
+          },
+          "appointmentsByTimeSlot": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppointmentByTimeSlot"
+            },
+            "nullable": true
+          },
+          "monthlyAppointments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppointmentMonthlyCount"
+            },
+            "nullable": true
+          },
+          "appointmentsByType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppointmentTypeCount"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "AppointmentStatus": {
         "enum": [
           0,
@@ -6283,6 +6961,24 @@
               "$ref": "#/components/schemas/AppointmentStatusCount"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppointmentTypeCount": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -8144,6 +8840,96 @@
         },
         "additionalProperties": false
       },
+      "MonthlyMetric": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentageChange": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MonthlyPaymentMetric": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "successfulPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "revenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "successRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "stiPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "menstrualPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "appointmentPayments": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MonthlyTrends": {
+        "type": "object",
+        "properties": {
+          "userRegistrations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonthlyMetric"
+            },
+            "nullable": true
+          },
+          "appointmentBookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonthlyMetric"
+            },
+            "nullable": true
+          },
+          "stiTestRequests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonthlyMetric"
+            },
+            "nullable": true
+          },
+          "completedServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonthlyMetric"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "NotificationPreferencesRequest": {
         "type": "object",
         "properties": {
@@ -8245,6 +9031,199 @@
           "ovulationDate": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentByMethod": {
+        "type": "object",
+        "properties": {
+          "paymentMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "successRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentByService": {
+        "type": "object",
+        "properties": {
+          "serviceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "successfulPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "successRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageAmount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentFailureReason": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "lostRevenue": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentOverview": {
+        "type": "object",
+        "properties": {
+          "totalPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "successfulPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "failedPayments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "successRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "stiRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "menstrualRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "appointmentRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageTransactionValue": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentStatistics": {
+        "type": "object",
+        "properties": {
+          "overview": {
+            "$ref": "#/components/schemas/PaymentOverview"
+          },
+          "paymentsByService": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentByService"
+            },
+            "nullable": true
+          },
+          "paymentsByMethod": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentByMethod"
+            },
+            "nullable": true
+          },
+          "successRates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentSuccessRate"
+            },
+            "nullable": true
+          },
+          "monthlyPayments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonthlyPaymentMetric"
+            },
+            "nullable": true
+          },
+          "failureReasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentFailureReason"
+            },
+            "nullable": true
+          },
+          "revenueAnalytics": {
+            "$ref": "#/components/schemas/RevenueAnalytics"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentSuccessRate": {
+        "type": "object",
+        "properties": {
+          "serviceCategory": {
+            "type": "string",
+            "nullable": true
+          },
+          "period": {
+            "type": "string",
+            "nullable": true
+          },
+          "successRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalTransactions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "successfulTransactions": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -8397,6 +9376,141 @@
         },
         "additionalProperties": false
       },
+      "ReportFilter": {
+        "type": "object",
+        "properties": {
+          "fromDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "toDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "reportType": {
+            "$ref": "#/components/schemas/ReportType"
+          },
+          "includeRoles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "includeConsultants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "includeUserStats": {
+            "type": "boolean"
+          },
+          "includeAppointmentStats": {
+            "type": "boolean"
+          },
+          "includeSTIStats": {
+            "type": "boolean"
+          },
+          "includePaymentStats": {
+            "type": "boolean"
+          },
+          "includeTrends": {
+            "type": "boolean"
+          },
+          "includePerformance": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReportHeader": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fromDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "toDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "generatedBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "reportType": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReportSummary": {
+        "type": "object",
+        "properties": {
+          "totalUsers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newUsersThisPeriod": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalAppointments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedAppointments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalSTITests": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedSTITests": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "revenueTotalEstimate": {
+            "type": "number",
+            "format": "double"
+          },
+          "appointmentCompletionRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "userRetentionRate": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReportType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "ResultOutcome": {
         "enum": [
           0,
@@ -8405,6 +9519,72 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "RevenueAnalytics": {
+        "type": "object",
+        "properties": {
+          "totalRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "stiTestingRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "menstrualCycleRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "appointmentRevenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthOverMonthGrowth": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageRevenuePerUser": {
+            "type": "number",
+            "format": "double"
+          },
+          "topService": {
+            "$ref": "#/components/schemas/TopRevenueService"
+          },
+          "stiPackageRevenue": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RevenueByPackage"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RevenueByPackage": {
+        "type": "object",
+        "properties": {
+          "packageName": {
+            "type": "string",
+            "nullable": true
+          },
+          "revenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "salesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averagePrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "popularityPercentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
       },
       "Role": {
         "required": [
@@ -8434,6 +9614,120 @@
         "type": "integer",
         "format": "int32"
       },
+      "STIResultStatistic": {
+        "type": "object",
+        "properties": {
+          "resultType": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "STITestByStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "STITestByType": {
+        "type": "object",
+        "properties": {
+          "testType": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "positiveResults": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "positiveRate": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "STITestMonthlyCount": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "testsRequested": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "testsCompleted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "positiveResults": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "STITestingStatistics": {
+        "type": "object",
+        "properties": {
+          "testsByType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/STITestByType"
+            },
+            "nullable": true
+          },
+          "testsByStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/STITestByStatus"
+            },
+            "nullable": true
+          },
+          "monthlyTests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/STITestMonthlyCount"
+            },
+            "nullable": true
+          },
+          "resultStatistics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/STIResultStatistic"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "SetUserRoleRequest": {
         "required": [
           "role"
@@ -8456,6 +9750,121 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "StatisticalReportResponse": {
+        "type": "object",
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/ReportHeader"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/ReportSummary"
+          },
+          "userStats": {
+            "$ref": "#/components/schemas/UserStatistics"
+          },
+          "appointmentStats": {
+            "$ref": "#/components/schemas/AppointmentStatistics"
+          },
+          "stiStats": {
+            "$ref": "#/components/schemas/STITestingStatistics"
+          },
+          "paymentStats": {
+            "$ref": "#/components/schemas/PaymentStatistics"
+          },
+          "monthlyTrends": {
+            "$ref": "#/components/schemas/MonthlyTrends"
+          },
+          "topConsultants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopConsultant"
+            },
+            "nullable": true
+          },
+          "performance": {
+            "$ref": "#/components/schemas/SystemPerformance"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StatisticalReportResponseApiResponse": {
+        "type": "object",
+        "properties": {
+          "status_code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StatisticalReportResponse"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StringListApiResponse": {
+        "type": "object",
+        "properties": {
+          "status_code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SystemPerformance": {
+        "type": "object",
+        "properties": {
+          "averageResponseTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "systemUptime": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAPIRequests": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "successfulRequests": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "successRate": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
       },
       "TestPackage": {
         "enum": [
@@ -8492,6 +9901,58 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "TopConsultant": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "specialization": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalAppointments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalReviews": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "estimatedRevenue": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TopRevenueService": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "revenue": {
+            "type": "number",
+            "format": "double"
+          },
+          "transactionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
       },
       "UpdateAppointmentRequest": {
         "required": [
@@ -8834,6 +10295,60 @@
         },
         "additionalProperties": false
       },
+      "UserAgeGroup": {
+        "type": "object",
+        "properties": {
+          "ageRange": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserGenderCount": {
+        "type": "object",
+        "properties": {
+          "gender": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserLocationCount": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
       "UserProfileResponse": {
         "type": "object",
         "properties": {
@@ -8915,6 +10430,24 @@
         },
         "additionalProperties": false
       },
+      "UserRegistrationTrend": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cumulativeCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "UserRoleCount": {
         "type": "object",
         "properties": {
@@ -8951,6 +10484,47 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UserRoleCount"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserStatistics": {
+        "type": "object",
+        "properties": {
+          "usersByRole": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleCount"
+            },
+            "nullable": true
+          },
+          "usersByAge": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserAgeGroup"
+            },
+            "nullable": true
+          },
+          "usersByGender": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserGenderCount"
+            },
+            "nullable": true
+          },
+          "usersByLocation": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserLocationCount"
+            },
+            "nullable": true
+          },
+          "registrationTrends": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRegistrationTrend"
             },
             "nullable": true
           }

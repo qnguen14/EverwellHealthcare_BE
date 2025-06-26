@@ -2275,6 +2275,332 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "GenerateDailyReport",
+    "RelativePath": "api/v2.5/reports/daily/{date}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "date",
+        "Type": "System.DateTime",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Reports.StatisticalReportResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "ExportReportToExcel",
+    "RelativePath": "api/v2.5/reports/export-report/excel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "report",
+        "Type": "Everwell.DAL.Data.Responses.Reports.StatisticalReportResponse",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.FileResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "ExportReportToPdf",
+    "RelativePath": "api/v2.5/reports/export-report/pdf",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "report",
+        "Type": "Everwell.DAL.Data.Responses.Reports.StatisticalReportResponse",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.FileResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "ExportToExcel",
+    "RelativePath": "api/v2.5/reports/export/excel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "Everwell.DAL.Data.Responses.Reports.ReportFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.FileResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "ExportToPdf",
+    "RelativePath": "api/v2.5/reports/export/pdf",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "Everwell.DAL.Data.Responses.Reports.ReportFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.FileResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "GenerateReport",
+    "RelativePath": "api/v2.5/reports/generate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "Everwell.DAL.Data.Responses.Reports.ReportFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Reports.StatisticalReportResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "GenerateFromTemplate",
+    "RelativePath": "api/v2.5/reports/generate-from-template",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "templateName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "filter",
+        "Type": "Everwell.DAL.Data.Responses.Reports.ReportFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Reports.StatisticalReportResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "GenerateMonthlyReport",
+    "RelativePath": "api/v2.5/reports/monthly/{year}/{month}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Reports.StatisticalReportResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "ExportMonthlyToExcel",
+    "RelativePath": "api/v2.5/reports/monthly/{year}/{month}/excel",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.FileResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "ExportMonthlyToPdf",
+    "RelativePath": "api/v2.5/reports/monthly/{year}/{month}/pdf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.FileResult",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "GetReportTemplates",
+    "RelativePath": "api/v2.5/reports/templates",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.StatisticalReportController",
+    "Method": "GenerateYearlyReport",
+    "RelativePath": "api/v2.5/reports/yearly/{year}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Everwell.DAL.Data.Metadata.ApiResponse\u00601[[Everwell.DAL.Data.Responses.Reports.StatisticalReportResponse, Everwell.DAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "Everwell.API.Controllers.STITestingsController",
     "Method": "GetSTITestingById",
     "RelativePath": "api/v2.5/stitesting/{id}",

@@ -144,6 +144,33 @@
             public const string GetUsersByRoleEndpoint = DashboardEndpoint + "/users-by-role";
             public const string GetAppointmentsByStatusEndpoint = DashboardEndpoint + "/appointments-by-status";
         }
+
+        public static class Reports
+        {
+            public const string ReportsEndpoint = ApiEndpoint + "/reports";
+            public const string GenerateReportEndpoint = ReportsEndpoint + "/generate";
+            public const string GenerateDailyReportEndpoint = ReportsEndpoint + "/daily/{date}";
+            public const string GenerateWeeklyReportEndpoint = ReportsEndpoint + "/weekly/{weekStart}";
+            public const string GenerateMonthlyReportEndpoint = ReportsEndpoint + "/monthly/{year}/{month}";
+            public const string GenerateQuarterlyReportEndpoint = ReportsEndpoint + "/quarterly/{year}/{quarter}";
+            public const string GenerateYearlyReportEndpoint = ReportsEndpoint + "/yearly/{year}";
+            
+            // Export endpoints
+            public const string ExportToPdfEndpoint = ReportsEndpoint + "/export/pdf";
+            public const string ExportToExcelEndpoint = ReportsEndpoint + "/export/excel";
+            public const string ExportReportToPdfEndpoint = ReportsEndpoint + "/export-report/pdf";
+            public const string ExportReportToExcelEndpoint = ReportsEndpoint + "/export-report/excel";
+            
+            // Quick export endpoints
+            public const string ExportMonthlyToPdfEndpoint = ReportsEndpoint + "/monthly/{year}/{month}/pdf";
+            public const string ExportMonthlyToExcelEndpoint = ReportsEndpoint + "/monthly/{year}/{month}/excel";
+            public const string ExportYearlyToPdfEndpoint = ReportsEndpoint + "/yearly/{year}/pdf";
+            public const string ExportYearlyToExcelEndpoint = ReportsEndpoint + "/yearly/{year}/excel";
+            
+            // Template endpoints
+            public const string GetReportTemplatesEndpoint = ReportsEndpoint + "/templates";
+            public const string GenerateFromTemplateEndpoint = ReportsEndpoint + "/generate-from-template";
+        }
         
         public static class Notification
         {
