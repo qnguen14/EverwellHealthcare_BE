@@ -22,6 +22,8 @@ public class CreateAppointmentsResponse
     public AppointmentStatus Status { get; set; }
 
     public string? Notes { get; set; }
+    
+    public string? GoogleMeetUrl { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }

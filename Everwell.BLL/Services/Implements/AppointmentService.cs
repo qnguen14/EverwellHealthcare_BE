@@ -21,7 +21,36 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         _mapper = mapper;
     }
 
-    #region Helper method to create appointment notifications
+    #region Helper methods
+    
+    private bool IsValidGoogleMeetUrl(string url)
+    {
+        try
+        {
+            // Check if the URL is not null and starts with the Google Meet domain
+            if (string.IsNullOrEmpty(url))
+                return false;
+
+            // Create a Uri object to validate the URL
+            var uri = new Uri(url);
+        
+            // Check if the host is meet.google.com
+            if (!uri.Host.Equals("meet.google.com", StringComparison.OrdinalIgnoreCase))
+                return false;
+            
+            // Check if the URL path follows the pattern of a Google Meet code
+            // Google Meet codes typically have a format like: /abc-defg-hij
+            var path = uri.AbsolutePath.TrimStart('/');
+        
+            // Basic check for the Google Meet code format (typically has two hyphens)
+            return path.Count(c => c == '-') >= 2 && path.Length >= 9;
+        }
+        catch
+        {
+            // If there's any exception while parsing the URL, it's not valid
+            return false;
+        }
+    }
 
     private string GetReadableTimeSlot(ShiftSlot slot)
     {
@@ -229,6 +258,58 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                     $"Cuộc hẹn của bạn với {existingAppointment.Consultant.Name} " +
                     $"vào ngày {existingAppointment.AppointmentDate} " +
                     $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã đuợc cập nhật.");
+
+                return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while updating appointment with id: {Id}", id);
+            throw;
+        }
+    }
+
+    public async Task<CreateAppointmentsResponse> UpdateMeetingLinkAsync(Guid id, string meetingLink)
+    {
+        try
+        {
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == id 
+                                        && a.Customer.IsActive == true 
+                                        && a.Consultant.IsActive == true,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant));
+                // .Include(ap => ap.Service));
+
+                if (existingAppointment == null)
+                {
+                    throw new NotFoundException($"Appointment with ID {id} not found");
+                }
+            
+                if (string.IsNullOrWhiteSpace(meetingLink))
+                {
+                    throw new BadRequestException("Meeting link cannot be empty");
+                }
+            
+                // Validate the meeting link format
+                if (!IsValidGoogleMeetUrl(meetingLink))
+                {
+                    throw new BadRequestException("Invalid Google Meet URL. URL must be in the format: https://meet.google.com/xxx-xxxx-xxx");
+                }
+
+                existingAppointment.GoogleMeetUrl = meetingLink;
+            
+                _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
+            
+
+                await CreateAppointmentNotification(existingAppointment, 
+                    "Cuộc hẹn đã được cập nhật", 
+                    $"Cuộc hẹn của bạn với {existingAppointment.Consultant.Name} " +
+                    $"vào ngày {existingAppointment.AppointmentDate} " +
+                    $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã đuợc cập nhật đường dẫn Google Meet.");
 
                 return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
             });
