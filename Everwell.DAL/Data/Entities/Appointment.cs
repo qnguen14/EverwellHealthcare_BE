@@ -56,6 +56,9 @@ public class Appointment
     [Column("notes", TypeName = "text")]
     public string? Notes { get; set; }
 
+    [Column("google_meet_url")]
+    public string? GoogleMeetUrl { get; set; }
+    
     [Required]
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
