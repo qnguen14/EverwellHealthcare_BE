@@ -1,0 +1,15 @@
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\bin\Release\net8.0\Everwell.DAL.deps.json
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\bin\Release\net8.0\Everwell.DAL.runtimeconfig.json
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\bin\Release\net8.0\Everwell.DAL.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\bin\Release\net8.0\Everwell.DAL.pdb
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.csproj.AssemblyReference.cache
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.GeneratedMSBuildEditorConfig.editorconfig
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.AssemblyInfoInputs.cache
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.AssemblyInfo.cs
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.csproj.CoreCompileInputs.cache
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.sourcelink.json
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\refint\Everwell.DAL.dll
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.pdb
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\Everwell.DAL.genruntimeconfig.cache
+D:\Gender System\EverwellHealthcare_BE\Everwell.DAL\obj\Release\net8.0\ref\Everwell.DAL.dll

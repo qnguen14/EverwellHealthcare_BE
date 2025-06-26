@@ -23,7 +23,7 @@ namespace Everwell.API.Controllers
         [ProducesResponseType(typeof(ApiResponse<DashboardResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin, Consultant")]
+        [Authorize(Roles = "Admin, Manager, Staff, Consultant")]
         public async Task<ActionResult<DashboardResponse>> GetDashboardData()
         {
             try
@@ -51,7 +51,7 @@ namespace Everwell.API.Controllers
         [ProducesResponseType(typeof(ApiResponse<DashboardStats>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Admin, Consultant")]
+        [Authorize(Roles = "Admin, Manager, Staff, Consultant")]
         public async Task<ActionResult<DashboardStats>> GetDashboardStats()
         {
             try

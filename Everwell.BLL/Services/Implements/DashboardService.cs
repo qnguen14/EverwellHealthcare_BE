@@ -115,10 +115,13 @@ namespace Everwell.BLL.Services.Implements
             try
             {
                 var usersByRole = await _unitOfWork.GetRepository<User>()
-                    .GetListAsync(predicate: u => u.IsActive);
+                    .GetListAsync(
+                        predicate: u => u.IsActive,
+                        include: u => u.Include(user => user.Role)
+                    );
 
                 return usersByRole
-                    .GroupBy(u => u.Role)
+                    .GroupBy(u => u.Role.Name)
                     .Select(g => new UserRoleCount
                     {
                         Role = g.Key.ToString(),

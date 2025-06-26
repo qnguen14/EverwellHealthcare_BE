@@ -422,7 +422,7 @@
         }
       }
     },
-    "/api/v2.5/appointment/delete/{id}": {
+    "/api/v2.5/appointment/cancel/{id}": {
       "put": {
         "tags": [
           "Appointments"
@@ -500,7 +500,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/v2.5/appointment/delete/{id}": {
       "delete": {
         "tags": [
           "Appointments"
@@ -6629,8 +6631,6 @@
           "content",
           "createdAt",
           "imageUrl",
-          "staffId",
-          "status",
           "title"
         ],
         "type": "object",
@@ -6649,15 +6649,8 @@
             "minLength": 1,
             "type": "string"
           },
-          "status": {
-            "$ref": "#/components/schemas/PostStatus"
-          },
           "category": {
             "$ref": "#/components/schemas/PostCategory"
-          },
-          "staffId": {
-            "type": "string",
-            "format": "uuid"
           },
           "createdAt": {
             "type": "string",
