@@ -173,6 +173,39 @@ public class AppointmentsController : ControllerBase
             return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
+    
+    [HttpPut(ApiEndpointConstants.Appointment.UpdateMeetingLinkEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles =  "Admin,Consultant")]
+    public async Task<IActionResult> UpdateMeetingLink(Guid id, string meetingLink)
+    {
+        try
+        {
+            var existingAppointment = await _appointmentService.GetAppointmentByIdAsync(id);
+            if (existingAppointment == null)
+                return NotFound(new { message = "Cuộc hẹn không tồn tại." });
+            
+            var response = await _appointmentService.UpdateMeetingLinkAsync(id, meetingLink);
+            if (response == null)
+                return NotFound(new { message = $"Đường dẫn cuộc hợp không hợp lệ: {meetingLink}" });
+
+            var apiResponse = new ApiResponse<CreateAppointmentsResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Cuộc họp được cập nhật đường dẫn thành công.",
+                IsSuccess = true,
+                Data = response
+            };
+
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
 
     [HttpPut(ApiEndpointConstants.Appointment.CancelAppointmentEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
