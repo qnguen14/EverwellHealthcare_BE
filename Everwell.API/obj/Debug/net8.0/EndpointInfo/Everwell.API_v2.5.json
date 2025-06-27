@@ -422,6 +422,93 @@
         }
       }
     },
+    "/api/v2.5/appointment/update/meetinglink/{id}": {
+      "put": {
+        "tags": [
+          "Appointments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "meetingLink",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAppointmentsResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAppointmentsResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAppointmentsResponseApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2.5/appointment/cancel/{id}": {
       "put": {
         "tags": [
@@ -7052,6 +7139,9 @@
           "notes": {
             "type": "string",
             "nullable": true
+          },
+          "isVirtual": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -7088,6 +7178,10 @@
             "$ref": "#/components/schemas/AppointmentStatus"
           },
           "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "googleMeetLink": {
             "type": "string",
             "nullable": true
           },
@@ -9975,6 +10069,9 @@
           "notes": {
             "type": "string",
             "nullable": true
+          },
+          "isVirtual": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

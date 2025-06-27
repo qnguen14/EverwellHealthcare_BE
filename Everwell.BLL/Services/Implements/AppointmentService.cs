@@ -13,37 +13,50 @@ namespace Everwell.BLL.Services.Implements;
 
 public class AppointmentService : BaseService<AppointmentService>, IAppointmentService
 {
-    public AppointmentService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<AppointmentService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+    private readonly ICalendarService _calendarService;
+
+    public AppointmentService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<AppointmentService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor, ICalendarService calendarService)
         : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _mapper = mapper;
+        _calendarService = calendarService;
     }
 
     #region Helper methods
     
-    private bool IsValidGoogleMeetUrl(string url)
+    private bool IsValidVideoMeetingUrl(string url)
     {
         try
         {
-            // Check if the URL is not null and starts with the Google Meet domain
+            // Check if the URL is not null
             if (string.IsNullOrEmpty(url))
                 return false;
 
             // Create a Uri object to validate the URL
             var uri = new Uri(url);
         
-            // Check if the host is meet.google.com
-            if (!uri.Host.Equals("meet.google.com", StringComparison.OrdinalIgnoreCase))
-                return false;
+            // Accept various video meeting platforms
+            if (uri.Host.Equals("meet.jit.si", StringComparison.OrdinalIgnoreCase))
+            {
+                // Jitsi Meet - any room name is valid
+                return !string.IsNullOrEmpty(uri.AbsolutePath.TrimStart('/'));
+            }
+            else if (uri.Host.Equals("meet.google.com", StringComparison.OrdinalIgnoreCase))
+            {
+                // Google Meet - check format
+                var path = uri.AbsolutePath.TrimStart('/');
+                return path.Count(c => c == '-') >= 2 && path.Length >= 9;
+            }
+            else if (uri.Host.Contains("zoom.us", StringComparison.OrdinalIgnoreCase) ||
+                     uri.Host.Contains("teams.microsoft.com", StringComparison.OrdinalIgnoreCase))
+            {
+                // Zoom or Teams - basic URL validation
+                return true;
+            }
             
-            // Check if the URL path follows the pattern of a Google Meet code
-            // Google Meet codes typically have a format like: /abc-defg-hij
-            var path = uri.AbsolutePath.TrimStart('/');
-        
-            // Basic check for the Google Meet code format (typically has two hyphens)
-            return path.Count(c => c == '-') >= 2 && path.Length >= 9;
+            return false;
         }
         catch
         {
@@ -208,13 +221,49 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             if (newAppointment.Id == Guid.Empty)
                 newAppointment.Id = Guid.NewGuid(); // Ensure Id is set
 
+            // Load customer and consultant information for video meeting
+            var customer = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
+                predicate: u => u.Id == request.CustomerId);
+            var consultant = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
+                predicate: u => u.Id == request.ConsultantId);
+            
+            newAppointment.Customer = customer;
+            newAppointment.Consultant = consultant;
+
+            // Create Jitsi Meet link if appointment is virtual
+            if (request.IsVirtual)
+            {
+                try
+                {
+                    var meetLink = await _calendarService.CreateVideoMeetingAsync(newAppointment);
+                    newAppointment.GoogleMeetLink = meetLink;
+                    newAppointment.IsVirtual = true;
+                    
+                    _logger.LogInformation("Jitsi Meet created for appointment {AppointmentId}: {MeetLink}", 
+                        newAppointment.Id, meetLink);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to create Jitsi Meet for appointment {AppointmentId}", newAppointment.Id);
+                    // Continue without video meeting if creation fails
+                    newAppointment.IsVirtual = false;
+                }
+            }
+
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
+
+            var notificationMessage = request.IsVirtual && !string.IsNullOrEmpty(newAppointment.GoogleMeetLink)
+                ? $"Cuộc hẹn trực tuyến của bạn với {newAppointment.Consultant?.Name} " +
+                  $"vào ngày {newAppointment.AppointmentDate} " +
+                  $"lúc {GetReadableTimeSlot(newAppointment.Slot)} đã được đặt thành công. " +
+                  $"Link video meeting: {newAppointment.GoogleMeetLink}"
+                : $"Cuộc hẹn của bạn với {newAppointment.Consultant?.Name} " +
+                  $"vào ngày {newAppointment.AppointmentDate} " +
+                  $"lúc {GetReadableTimeSlot(newAppointment.Slot)} đã được đặt thành công.";
 
             await CreateAppointmentNotification(newAppointment,
                 "Cuộc hẹn đã được đặt",
-                $"Cuộc hẹn của bạn với {newAppointment.Consultant?.Name} " +
-                $"vào ngày {newAppointment.AppointmentDate} " +
-                $"lúc {GetReadableTimeSlot(newAppointment.Slot)} đã được đặt thành công.");
+                notificationMessage);
 
             return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
         });
@@ -250,14 +299,74 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 existingAppointment.Status = request.Status;
                 existingAppointment.Notes = request.Notes;
                 
+                // Handle virtual meeting changes
+                bool wasVirtual = existingAppointment.IsVirtual;
+                existingAppointment.IsVirtual = request.IsVirtual;
+                
+                // If changing from non-virtual to virtual, create Jitsi Meet
+                if (!wasVirtual && request.IsVirtual)
+                {
+                    try
+                    {
+                        var meetLink = await _calendarService.CreateVideoMeetingAsync(existingAppointment);
+                        existingAppointment.GoogleMeetLink = meetLink;
+                        
+                        _logger.LogInformation("Jitsi Meet created for updated appointment {AppointmentId}: {MeetLink}", 
+                            existingAppointment.Id, meetLink);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to create Jitsi Meet for updated appointment {AppointmentId}", existingAppointment.Id);
+                        // Continue without video meeting if creation fails
+                        existingAppointment.IsVirtual = false;
+                    }
+                }
+                // If changing from virtual to non-virtual, remove video meeting
+                else if (wasVirtual && !request.IsVirtual)
+                {
+                    if (!string.IsNullOrEmpty(existingAppointment.GoogleEventId))
+                    {
+                        try
+                        {
+                            await _calendarService.DeleteCalendarEventAsync(existingAppointment.GoogleEventId);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to delete calendar event for appointment {AppointmentId}", existingAppointment.Id);
+                        }
+                    }
+                    existingAppointment.GoogleMeetLink = null;
+                    existingAppointment.GoogleEventId = null;
+                    existingAppointment.MeetingId = null;
+                }
+                // If already virtual and still virtual, update the meeting
+                else if (wasVirtual && request.IsVirtual && !string.IsNullOrEmpty(existingAppointment.GoogleEventId))
+                {
+                    try
+                    {
+                        await _calendarService.UpdateCalendarEventAsync(existingAppointment.GoogleEventId, existingAppointment);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to update calendar event for appointment {AppointmentId}", existingAppointment.Id);
+                    }
+                }
+                
                 _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
                 
 
+                var updateMessage = existingAppointment.IsVirtual && !string.IsNullOrEmpty(existingAppointment.GoogleMeetLink)
+                    ? $"Cuộc hẹn trực tuyến của bạn với {existingAppointment.Consultant.Name} " +
+                      $"vào ngày {existingAppointment.AppointmentDate} " +
+                      $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã được cập nhật. " +
+                      $"Link video meeting: {existingAppointment.GoogleMeetLink}"
+                    : $"Cuộc hẹn của bạn với {existingAppointment.Consultant.Name} " +
+                      $"vào ngày {existingAppointment.AppointmentDate} " +
+                      $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã được cập nhật.";
+
                 await CreateAppointmentNotification(existingAppointment, 
                     "Cuộc hẹn đã được cập nhật", 
-                    $"Cuộc hẹn của bạn với {existingAppointment.Consultant.Name} " +
-                    $"vào ngày {existingAppointment.AppointmentDate} " +
-                    $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã đuợc cập nhật.");
+                    updateMessage);
 
                 return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
             });
@@ -295,12 +404,12 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 }
             
                 // Validate the meeting link format
-                if (!IsValidGoogleMeetUrl(meetingLink))
+                if (!IsValidVideoMeetingUrl(meetingLink))
                 {
-                    throw new BadRequestException("Invalid Google Meet URL. URL must be in the format: https://meet.google.com/xxx-xxxx-xxx");
+                    throw new BadRequestException("Invalid video meeting URL. URL must be from a supported platform (Jitsi Meet, Google Meet, Zoom, or Teams).");
                 }
 
-                existingAppointment.GoogleMeetUrl = meetingLink;
+                existingAppointment.GoogleMeetLink = meetingLink;
             
                 _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
             

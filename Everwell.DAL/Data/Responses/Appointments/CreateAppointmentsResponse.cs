@@ -23,7 +23,7 @@ public class CreateAppointmentsResponse
 
     public string? Notes { get; set; }
     
-    public string? GoogleMeetUrl { get; set; }
+    public string? GoogleMeetLink { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }
