@@ -29,6 +29,7 @@ namespace Everwell.DAL.Mappers
                     opt => opt.MapFrom(src => src.AppointmentDate))
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.IsVirtual, opt => opt.MapFrom(src => src.IsVirtual))
                 .ForMember(dest => dest.Customer, opt => opt.Ignore()) // Don't map navigation properties
                 .ForMember(dest => dest.Consultant, opt => opt.Ignore()); // Don't map navigation properties
                 // .ForMember(dest => dest.Service, opt => opt.Ignore()); // Don't map navigation properties
@@ -53,6 +54,9 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.ConsultantId, opt => opt.MapFrom(src => src.ConsultantId))
                 .ForMember(dest => dest.Consultant, opt => opt.MapFrom(src => src.Consultant))
                 .ForMember(dest => dest.GoogleMeetLink, opt => opt.MapFrom(src => src.GoogleMeetLink))
+                .ForMember(dest => dest.GoogleEventId, opt => opt.MapFrom(src => src.GoogleEventId))
+                .ForMember(dest => dest.MeetingId, opt => opt.MapFrom(src => src.MeetingId))
+                .ForMember(dest => dest.IsVirtual, opt => opt.MapFrom(src => src.IsVirtual))
                 .ForMember(dest => dest.AppointmentDate, opt => opt.MapFrom(src => src.AppointmentDate))
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
