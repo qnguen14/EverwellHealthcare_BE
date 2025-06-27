@@ -19,4 +19,5 @@ public class CreateAppointmentRequest
     
     public string Notes { get; set; } = string.Empty;
     
+    public bool IsVirtual { get; set; } = true;
 }

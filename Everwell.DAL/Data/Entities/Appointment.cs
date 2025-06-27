@@ -56,6 +56,19 @@ public class Appointment
     [Column("notes", TypeName = "text")]
     public string? Notes { get; set; }
 
+    // Google Meet integration fields
+    [Column("google_meet_url")]
+    public string? GoogleMeetLink { get; set; }
+
+    [Column("google_event_id")]
+    public string? GoogleEventId { get; set; }
+
+    [Column("meeting_id")]
+    public string? MeetingId { get; set; }
+
+    [Column("is_virtual")]
+    public bool IsVirtual { get; set; } = true;
+
     [Required]
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

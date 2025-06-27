@@ -23,5 +23,14 @@ public class CreateAppointmentsResponse
 
     public string? Notes { get; set; }
 
+    // Google Meet integration fields
+    public string? GoogleMeetLink { get; set; }
+
+    public string? GoogleEventId { get; set; }
+
+    public string? MeetingId { get; set; }
+
+    public bool IsVirtual { get; set; }
+
     public DateTime CreatedAt { get; set; }
 }

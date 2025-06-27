@@ -14,10 +14,14 @@ namespace Everwell.API.Controllers;
 public class AppointmentsController : ControllerBase
 {
     private readonly IAppointmentService _appointmentService;
+    private readonly ICalendarService _calendarService;
+    private readonly ILogger<AppointmentsController> _logger;
 
-    public AppointmentsController(IAppointmentService appointmentService)
+    public AppointmentsController(IAppointmentService appointmentService, ICalendarService calendarService, ILogger<AppointmentsController> logger)
     {
         _appointmentService = appointmentService;
+        _calendarService = calendarService;
+        _logger = logger;
     }
 
     [HttpGet(ApiEndpointConstants.Appointment.GetAllAppointmentsEndpoint)]
@@ -145,7 +149,7 @@ public class AppointmentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles =  "Admin,Consultant")]
+    [Authorize(Roles =  "Admin,Consultant, Customer")]
     public async Task<IActionResult> UpdateAppointment(Guid id, UpdateAppointmentRequest request)
     {
         try
@@ -189,6 +193,105 @@ public class AppointmentsController : ControllerBase
                 IsSuccess = true,
                 Data = response
             };
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+
+    [HttpGet(ApiEndpointConstants.Appointment.TestGoogleCalendarEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin,Customer,Consultant")]
+    public async Task<IActionResult> TestGoogleCalendar()
+    {
+        try
+        {
+            // Create a dummy appointment for testing
+            var testAppointment = new Appointment
+            {
+                Id = Guid.NewGuid(),
+                Customer = new User { Name = "Test Customer", Email = "test@customer.com" },
+                Consultant = new User { Name = "Test Consultant", Email = "test@consultant.com" },
+                AppointmentDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+                Slot = ShiftSlot.Morning1,
+                Notes = "Test Google Calendar integration"
+            };
+
+            var meetLink = await _calendarService.CreateVideoMeetingAsync(testAppointment);
+
+            var apiResponse = new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Google Calendar test successful",
+                IsSuccess = true,
+                Data = new 
+                {
+                    MeetingLink = meetLink,
+                    MeetingType = "Jitsi Meet",
+                    TestStatus = "SUCCESS",
+                    Message = "Jitsi Meet integration is working correctly"
+                }
+            };
+
+            return Ok(apiResponse);
+        }
+        catch (Exception ex)
+        {
+            var apiResponse = new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = "Google Calendar test failed",
+                IsSuccess = false,
+                Data = new 
+                {
+                    TestStatus = "FAILED",
+                    Error = ex.Message,
+                    InnerError = ex.InnerException?.Message,
+                    StackTrace = ex.StackTrace
+                }
+            };
+
+            return StatusCode(500, apiResponse);
+        }
+    }
+
+    [HttpGet(ApiEndpointConstants.Appointment.GetGoogleMeetLinkEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin,Customer,Consultant")]
+    public async Task<IActionResult> GetVideoMeetingLink(Guid id)
+    {
+        try
+        {
+            var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+            if (appointment == null)
+                return NotFound(new { message = "Cuộc hẹn không tồn tại." });
+
+            if (!appointment.IsVirtual || string.IsNullOrEmpty(appointment.GoogleMeetLink))
+                return NotFound(new { message = "Cuộc hẹn này không có video meeting link." });
+
+            var apiResponse = new ApiResponse<object>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Video meeting link retrieved successfully",
+                IsSuccess = true,
+                Data = new 
+                {
+                    AppointmentId = appointment.Id,
+                    VideoMeetingLink = appointment.GoogleMeetLink,
+                    MeetingType = "Jitsi Meet",
+                    IsVirtual = appointment.IsVirtual,
+                    AppointmentDate = appointment.AppointmentDate,
+                    Slot = appointment.Slot,
+                    ConsultantName = appointment.Consultant?.Name,
+                    CustomerName = appointment.Customer?.Name
+                }
+            };
+
             return Ok(apiResponse);
         }
         catch (Exception ex)
@@ -311,4 +414,58 @@ public class AppointmentsController : ControllerBase
         }
     }
 
+    [HttpGet("test-google-calendar-simple")]
+    [AllowAnonymous]
+    public async Task<IActionResult> TestGoogleCalendarSimple()
+    {
+        try
+        {
+            // Create a test appointment
+            var testAppointment = new Appointment
+            {
+                Id = Guid.NewGuid(),
+                AppointmentDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+                Slot = ShiftSlot.Morning1,
+                IsVirtual = true,
+                Notes = "Test appointment for Google Calendar",
+                Customer = new User { Name = "Test Patient", Email = "test@everwell.com" },
+                Consultant = new User { Name = "Dr. Test", Email = "doctor@everwell.com" }
+            };
+
+            // Test creating a simple calendar event without Google Meet
+            var calendarService = HttpContext.RequestServices.GetRequiredService<ICalendarService>();
+            
+            // Call a simple calendar test
+            var testResult = await TestSimpleCalendarEvent(calendarService, testAppointment);
+
+            return Ok(ApiResponseBuilder.BuildResponse(200, 
+                testResult ? "Simple calendar event created successfully" : "Failed to create simple calendar event",
+                new 
+                { 
+                    testStatus = testResult ? "SUCCESS" : "FAILED",
+                    message = testResult ? "Simple calendar event created successfully" : "Failed to create simple calendar event"
+                }));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Google Calendar simple test failed");
+            return StatusCode(500, ApiResponseBuilder.BuildErrorResponse(
+                new 
+                { 
+                    testStatus = "FAILED",
+                    error = ex.Message,
+                    innerError = ex.InnerException?.Message,
+                    stackTrace = ex.StackTrace
+                },
+                500,
+                "Google Calendar simple test failed",
+                ex.Message
+            ));
+        }
+    }
+
+    private async Task<bool> TestSimpleCalendarEvent(ICalendarService calendarService, Appointment appointment)
+    {
+        return await calendarService.CreateSimpleCalendarEventAsync(appointment);
+    }
 }
