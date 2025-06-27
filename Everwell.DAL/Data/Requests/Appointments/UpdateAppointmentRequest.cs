@@ -15,6 +15,4 @@ public class UpdateAppointmentRequest
     public AppointmentStatus Status { get; set; }
     
     public string Notes { get; set; }
-    
-    public bool IsVirtual { get; set; }
 }

@@ -58,8 +58,6 @@
             public const string UpdateMeetingLinkEndpoint = AppointmentEndpoint + "/update/meetinglink/{id}";
             public const string CancelAppointmentEndpoint = AppointmentEndpoint + "/cancel/{id}";
             public const string DeleteAppointmentEndpoint = AppointmentEndpoint + "/delete/{id}";
-            public const string GetGoogleMeetLinkEndpoint = AppointmentEndpoint + "/video-meeting/{id}";
-            public const string TestGoogleCalendarEndpoint = AppointmentEndpoint + "/test-google-calendar";
             public const string GetConsultantSchedulesEndpoint = AppointmentEndpoint + "/consultant/schedules";
             public const string GetConsultantSchedulesByIdEndpoint = AppointmentEndpoint + "/consultant/schedules/{id}";
             public const string CreateConsultantScheduleEndpoint = AppointmentEndpoint + "/consultant/schedule/create";

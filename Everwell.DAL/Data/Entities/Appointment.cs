@@ -56,6 +56,7 @@ public class Appointment
     [Column("notes", TypeName = "text")]
     public string? Notes { get; set; }
 
+<<<<<<< HEAD
     [Column("google_meet_url")]
     public string? GoogleMeetLink { get; set; }
 
@@ -69,4 +70,9 @@ public class Appointment
     public bool IsVirtual { get; set; } = true;
 
 
+=======
+    [Required]
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+>>>>>>> parent of 16ef83d (add meet to appointment)
 }

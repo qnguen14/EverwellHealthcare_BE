@@ -502,135 +502,6 @@
         }
       }
     },
-    "/api/v2.5/appointment/test-google-calendar": {
-      "get": {
-        "tags": [
-          "Appointments"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v2.5/appointment/video-meeting/{id}": {
-      "get": {
-        "tags": [
-          "Appointments"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v2.5/appointment/delete/{id}": {
       "delete": {
         "tags": [
@@ -944,18 +815,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/test-google-calendar-simple": {
-      "get": {
-        "tags": [
-          "Appointments"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         }
       }
@@ -7193,9 +7052,6 @@
           "notes": {
             "type": "string",
             "nullable": true
-          },
-          "isVirtual": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -7234,21 +7090,6 @@
           "notes": {
             "type": "string",
             "nullable": true
-          },
-          "googleMeetLink": {
-            "type": "string",
-            "nullable": true
-          },
-          "googleEventId": {
-            "type": "string",
-            "nullable": true
-          },
-          "meetingId": {
-            "type": "string",
-            "nullable": true
-          },
-          "isVirtual": {
-            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -10134,9 +9975,6 @@
           "notes": {
             "type": "string",
             "nullable": true
-          },
-          "isVirtual": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false

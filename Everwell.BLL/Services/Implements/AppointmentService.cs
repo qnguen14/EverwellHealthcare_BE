@@ -13,20 +13,12 @@ namespace Everwell.BLL.Services.Implements;
 
 public class AppointmentService : BaseService<AppointmentService>, IAppointmentService
 {
-    private readonly ICalendarService _calendarService;
-
-    public AppointmentService(
-        IUnitOfWork<EverwellDbContext> unitOfWork, 
-        ILogger<AppointmentService> logger, 
-        IMapper mapper, 
-        IHttpContextAccessor httpContextAccessor,
-        ICalendarService calendarService)
+    public AppointmentService(IUnitOfWork<EverwellDbContext> unitOfWork, ILogger<AppointmentService> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _mapper = mapper;
-        _calendarService = calendarService;
     }
 
     #region Helper methods
@@ -216,49 +208,13 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             if (newAppointment.Id == Guid.Empty)
                 newAppointment.Id = Guid.NewGuid(); // Ensure Id is set
 
-            // Load customer and consultant information for Google Meet
-            var customer = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
-                predicate: u => u.Id == request.CustomerId);
-            var consultant = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
-                predicate: u => u.Id == request.ConsultantId);
-            
-            newAppointment.Customer = customer;
-            newAppointment.Consultant = consultant;
-
-            // Create Jitsi Meet if appointment is virtual
-            if (request.IsVirtual)
-            {
-                try
-                {
-                    var meetLink = await _calendarService.CreateVideoMeetingAsync(newAppointment);
-                    newAppointment.GoogleMeetLink = meetLink;
-                    newAppointment.IsVirtual = true;
-                    
-                    _logger.LogInformation("Jitsi Meet created for appointment {AppointmentId}: {MeetLink}", 
-                        newAppointment.Id, meetLink);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to create Jitsi Meet for appointment {AppointmentId}", newAppointment.Id);
-                    // Continue without video meeting if creation fails
-                    newAppointment.IsVirtual = false;
-                }
-            }
-
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
-
-            var notificationMessage = request.IsVirtual && !string.IsNullOrEmpty(newAppointment.GoogleMeetLink)
-                ? $"Cuộc hẹn trực tuyến của bạn với {newAppointment.Consultant?.Name} " +
-                  $"vào ngày {newAppointment.AppointmentDate} " +
-                  $"lúc {GetReadableTimeSlot(newAppointment.Slot)} đã được đặt thành công. " +
-                  $"Link video meeting: {newAppointment.GoogleMeetLink}"
-                : $"Cuộc hẹn của bạn với {newAppointment.Consultant?.Name} " +
-                  $"vào ngày {newAppointment.AppointmentDate} " +
-                  $"lúc {GetReadableTimeSlot(newAppointment.Slot)} đã được đặt thành công.";
 
             await CreateAppointmentNotification(newAppointment,
                 "Cuộc hẹn đã được đặt",
-                notificationMessage);
+                $"Cuộc hẹn của bạn với {newAppointment.Consultant?.Name} " +
+                $"vào ngày {newAppointment.AppointmentDate} " +
+                $"lúc {GetReadableTimeSlot(newAppointment.Slot)} đã được đặt thành công.");
 
             return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
         });
@@ -294,74 +250,14 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 existingAppointment.Status = request.Status;
                 existingAppointment.Notes = request.Notes;
                 
-                // Handle virtual meeting changes
-                bool wasVirtual = existingAppointment.IsVirtual;
-                existingAppointment.IsVirtual = request.IsVirtual;
-                
-                // If changing from non-virtual to virtual, create Jitsi Meet
-                if (!wasVirtual && request.IsVirtual)
-                {
-                    try
-                    {
-                        var meetLink = await _calendarService.CreateVideoMeetingAsync(existingAppointment);
-                        existingAppointment.GoogleMeetLink = meetLink;
-                        
-                        _logger.LogInformation("Jitsi Meet created for updated appointment {AppointmentId}: {MeetLink}", 
-                            existingAppointment.Id, meetLink);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to create Jitsi Meet for updated appointment {AppointmentId}", existingAppointment.Id);
-                        // Continue without video meeting if creation fails
-                        existingAppointment.IsVirtual = false;
-                    }
-                }
-                // If changing from virtual to non-virtual, remove video meeting
-                else if (wasVirtual && !request.IsVirtual)
-                {
-                    if (!string.IsNullOrEmpty(existingAppointment.GoogleEventId))
-                    {
-                        try
-                        {
-                            await _calendarService.DeleteCalendarEventAsync(existingAppointment.GoogleEventId);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to delete calendar event for appointment {AppointmentId}", existingAppointment.Id);
-                        }
-                    }
-                    existingAppointment.GoogleMeetLink = null;
-                    existingAppointment.GoogleEventId = null;
-                    existingAppointment.MeetingId = null;
-                }
-                // If already virtual and still virtual, update the meeting
-                else if (wasVirtual && request.IsVirtual && !string.IsNullOrEmpty(existingAppointment.GoogleEventId))
-                {
-                    try
-                    {
-                        await _calendarService.UpdateCalendarEventAsync(existingAppointment.GoogleEventId, existingAppointment);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to update calendar event for appointment {AppointmentId}", existingAppointment.Id);
-                    }
-                }
-                
                 _unitOfWork.GetRepository<Appointment>().UpdateAsync(existingAppointment);
                 
 
-                var updateMessage = existingAppointment.IsVirtual && !string.IsNullOrEmpty(existingAppointment.GoogleMeetLink)
-                    ? $"Cuộc hẹn trực tuyến của bạn với {existingAppointment.Consultant.Name} " +
-                      $"vào ngày {existingAppointment.AppointmentDate} " +
-                      $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã được cập nhật. " +
-                      $"Link video meeting: {existingAppointment.GoogleMeetLink}"
-                    : $"Cuộc hẹn của bạn với {existingAppointment.Consultant.Name} " +
-                      $"vào ngày {existingAppointment.AppointmentDate} " +
-                      $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã được cập nhật.";
-
                 await CreateAppointmentNotification(existingAppointment, 
                     "Cuộc hẹn đã được cập nhật", 
-                    updateMessage);
+                    $"Cuộc hẹn của bạn với {existingAppointment.Consultant.Name} " +
+                    $"vào ngày {existingAppointment.AppointmentDate} " +
+                    $"lúc {GetReadableTimeSlot(existingAppointment.Slot)} đã đuợc cập nhật.");
 
                 return _mapper.Map<CreateAppointmentsResponse>(existingAppointment);
             });
