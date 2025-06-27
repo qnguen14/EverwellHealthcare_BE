@@ -8600,6 +8600,21 @@
             "type": "string",
             "nullable": true
           },
+          "googleMeetLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "googleEventId": {
+            "type": "string",
+            "nullable": true
+          },
+          "meetingId": {
+            "type": "string",
+            "nullable": true
+          },
+          "isVirtual": {
+            "type": "boolean"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"

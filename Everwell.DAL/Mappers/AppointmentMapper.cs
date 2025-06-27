@@ -84,6 +84,10 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.GoogleMeetLink, opt => opt.MapFrom(src => src.GoogleMeetLink))
+                .ForMember(dest => dest.GoogleEventId, opt => opt.MapFrom(src => src.GoogleEventId))
+                .ForMember(dest => dest.MeetingId, opt => opt.MapFrom(src => src.MeetingId))
+                .ForMember(dest => dest.IsVirtual, opt => opt.MapFrom(src => src.IsVirtual))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
             
             // Appointment to DeleteAppointmentResponse

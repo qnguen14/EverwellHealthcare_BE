@@ -19,6 +19,14 @@ public class GetAppointmentConsultantResponse
     public AppointmentStatus Status { get; set; }
 
     public string? Notes { get; set; }
+    
+    public string? GoogleMeetLink { get; set; }
+    
+    public string? GoogleEventId { get; set; }
+    
+    public string? MeetingId { get; set; }
+    
+    public bool IsVirtual { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }
