@@ -52,7 +52,7 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
                 .ForMember(dest => dest.ConsultantId, opt => opt.MapFrom(src => src.ConsultantId))
                 .ForMember(dest => dest.Consultant, opt => opt.MapFrom(src => src.Consultant))
-                .ForMember(dest => dest.GoogleMeetUrl, opt => opt.MapFrom(src => src.GoogleMeetUrl))
+                // .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceId))
                 .ForMember(dest => dest.AppointmentDate, opt => opt.MapFrom(src => src.AppointmentDate))
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))

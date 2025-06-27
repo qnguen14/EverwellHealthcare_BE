@@ -55,7 +55,6 @@
             public const string GetAppointmentEndpoint = AppointmentEndpoint + "/{id}";
             public const string CreateAppointmentEndpoint = AppointmentEndpoint + "/create";
             public const string UpdateAppointmentEndpoint = AppointmentEndpoint + "/update/{id}";
-            public const string UpdateMeetingLinkEndpoint = AppointmentEndpoint + "/update/meetinglink/{id}";
             public const string CancelAppointmentEndpoint = AppointmentEndpoint + "/cancel/{id}";
             public const string DeleteAppointmentEndpoint = AppointmentEndpoint + "/delete/{id}";
             public const string GetGoogleMeetLinkEndpoint = AppointmentEndpoint + "/video-meeting/{id}";
