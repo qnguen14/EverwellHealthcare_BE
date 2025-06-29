@@ -67,7 +67,9 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
+builder.Services.AddScoped<IAgoraService, AgoraService>();
 builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.MenstrualCycleNotificationService>();
+builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.AgoraChannelManagementService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -126,11 +128,26 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(options =>
 {
-    options.SetIsOriginAllowed(origin =>
-            origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
+    if (app.Environment.IsDevelopment())
+    {
+        // Development: Allow localhost
+        options.SetIsOriginAllowed(origin =>
+                origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    }
+    else
+    {
+        // Production: Specify exact domains
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+            ?? new[] { "https://your-production-domain.com" };
+            
+        options.WithOrigins(allowedOrigins)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    }
 });
 
 app.UseHttpsRedirection();

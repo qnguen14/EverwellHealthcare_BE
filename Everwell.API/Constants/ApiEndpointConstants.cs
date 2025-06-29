@@ -180,5 +180,13 @@
             public const string MarkAsRead = NotificationEndpoint + "/mark/{id}";
             public const string DeleteNotificationEndpoint = NotificationEndpoint + "/delete/{id}";
         }
+
+        public static class Meeting
+        {
+            public const string MeetingEndpoint = ApiEndpoint + "/meeting";
+            public const string JoinMeetingEndpoint = MeetingEndpoint + "/join/{appointmentId}";
+            public const string GetMeetingInfoEndpoint = MeetingEndpoint + "/appointment/{appointmentId}/meeting-info";
+            public const string GetChannelStatusEndpoint = MeetingEndpoint + "/channel/{channelName}/status";
+        }
     }
 }
