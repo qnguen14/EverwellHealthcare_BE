@@ -95,6 +95,27 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Everwell.API.Controllers.MeetingController",
+    "Method": "TestDailyPreScheduled",
+    "RelativePath": "api/Meeting/test-daily-prescheduled",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userRole",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "hoursFromNow",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
     "Method": "GetAllMenstrualCycleTrackings",
     "RelativePath": "api/menstrual-cycle-trackings",

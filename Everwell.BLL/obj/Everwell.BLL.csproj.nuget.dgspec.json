@@ -67,6 +67,10 @@
               "target": "Package",
               "version": "[2.3.0, )"
             },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Microsoft.IdentityModel.JsonWebTokens": {
               "target": "Package",
               "version": "[8.11.0, )"

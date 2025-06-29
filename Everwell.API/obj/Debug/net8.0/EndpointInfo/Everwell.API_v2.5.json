@@ -2246,6 +2246,37 @@
         }
       }
     },
+    "/api/Meeting/test-daily-prescheduled": {
+      "get": {
+        "tags": [
+          "Meeting"
+        ],
+        "parameters": [
+          {
+            "name": "userRole",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "user1"
+            }
+          },
+          {
+            "name": "hoursFromNow",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/menstrual-cycle-trackings": {
       "get": {
         "tags": [

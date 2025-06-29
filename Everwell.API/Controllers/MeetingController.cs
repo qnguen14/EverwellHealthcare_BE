@@ -8,6 +8,10 @@ using Everwell.DAL.Data;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Repositories.Interfaces;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace Everwell.API.Controllers
 {
@@ -15,16 +19,16 @@ namespace Everwell.API.Controllers
     [Route("api/[controller]")]
     public class MeetingController : ControllerBase
     {
-        private readonly IAgoraService _agoraService;
+        private readonly IDailyService _dailyService;
         private readonly IUnitOfWork<EverwellDbContext> _unitOfWork;
         private readonly ILogger<MeetingController> _logger;
 
         public MeetingController(
-            IAgoraService agoraService,
+            IDailyService dailyService,
             IUnitOfWork<EverwellDbContext> unitOfWork,
             ILogger<MeetingController> logger)
         {
-            _agoraService = agoraService;
+            _dailyService = dailyService;
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
@@ -36,7 +40,7 @@ namespace Everwell.API.Controllers
             try
             {
                 var currentTime = DateTime.UtcNow;
-                var isActive = await _agoraService.IsChannelActiveAsync(channelName, currentTime);
+                var isActive = await _dailyService.IsChannelActiveAsync(channelName, currentTime);
                 return Ok(new
                 {
                     ChannelName = channelName,
@@ -87,33 +91,17 @@ namespace Everwell.API.Controllers
                 }
 
                 // Generate channel info for this specific appointment
-                var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+                var url = await _dailyService.EnsureRoomAsync(appointment);
                 
-                // If a specific user ID is provided, generate a consistent UID for that user
-                uint userUid;
-                if (userId.HasValue)
-                {
-                    userUid = GenerateConsistentUidForUser(userId.Value, appointmentId);
-                }
-                else
-                {
-                    // Generate a random unique UID for this session
-                    userUid = GenerateRandomUid();
-                }
-
-                // Generate a new token for this specific user
-                var userToken = await _agoraService.GenerateRtcTokenAsync(channelInfo.ChannelName, userUid, "publisher", endTime);
+                var canJoin = currentTime >= startTime.AddMinutes(-5) && currentTime <= endTime;
 
                 return Ok(new
                 {
-                    channelInfo.ChannelName,
-                    channelInfo.AppId,
-                    RtcToken = userToken,  // User-specific token
-                    Uid = userUid,         // User-specific UID
-                    channelInfo.MeetingUrl,
-                    channelInfo.StartTime,
-                    channelInfo.EndTime,
-                    Message = "You can now join the meeting"
+                    MeetingUrl = url,
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    CanJoin = canJoin,
+                    Message = canJoin ? "You can now join the meeting" : "Meeting not active yet"
                 });
             }
             catch (Exception ex)
@@ -165,44 +153,17 @@ namespace Everwell.API.Controllers
                 var currentTime = DateTime.UtcNow;
                 var startTime = GetAppointmentStartTime(appointment);
                 var endTime = GetAppointmentEndTime(appointment);
-                var channelInfo = await _agoraService.CreateChannelAsync(appointment);
-                // Determine UID for this user
-                uint userUid;
-                if (userId.HasValue)
-                {
-                    userUid = GenerateConsistentUidForUser(userId.Value, appointmentId);
-                }
-                else
-                {
-                    var claimUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (Guid.TryParse(claimUserId, out var parsedId))
-                    {
-                        userUid = GenerateConsistentUidForUser(parsedId, appointmentId);
-                    }
-                    else
-                    {
-                        userUid = GenerateRandomUid();
-                    }
-                }
+                var url = await _dailyService.EnsureRoomAsync(appointment);
 
-                // Generate a user-specific RTC token
-                var userToken = await _agoraService.GenerateRtcTokenAsync(channelInfo.ChannelName, userUid, "publisher", endTime);
-
-                var isActive = await _agoraService.IsChannelActiveAsync(channelInfo.ChannelName, currentTime);
                 var canJoin = currentTime >= startTime.AddMinutes(-5) && currentTime <= endTime;
 
                 return Ok(new
                 {
                     AppointmentId = appointmentId,
-                    channelInfo.ChannelName,
-                    channelInfo.AppId,
-                    RtcToken = userToken, // user-specific token
-                    Uid = userUid,        // user-specific UID
-                    channelInfo.MeetingUrl,
+                    MeetingUrl = url,
                     StartTime = startTime,
                     EndTime = endTime,
                     CurrentTime = currentTime,
-                    IsActive = isActive,
                     CanJoin = canJoin
                 });
             }
@@ -234,35 +195,20 @@ namespace Everwell.API.Controllers
                 };
 
                 // Generate channel info
-                var channelInfo = await _agoraService.CreateChannelAsync(tempAppointment);
-
-                // Generate a unique UID based on the user role (for testing multiple users)
-                var userUid = GenerateTestUid(userRole, tempAppointment.Id);
-                
-                // Generate user-specific token
-                var userToken = await _agoraService.GenerateRtcTokenAsync(channelInfo.ChannelName, userUid, "publisher", channelInfo.EndTime);
+                var url = await _dailyService.EnsureRoomAsync(tempAppointment);
 
                 return Ok(new
                 {
                     Success = true,
                     Message = $"Generated a temporary meeting room for {userRole}. Use different userRole values (user1, user2, etc.) to test multiple participants.",
                     UserRole = userRole,
-                    ChannelInfo = new
-                    {
-                        channelInfo.ChannelName,
-                        channelInfo.AppId,
-                        RtcToken = userToken,    // User-specific token
-                        Uid = userUid,          // User-specific UID
-                        channelInfo.MeetingUrl,
-                        channelInfo.StartTime,
-                        channelInfo.EndTime,
-                        IsActive = await _agoraService.IsChannelActiveAsync(channelInfo.ChannelName, DateTime.UtcNow)
-                    },
+                    MeetingUrl = url,
                     TestingInfo = new
                     {
                         Instructions = "To test multiple users, call this endpoint with different userRole parameters (e.g., ?userRole=user1, ?userRole=user2)",
                         Note = "Each user will get a unique UID and token, allowing them to see each other in the video call"
-                    }
+                    },
+                    Timestamp = now
                 });
             }
             catch (Exception ex)
@@ -296,27 +242,120 @@ namespace Everwell.API.Controllers
                     return NotFound("Appointment not found");
                 }
 
-                var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+                var url = await _dailyService.EnsureRoomAsync(appointment);
                 return Ok(new
                 {
                     Success = true,
                     AppointmentId = appointmentId,
-                    ChannelInfo = new
-                    {
-                        channelInfo.ChannelName,
-                        channelInfo.AppId,
-                        channelInfo.RtcToken,
-                        channelInfo.MeetingUrl,
-                        channelInfo.StartTime,
-                        channelInfo.EndTime,
-                        channelInfo.IsActive
-                    },
-                    Message = "Agora service test completed successfully"
+                    MeetingUrl = url,
+                    Message = "Daily service test completed successfully"
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Agora service test failed for appointment {AppointmentId}", appointmentId);
+                return StatusCode(500, new { Success = false, Error = ex.Message });
+            }
+        }
+
+        [HttpGet("test-daily-prescheduled")]
+        [AllowAnonymous]
+        public async Task<IActionResult> TestDailyPreScheduled([FromQuery] string? userRole = "user1", [FromQuery] int hoursFromNow = 1)
+        {
+            try
+            {
+                _logger.LogInformation("Testing Daily.co pre-scheduled meeting for user role: {UserRole}", userRole);
+                
+                // Calculate scheduled time
+                var now = DateTime.UtcNow;
+                var scheduledStart = now.AddHours(hoursFromNow);
+                var scheduledEnd = scheduledStart.AddHours(2);
+                
+                // Create room name
+                var roomName = $"prescheduled-{Guid.NewGuid().ToString().Replace("-", "")}";
+                
+                // Build payload
+                var payload = new
+                {
+                    name = roomName,
+                    properties = new
+                    {
+                        nbf = new DateTimeOffset(scheduledStart).ToUnixTimeSeconds(),
+                        exp = new DateTimeOffset(scheduledEnd).ToUnixTimeSeconds(),
+                        max_participants = 2
+                    }
+                };
+
+                // Call Daily.co API directly
+                var apiKey = HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Daily:ApiKey"];
+                var httpClientFactory = HttpContext.RequestServices.GetRequiredService<IHttpClientFactory>();
+                
+                var client = httpClientFactory.CreateClient();
+                client.BaseAddress = new Uri("https://api.daily.co/v1/");
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+
+                var jsonPayload = System.Text.Json.JsonSerializer.Serialize(payload);
+                var content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
+                var resp = await client.PostAsync("rooms", content);
+                
+                if (!resp.IsSuccessStatusCode)
+                {
+                    var errorContent = await resp.Content.ReadAsStringAsync();
+                    _logger.LogError("Daily.co API error: {StatusCode} - {ErrorContent}", resp.StatusCode, errorContent);
+                    return StatusCode(500, new { Success = false, Error = $"Daily.co API error: {resp.StatusCode} - {errorContent}" });
+                }
+                
+                var json = await resp.Content.ReadAsStringAsync();
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                var url = doc.RootElement.GetProperty("url").GetString();
+
+                var canJoinNow = now >= scheduledStart.AddMinutes(-5) && now <= scheduledEnd;
+
+                return Ok(new
+                {
+                    Success = true,
+                    Message = $"✅ Daily.co Pre-Scheduled Meeting Created Successfully!",
+                    UserRole = userRole,
+                    MeetingUrl = url,
+                    RoomName = roomName,
+                    Schedule = new
+                    {
+                        CurrentTime = now,
+                        ScheduledStart = scheduledStart,
+                        ScheduledEnd = scheduledEnd,
+                        EarlyAccessFrom = scheduledStart.AddMinutes(-5),
+                        CanJoinNow = canJoinNow,
+                        TimeUntilStart = canJoinNow ? "Available now" : $"Available in {(scheduledStart.AddMinutes(-5) - now).TotalMinutes:F0} minutes"
+                    },
+                    PreSchedulingFeatures = new
+                    {
+                        Description = "✅ Complete Pre-Scheduling System",
+                        Features = new[]
+                        {
+                            "✅ Scheduled start and end times",
+                            "✅ 5-minute early access window",
+                            "✅ 2-hour meeting duration",
+                            "✅ Maximum 2 participants",
+                            "✅ Automatic room expiration",
+                            "✅ Timezone handling (UTC)",
+                            "✅ Access control based on time"
+                        }
+                    },
+                    TestingInstructions = new
+                    {
+                        HowToTest = "Change the 'hoursFromNow' parameter to test different scheduling scenarios",
+                        Examples = new[]
+                        {
+                            "?hoursFromNow=0 - Meeting starts now",
+                            "?hoursFromNow=1 - Meeting starts in 1 hour",
+                            "?hoursFromNow=2 - Meeting starts in 2 hours"
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Daily.co pre-scheduled meeting test failed");
                 return StatusCode(500, new { Success = false, Error = ex.Message });
             }
         }

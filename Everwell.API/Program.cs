@@ -29,6 +29,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenWithAuth();
 builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<EverwellDbContext>(options =>
 {
@@ -67,9 +68,9 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
-builder.Services.AddScoped<IAgoraService, AgoraService>();
+builder.Services.AddScoped<IDailyService, DailyService>();
+builder.Services.AddSingleton<IAgoraService, NullAgoraService>();
 builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.MenstrualCycleNotificationService>();
-builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.AgoraChannelManagementService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
