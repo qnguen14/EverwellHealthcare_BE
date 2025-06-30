@@ -9,7 +9,8 @@ public enum AppointmentStatus
     Scheduled,
     Completed,
     Cancelled,
-    NoShow
+    NoShow,
+    Temp
 }
 
 public enum ShiftSlot

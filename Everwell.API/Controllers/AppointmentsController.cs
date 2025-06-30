@@ -122,7 +122,7 @@ public class AppointmentsController : ControllerBase
             var response = await _appointmentService.CreateAppointmentAsync(request);
             if (response == null)
             {
-                return NotFound(new { message = "Cuộc hẹn này đã được đặt với ngày và giờ này." });
+                return NotFound(new { message = "Cuộc hẹn này đã được đặt hoặc ngày chọn không hợp lệ." });
             }
 
             var apiResponse = new ApiResponse<CreateAppointmentsResponse>

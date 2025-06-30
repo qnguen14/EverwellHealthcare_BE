@@ -11,83 +11,127 @@ namespace Everwell.BLL.Services.Implements;
 public class CalendarService : BaseService<CalendarService>, ICalendarService
 {
     private readonly IConfiguration _configuration;
+    private readonly IAgoraService _agoraService;
 
     public CalendarService(
         IUnitOfWork<EverwellDbContext> unitOfWork,
         ILogger<CalendarService> logger,
         IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IAgoraService agoraService)
         : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _configuration = configuration;
+        _agoraService = agoraService;
     }
 
     public async Task<string> CreateVideoMeetingAsync(Appointment appointment)
     {
+        _logger.LogInformation("🔍 DEBUG - CalendarService.CreateVideoMeetingAsync called for appointment {AppointmentId}", appointment.Id);
+        
         try
         {
-            // Generate Jitsi Meet link
-            var jitsiMeetLink = GenerateJitsiMeetLink(appointment);
+            if (appointment == null)
+            {
+                throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null");
+            }
+
+            _logger.LogInformation("🔍 DEBUG - About to call _agoraService.CreateChannelAsync");
+            // Create Agora channel with time-based access
+            var channelInfo = await _agoraService.CreateChannelAsync(appointment);
             
-            _logger.LogInformation("Generated Jitsi Meet link for appointment {AppointmentId}: {MeetingLink}", 
-                appointment.Id, jitsiMeetLink);
+            if (channelInfo == null)
+            {
+                throw new Exception("AgoraService returned null channel info");
+            }
+
+            if (string.IsNullOrEmpty(channelInfo.MeetingUrl))
+            {
+                throw new Exception("AgoraService returned empty meeting URL");
+            }
+
+            _logger.LogInformation("🔍 DEBUG - _agoraService.CreateChannelAsync succeeded, channelInfo.MeetingUrl: {MeetingUrl}", channelInfo.MeetingUrl);
             
-            return await Task.FromResult(jitsiMeetLink);
+            _logger.LogInformation("✅ Created Agora channel for appointment {AppointmentId}: {ChannelName} from {StartTime} to {EndTime}", 
+                appointment.Id, channelInfo.ChannelName, channelInfo.StartTime, channelInfo.EndTime);
+            
+            return channelInfo.MeetingUrl;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to create video meeting for appointment {AppointmentId}", appointment.Id);
-            
-            // Even if there's an error, still return the Jitsi Meet link
-            return await Task.FromResult(GenerateJitsiMeetLink(appointment));
+            _logger.LogError(ex, "❌ Failed to create Agora video meeting for appointment {AppointmentId}", appointment.Id);
+            throw;
         }
-    }
-
-    private string GenerateJitsiMeetLink(Appointment appointment)
-    {
-        // Generate a unique room name based on appointment details
-        var roomName = $"everwell-{appointment.Id.ToString("N")[..12]}-{appointment.AppointmentDate:yyyyMMdd}";
-        
-        // Use custom Jitsi domain if configured, otherwise use meet.jit.si
-        var jitsiDomain = _configuration["JitsiMeet:Domain"] ?? "meet.jit.si";
-        var meetingLink = $"https://{jitsiDomain}/{roomName}";
-        
-        _logger.LogInformation("Generated Jitsi Meet link for appointment {AppointmentId}: {MeetingLink}", 
-            appointment.Id, meetingLink);
-        
-        return meetingLink;
     }
 
     public async Task<bool> UpdateCalendarEventAsync(string eventId, Appointment appointment)
     {
-        // For Jitsi Meet, we don't need to update external calendar events
-        // The meeting link is regenerated based on appointment details
-        _logger.LogInformation("Calendar event update requested for appointment {AppointmentId}, but not needed for Jitsi Meet", appointment.Id);
-        return await Task.FromResult(true);
+        try
+        {
+            // Disable old channel and create new one for updated appointment
+            await _agoraService.DisableChannelAsync(eventId);
+            var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+            
+            _logger.LogInformation("Updated Agora channel for appointment {AppointmentId}", appointment.Id);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update Agora channel for appointment {AppointmentId}", appointment.Id);
+            return false;
+        }
     }
 
     public async Task<bool> DeleteCalendarEventAsync(string eventId)
     {
-        // For Jitsi Meet, we don't need to delete external calendar events
-        // The meeting room is automatically cleaned up by Jitsi
-        _logger.LogInformation("Calendar event deletion requested for event {EventId}, but not needed for Jitsi Meet", eventId);
-        return await Task.FromResult(true);
+        try
+        {
+            // Disable the Agora channel
+            var result = await _agoraService.DisableChannelAsync(eventId);
+            
+            _logger.LogInformation("Disabled Agora channel {ChannelName}", eventId);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to disable Agora channel {ChannelName}", eventId);
+            return false;
+        }
     }
 
     public async Task<string> GenerateMeetingLinkAsync(string eventId)
     {
-        // For Jitsi Meet, we can't retrieve the link from external events
-        // This would need to be stored in the database or regenerated
-        _logger.LogWarning("Cannot retrieve Jitsi Meet link from external event {EventId}. Link should be stored in database.", eventId);
-        return await Task.FromResult(string.Empty);
+        try
+        {
+            // For Agora, we need the full appointment info to generate proper channel data
+            _logger.LogInformation("Generating new meeting link for channel {ChannelName}", eventId);
+            
+            // This is a simplified approach - in production you might want to store more info
+            // or reconstruct the appointment from the eventId
+            return $"{_configuration["Agora:BaseUrl"]}/{eventId}";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to generate meeting link for channel {ChannelName}", eventId);
+            return string.Empty;
+        }
     }
 
     public async Task<bool> CreateSimpleCalendarEventAsync(Appointment appointment)
     {
-        // This is a no-op for Jitsi Meet since we don't integrate with external calendars
-        // Users can manually add the Jitsi Meet link to their own calendars
-        _logger.LogInformation("Simple calendar event creation requested for appointment {AppointmentId}. With Jitsi Meet, users can manually add the meeting link to their calendars.", appointment.Id);
-        return await Task.FromResult(true);
+        try
+        {
+            // Create Agora channel with time-based access
+            var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+            
+            _logger.LogInformation("Created simple calendar event for appointment {AppointmentId}", appointment.Id);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create simple calendar event for appointment {AppointmentId}", appointment.Id);
+            return false;
+        }
     }
 } 

@@ -76,7 +76,6 @@ namespace Everwell.BLL.Services.Implements
                         predicate: n => n.UserId == userId,
                         include: a => a.Include(nt => nt.TestResult)
                             .Include(nt => nt.Appointment)
-                            .Include(nt => nt.TestResult)
                             .Include(nt => nt.STITesting)
                             .Include(nt => nt.Question)
                             .Include(nt => nt.Customer),
@@ -108,7 +107,6 @@ namespace Everwell.BLL.Services.Implements
                                             n.IsRead == false && n.Customer.IsActive == true,  
                             include: n => n.Include(nt => nt.TestResult)
                                 .Include(nt => nt.Appointment)
-                                .Include(nt => nt.TestResult)
                                 .Include(nt => nt.Customer));
 
                     if (notification == null)
@@ -141,7 +139,6 @@ namespace Everwell.BLL.Services.Implements
                                             n.IsRead == false && n.Customer.IsActive == true,  
                             include: n => n.Include(nt => nt.TestResult)
                                 .Include(nt => nt.Appointment)
-                                .Include(nt => nt.TestResult)
                                 .Include(nt => nt.Customer));
 
                     if (notification == null)

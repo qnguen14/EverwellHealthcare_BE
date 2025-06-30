@@ -17,8 +17,8 @@ public class CreateAppointmentsResponse
 
     public DateOnly AppointmentDate { get; set; }
 
-    public ShiftSlot Slot { get; set; }
-
+    public ShiftSlot? Slot { get; set; }
+    
     public AppointmentStatus Status { get; set; }
 
     public string? Notes { get; set; }
