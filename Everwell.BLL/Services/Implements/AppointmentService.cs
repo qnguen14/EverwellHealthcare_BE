@@ -28,6 +28,18 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
     }
 
     #region Helper methods
+
+    private bool IsValidDate(DateOnly date)
+    {
+        // Check if the requested date is in the future
+        return date > DateOnly.FromDateTime(DateTime.UtcNow) ? true : false;
+    }
+    
+    private bool IsCancelled(Appointment appointment)
+    {
+        // Check if the appointment is cancelled
+        return appointment.Status == AppointmentStatus.Cancelled;
+    }
     
     private string ExtractRoomNameFromUrl(string url)
     {
@@ -218,112 +230,126 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
     }
     
     public async Task<CreateAppointmentsResponse> CreateAppointmentAsync(CreateAppointmentRequest request)
-    {
-        try
-        {
-            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
-        {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request), "request cannot be null.");
-
-            var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
-                .FirstOrDefaultAsync(
-                    predicate: a => a.AppointmentDate == request.AppointmentDate
-                                    && a.Slot == request.Slot
-                                    && a.ConsultantId == request.ConsultantId,
-                    include: a => a.Include(ap => ap.Customer)
-                                   .Include(ap => ap.Consultant)
-                );
-            if (existingAppointment != null &&
-                existingAppointment.Customer.IsActive &&
-                existingAppointment.Consultant.IsActive)
-            {
-                throw new BadRequestException(
-                    "An appointment already exists for the specified date, slot, and consultant.");
-            }
-
-            var newAppointment = _mapper.Map<Appointment>(request);
-            if (newAppointment.Id == Guid.Empty)
-                newAppointment.Id = Guid.NewGuid(); // Ensure Id is set
-
-            // Load customer and consultant information for video meeting
-            var customer = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
-                predicate: u => u.Id == request.CustomerId);
-            var consultant = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
-                predicate: u => u.Id == request.ConsultantId);
-            
-            newAppointment.Customer = customer;
-            newAppointment.Consultant = consultant;
-
-            // Set the virtual meeting flag as requested
-            newAppointment.IsVirtual = request.IsVirtual;
-            
-            // Create Agora channel if appointment is virtual
-            if (request.IsVirtual)
-            {
-                try
                 {
-                    _logger.LogInformation("🔍 Creating Agora meeting for virtual appointment {AppointmentId}", newAppointment.Id);
-                    var meetLink = await _calendarService.CreateVideoMeetingAsync(newAppointment);
-                    
-                    if (string.IsNullOrEmpty(meetLink))
+                    try
                     {
-                        throw new Exception("Meeting link generation returned null or empty");
+                        return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                        {
+                            if (request == null)
+                                throw new ArgumentNullException(nameof(request), "request cannot be null.");
+                
+                            if (!IsValidDate(request.AppointmentDate))
+                            {
+                                _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
+                                return null;
+                            }
+                
+                            var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
+                                .FirstOrDefaultAsync(
+                                    predicate: a => a.AppointmentDate == request.AppointmentDate
+                                                    && a.Slot == request.Slot
+                                                    && a.ConsultantId == request.ConsultantId,
+                                    include: a => a.Include(ap => ap.Customer)
+                                                   .Include(ap => ap.Consultant)
+                                );
+                
+                            if (existingAppointment != null &&
+                                existingAppointment.Customer.IsActive &&
+                                existingAppointment.Consultant.IsActive &&
+                                !IsCancelled(existingAppointment))
+                            {
+                                throw new BadRequestException(
+                                    "An appointment already exists for the specified date, slot, and consultant.");
+                            }
+                
+                            var newAppointment = _mapper.Map<Appointment>(request);
+                            if (newAppointment.Id == Guid.Empty)
+                                newAppointment.Id = Guid.NewGuid(); // Ensure Id is set
+                
+                            // Load customer and consultant information for video meeting
+                            var customer = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
+                                predicate: u => u.Id == request.CustomerId);
+                            var consultant = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(
+                                predicate: u => u.Id == request.ConsultantId);
+                            
+                            newAppointment.Customer = customer;
+                            newAppointment.Consultant = consultant;
+                
+                            // Set the virtual meeting flag as requested
+                            newAppointment.IsVirtual = request.IsVirtual;
+                            
+                            // Create Agora channel if appointment is virtual
+                            if (request.IsVirtual)
+                            {
+                                try
+                                {
+                                    _logger.LogInformation("🔍 Creating Agora meeting for virtual appointment {AppointmentId}", newAppointment.Id);
+                                    var meetLink = await _calendarService.CreateVideoMeetingAsync(newAppointment);
+                                    
+                                    if (string.IsNullOrEmpty(meetLink))
+                                    {
+                                        throw new Exception("Meeting link generation returned null or empty");
+                                    }
+                                    
+                                    newAppointment.GoogleMeetLink = meetLink; // Store Agora meeting URL
+                                    newAppointment.MeetingId = ExtractRoomNameFromUrl(meetLink); // Store channel name
+                                    
+                                    _logger.LogInformation("✅ Agora channel created successfully for appointment {AppointmentId}: {MeetLink}", 
+                                        newAppointment.Id, meetLink);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "❌ Failed to create Agora channel for appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", newAppointment.Id);
+                                    _logger.LogError("🔍 DEBUG - Agora error details: {ErrorMessage}", ex.Message);
+                                    _logger.LogError("🔍 DEBUG - Agora stack trace: {StackTrace}", ex.StackTrace);
+                                    
+                                    // Set a fallback meeting URL so users can still access the meeting page
+                                    var fallbackUrl = $"{_configuration?["Agora:BaseUrl"] ?? "http://localhost:5173/meeting"}/{newAppointment.Id}";
+                                    newAppointment.GoogleMeetLink = fallbackUrl;
+                                    newAppointment.MeetingId = newAppointment.Id.ToString();
+                                    
+                                    _logger.LogWarning("⚠️ Set fallback meeting URL for appointment {AppointmentId}: {FallbackUrl}", 
+                                        newAppointment.Id, fallbackUrl);
+                                }
+                            }
+                
+                            await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
+                
+                            var notificationMessage = request.IsVirtual && !string.IsNullOrEmpty(newAppointment.GoogleMeetLink)
+                                ? $"Cuộc hẹn trực tuyến của bạn với {newAppointment.Consultant?.Name} " +
+                                  $"vào ngày {newAppointment.AppointmentDate} " +
+                                  $"lúc {GetReadableTimeSlot(newAppointment)} đã được đặt thành công. " +
+                                  $"Link video meeting: {newAppointment.GoogleMeetLink}"
+                                : $"Cuộc hẹn của bạn với {newAppointment.Consultant?.Name} " +
+                                  $"vào ngày {newAppointment.AppointmentDate} " +
+                                  $"lúc {GetReadableTimeSlot(newAppointment)} đã được đặt thành công.";
+                
+                            await CreateAppointmentNotification(newAppointment,
+                                "Cuộc hẹn đã được đặt",
+                                notificationMessage);
+                
+                            return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
+                        });
                     }
-                    
-                    newAppointment.GoogleMeetLink = meetLink; // Store Agora meeting URL
-                    newAppointment.MeetingId = ExtractRoomNameFromUrl(meetLink); // Store channel name
-                    
-                    _logger.LogInformation("✅ Agora channel created successfully for appointment {AppointmentId}: {MeetLink}", 
-                        newAppointment.Id, meetLink);
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error occurred while creating appointment");
+                        throw;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "❌ Failed to create Agora channel for appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", newAppointment.Id);
-                    _logger.LogError("🔍 DEBUG - Agora error details: {ErrorMessage}", ex.Message);
-                    _logger.LogError("🔍 DEBUG - Agora stack trace: {StackTrace}", ex.StackTrace);
-                    
-                    // Set a fallback meeting URL so users can still access the meeting page
-                    var fallbackUrl = $"{_configuration?["Agora:BaseUrl"] ?? "http://localhost:5173/meeting"}/{newAppointment.Id}";
-                    newAppointment.GoogleMeetLink = fallbackUrl;
-                    newAppointment.MeetingId = newAppointment.Id.ToString();
-                    
-                    _logger.LogWarning("⚠️ Set fallback meeting URL for appointment {AppointmentId}: {FallbackUrl}", 
-                        newAppointment.Id, fallbackUrl);
-                }
-            }
 
-            await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
-
-            var notificationMessage = request.IsVirtual && !string.IsNullOrEmpty(newAppointment.GoogleMeetLink)
-                ? $"Cuộc hẹn trực tuyến của bạn với {newAppointment.Consultant?.Name} " +
-                  $"vào ngày {newAppointment.AppointmentDate} " +
-                  $"lúc {GetReadableTimeSlot(newAppointment)} đã được đặt thành công. " +
-                  $"Link video meeting: {newAppointment.GoogleMeetLink}"
-                : $"Cuộc hẹn của bạn với {newAppointment.Consultant?.Name} " +
-                  $"vào ngày {newAppointment.AppointmentDate} " +
-                  $"lúc {GetReadableTimeSlot(newAppointment)} đã được đặt thành công.";
-
-            await CreateAppointmentNotification(newAppointment,
-                "Cuộc hẹn đã được đặt",
-                notificationMessage);
-
-            return _mapper.Map<CreateAppointmentsResponse>(newAppointment);
-        });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while creating appointment");
-            throw;
-        }
-    }
-
-    public async Task<CreateAppointmentsResponse> UpdateAppointmentAsync(Guid id, UpdateAppointmentRequest request)
+    public async Task<CreateAppointmentsResponse?> UpdateAppointmentAsync(Guid id, UpdateAppointmentRequest request)
     {
         try
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
+                if (!IsValidDate(request.AppointmentDate))
+                {
+                    _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
+                    return null;
+                }
+                
                 var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
                     .FirstOrDefaultAsync(
                         predicate: a => a.Id == id 
@@ -337,6 +363,25 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 {
                     throw new NotFoundException($"Appointment with ID {id} not found");
                 }
+                
+                var conflictingAppointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.AppointmentDate == request.AppointmentDate
+                                        && a.Slot == request.Slot
+                                        && a.ConsultantId == existingAppointment.ConsultantId
+                                        && a.Id != id
+                                        && a.Status != AppointmentStatus.Cancelled,
+                        include: a => a.Include(ap => ap.Customer)
+                            .Include(ap => ap.Consultant)
+                    );
+
+                if (conflictingAppointment != null)
+                {
+                    throw new BadRequestException(
+                        "An appointment already exists for the specified date, slot, and consultant.");
+                }
+                
+                
 
                 existingAppointment.AppointmentDate = request.AppointmentDate;
                 existingAppointment.Status = request.Status;
