@@ -8,6 +8,8 @@ using Everwell.DAL.Data;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Repositories.Interfaces;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Everwell.API.Controllers
 {
@@ -15,342 +17,284 @@ namespace Everwell.API.Controllers
     [Route("api/[controller]")]
     public class MeetingController : ControllerBase
     {
-        private readonly IAgoraService _agoraService;
-        private readonly IUnitOfWork<EverwellDbContext> _unitOfWork;
         private readonly ILogger<MeetingController> _logger;
+        private readonly IUnitOfWork<EverwellDbContext> _unitOfWork;
+        private readonly IDailyService _dailyService;
 
         public MeetingController(
-            IAgoraService agoraService,
+            ILogger<MeetingController> logger,
             IUnitOfWork<EverwellDbContext> unitOfWork,
-            ILogger<MeetingController> logger)
+            IDailyService dailyService)
         {
-            _agoraService = agoraService;
-            _unitOfWork = unitOfWork;
             _logger = logger;
-        }
-
-        [HttpGet("channel/{channelName}/status")]
-        [Authorize]
-        public async Task<IActionResult> GetChannelStatus(string channelName)
-        {
-            try
-            {
-                var currentTime = DateTime.UtcNow;
-                var isActive = await _agoraService.IsChannelActiveAsync(channelName, currentTime);
-                return Ok(new
-                {
-                    ChannelName = channelName,
-                    IsActive = isActive,
-                    CurrentTime = currentTime,
-                    Message = isActive ? "Channel is available for joining" : "Channel is not available at this time"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error checking channel status for {ChannelName}", channelName);
-                return StatusCode(500, "Error checking channel status");
-            }
-        }
-
-        [HttpPost("join/{appointmentId}")]
-        [Authorize]
-        public async Task<IActionResult> JoinMeeting(Guid appointmentId, [FromQuery] bool bypass = false, [FromQuery] Guid? userId = null)
-        {
-            try
-            {
-                var appointment = await _unitOfWork.GetRepository<Appointment>().FirstOrDefaultAsync(predicate: a => a.Id == appointmentId);
-                if (appointment == null)
-                {
-                    return NotFound("Appointment not found");
-                }
-
-                if (!appointment.IsVirtual)
-                {
-                    return BadRequest(new { Message = "This is an in-person appointment." });
-                }
-
-                var currentTime = DateTime.UtcNow;
-                var startTime = GetAppointmentStartTime(appointment);
-                var endTime = GetAppointmentEndTime(appointment);
-
-                if (!bypass)
-                {
-                    var availableFrom = startTime.AddMinutes(-5);
-                    if (currentTime < availableFrom)
-                    {
-                        return BadRequest(new { Message = $"Meeting room will be available in {Math.Ceiling((availableFrom - currentTime).TotalMinutes)} minutes." });
-                    }
-                    if (currentTime > endTime)
-                    {
-                        return BadRequest(new { Message = "Meeting has ended." });
-                    }
-                }
-
-                // Generate channel info for this specific appointment
-                var channelInfo = await _agoraService.CreateChannelAsync(appointment);
-                
-                // If a specific user ID is provided, generate a consistent UID for that user
-                uint userUid;
-                if (userId.HasValue)
-                {
-                    userUid = GenerateConsistentUidForUser(userId.Value, appointmentId);
-                }
-                else
-                {
-                    // Generate a random unique UID for this session
-                    userUid = GenerateRandomUid();
-                }
-
-                // Generate a new token for this specific user
-                var userToken = await _agoraService.GenerateRtcTokenAsync(channelInfo.ChannelName, userUid, "publisher", endTime);
-
-                return Ok(new
-                {
-                    channelInfo.ChannelName,
-                    channelInfo.AppId,
-                    RtcToken = userToken,  // User-specific token
-                    Uid = userUid,         // User-specific UID
-                    channelInfo.MeetingUrl,
-                    channelInfo.StartTime,
-                    channelInfo.EndTime,
-                    Message = "You can now join the meeting"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error joining meeting for appointment {AppointmentId}", appointmentId);
-                return StatusCode(500, "Error joining meeting");
-            }
-        }
-
-        // Generate a consistent UID for a specific user in a specific appointment
-        private uint GenerateConsistentUidForUser(Guid userId, Guid appointmentId)
-        {
-            // Combine user ID and appointment ID to create a consistent UID
-            var combinedString = $"{userId}-{appointmentId}";
-            var hash = combinedString.GetHashCode();
-            var uid = (uint)(Math.Abs(hash) % (int.MaxValue - 1)) + 1;
-            
-            _logger.LogInformation("Generated consistent UID {Uid} for user {UserId} in appointment {AppointmentId}", 
-                uid, userId, appointmentId);
-            return uid;
-        }
-
-        // Generate a random UID for anonymous users
-        private uint GenerateRandomUid()
-        {
-            var random = new Random();
-            var uid = (uint)random.Next(1, int.MaxValue);
-            
-            _logger.LogInformation("Generated random UID {Uid} for anonymous user", uid);
-            return uid;
+            _unitOfWork = unitOfWork;
+            _dailyService = dailyService;
         }
 
         [HttpGet("appointment/{appointmentId}/meeting-info")]
         [Authorize]
-        public async Task<IActionResult> GetMeetingInfo(Guid appointmentId, [FromQuery] Guid? userId = null)
+        public async Task<IActionResult> GetMeetingInfo(Guid appointmentId, [FromQuery] string userId = null)
         {
             try
             {
-                var appointment = await _unitOfWork.GetRepository<Appointment>().FirstOrDefaultAsync(predicate: a => a.Id == appointmentId);
+                _logger.LogInformation("Getting meeting info for appointment {AppointmentId}, user {UserId}", appointmentId, userId);
+
+                var appointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == appointmentId,
+                        include: a => a.Include(ap => ap.Customer).Include(ap => ap.Consultant)
+                    );
+
                 if (appointment == null)
                 {
-                    return NotFound("Appointment not found");
-                }
-                if (!appointment.IsVirtual)
-                {
-                    return BadRequest(new { Message = "This is an in-person appointment." });
+                    return NotFound(new { message = "Appointment not found" });
                 }
 
-                var currentTime = DateTime.UtcNow;
-                var startTime = GetAppointmentStartTime(appointment);
-                var endTime = GetAppointmentEndTime(appointment);
-                var channelInfo = await _agoraService.CreateChannelAsync(appointment);
-                // Determine UID for this user
-                uint userUid;
-                if (userId.HasValue)
+                Guid? callerId = null;
+                if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out var parsed))
                 {
-                    userUid = GenerateConsistentUidForUser(userId.Value, appointmentId);
+                    callerId = parsed;
                 }
                 else
                 {
-                    var claimUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (Guid.TryParse(claimUserId, out var parsedId))
+                    // fallback: try claim
+                    var subClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    if (Guid.TryParse(subClaim, out var claimGuid)) callerId = claimGuid;
+                }
+
+                if (callerId.HasValue)
+                {
+                    if (appointment.CustomerId != callerId && appointment.ConsultantId != callerId)
                     {
-                        userUid = GenerateConsistentUidForUser(parsedId, appointmentId);
-                    }
-                    else
-                    {
-                        userUid = GenerateRandomUid();
+                        return Forbid("You don't have access to this appointment");
                     }
                 }
 
-                // Generate a user-specific RTC token
-                var userToken = await _agoraService.GenerateRtcTokenAsync(channelInfo.ChannelName, userUid, "publisher", endTime);
+                var currentTime = DateTime.UtcNow;
+                var roomName = $"appointment-{appointmentId:N}".ToLower();
+                
+                // Get room info from Daily.co
+                var roomInfo = await _dailyService.GetRoomInfoAsync(roomName);
+                
+                if (roomInfo == null)
+                {
+                    // Create room if it doesn't exist
+                    roomInfo = await _dailyService.CreatePreScheduledRoomAsync(appointment);
+                }
 
-                var isActive = await _agoraService.IsChannelActiveAsync(channelInfo.ChannelName, currentTime);
-                var canJoin = currentTime >= startTime.AddMinutes(-5) && currentTime <= endTime;
+                // Public rooms do not require a meeting token
+                string meetingToken = null;
 
-                return Ok(new
+                var response = new
                 {
                     AppointmentId = appointmentId,
-                    channelInfo.ChannelName,
-                    channelInfo.AppId,
-                    RtcToken = userToken, // user-specific token
-                    Uid = userUid,        // user-specific UID
-                    channelInfo.MeetingUrl,
-                    StartTime = startTime,
-                    EndTime = endTime,
-                    CurrentTime = currentTime,
-                    IsActive = isActive,
-                    CanJoin = canJoin
-                });
+                    RoomName = roomInfo.RoomName,
+                    RoomUrl = roomInfo.RoomUrl,
+                    MeetingUrl = roomInfo.MeetingUrl,
+                    MeetingToken = meetingToken,
+                    StartTime = roomInfo.StartTime,
+                    EndTime = roomInfo.EndTime,
+                    IsActive = roomInfo.IsActive,
+                    IsPreScheduled = roomInfo.IsPreScheduled,
+                    CanJoinEarly = currentTime >= roomInfo.StartTime.AddMinutes(-5), // Can join 5 minutes early
+                    Customer = new
+                    {
+                        Id = appointment.Customer.Id,
+                        Name = appointment.Customer.Name,
+                        Email = appointment.Customer.Email
+                    },
+                    Consultant = new
+                    {
+                        Id = appointment.Consultant.Id,
+                        Name = appointment.Consultant.Name,
+                        Email = appointment.Consultant.Email
+                    }
+                };
+
+                _logger.LogInformation("MEETING_INFO_RESPONSE {Response}", JsonConvert.SerializeObject(response));
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting meeting info for appointment {AppointmentId}", appointmentId);
-                return StatusCode(500, "Error getting meeting information");
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
         }
 
-        [HttpGet("test-agora/join-now")]
-        [AllowAnonymous]
-        public async Task<IActionResult> TestAgoraJoinNow([FromQuery] string? userRole = "user1")
+        [HttpPost("appointment/{appointmentId}/create-room")]
+        [Authorize]
+        public async Task<IActionResult> CreateMeetingRoom(Guid appointmentId, [FromQuery] bool preScheduled = true)
         {
             try
             {
-                _logger.LogInformation("Testing Agora 'Join Now' service for user role: {UserRole}", userRole);
-                var now = DateTime.UtcNow;
+                _logger.LogInformation("Creating meeting room for appointment {AppointmentId}, preScheduled: {PreScheduled}", appointmentId, preScheduled);
 
-                // Create a temporary appointment that is active immediately
+                var appointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == appointmentId,
+                        include: a => a.Include(ap => ap.Customer).Include(ap => ap.Consultant)
+                    );
+
+                if (appointment == null)
+                {
+                    return NotFound(new { message = "Appointment not found" });
+                }
+
+                DailyRoomInfo roomInfo;
+                if (preScheduled)
+                {
+                    roomInfo = await _dailyService.CreatePreScheduledRoomAsync(appointment);
+                }
+                else
+                {
+                    roomInfo = await _dailyService.CreateRoomAsync(appointment);
+                }
+
+                // Update appointment with the room URL
+                appointment.GoogleMeetLink = roomInfo.RoomUrl;
+                await _unitOfWork.SaveChangesAsync();
+
+                var response = new
+                {
+                    AppointmentId = appointmentId,
+                    RoomName = roomInfo.RoomName,
+                    RoomUrl = roomInfo.RoomUrl,
+                    MeetingUrl = roomInfo.MeetingUrl,
+                    StartTime = roomInfo.StartTime,
+                    EndTime = roomInfo.EndTime,
+                    IsActive = roomInfo.IsActive,
+                    IsPreScheduled = roomInfo.IsPreScheduled
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating meeting room for appointment {AppointmentId}", appointmentId);
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpDelete("room/{roomName}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteMeetingRoom(string roomName)
+        {
+            try
+            {
+                _logger.LogInformation("Deleting meeting room {RoomName}", roomName);
+
+                var result = await _dailyService.DeleteRoomAsync(roomName);
+
+                if (result)
+                {
+                    return Ok(new { message = "Room deleted successfully", roomName });
+                }
+                else
+                {
+                    return BadRequest(new { message = "Failed to delete room", roomName });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting meeting room {RoomName}", roomName);
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpGet("room/{roomName}/status")]
+        [Authorize]
+        public async Task<IActionResult> GetRoomStatus(string roomName)
+        {
+            try
+            {
+                _logger.LogInformation("Getting status for room {RoomName}", roomName);
+
+                var roomInfo = await _dailyService.GetRoomInfoAsync(roomName);
+
+                if (roomInfo == null)
+                {
+                    return NotFound(new { message = "Room not found", roomName });
+                }
+
+                var response = new
+                {
+                    RoomName = roomInfo.RoomName,
+                    RoomUrl = roomInfo.RoomUrl,
+                    StartTime = roomInfo.StartTime,
+                    EndTime = roomInfo.EndTime,
+                    IsActive = roomInfo.IsActive,
+                    IsPreScheduled = roomInfo.IsPreScheduled
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting room status for {RoomName}", roomName);
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpGet("test-daily/join-now")]
+        [Authorize]
+        public async Task<IActionResult> TestJoinNow([FromQuery] string userRole = "user1")
+        {
+            try
+            {
+                _logger.LogInformation("Creating test Daily.co room for user role: {UserRole}", userRole);
+
+                // Create a temporary appointment for testing
                 var tempAppointment = new Appointment
                 {
                     Id = Guid.NewGuid(),
-                    AppointmentDate = DateOnly.FromDateTime(now),
-                    Slot = ShiftSlot.Morning1, // This will be used to calculate a base time
+                    Status = AppointmentStatus.Temp,
+                    AppointmentDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                    Slot = ShiftSlot.Morning1,
                     IsVirtual = true,
-                    // Mark this as a temporary appointment for the service to handle
-                    Status = AppointmentStatus.Temp
+                    CreatedAt = DateTime.UtcNow
                 };
 
-                // Generate channel info
-                var channelInfo = await _agoraService.CreateChannelAsync(tempAppointment);
+                var roomInfo = await _dailyService.CreateRoomAsync(tempAppointment);
 
-                // Generate a unique UID based on the user role (for testing multiple users)
-                var userUid = GenerateTestUid(userRole, tempAppointment.Id);
-                
-                // Generate user-specific token
-                var userToken = await _agoraService.GenerateRtcTokenAsync(channelInfo.ChannelName, userUid, "publisher", channelInfo.EndTime);
-
-                return Ok(new
+                var response = new
                 {
-                    Success = true,
-                    Message = $"Generated a temporary meeting room for {userRole}. Use different userRole values (user1, user2, etc.) to test multiple participants.",
+                    AppointmentId = tempAppointment.Id,
+                    RoomName = roomInfo.RoomName,
+                    RoomUrl = roomInfo.RoomUrl,
+                    MeetingUrl = roomInfo.MeetingUrl,
+                    StartTime = roomInfo.StartTime,
+                    EndTime = roomInfo.EndTime,
+                    IsActive = roomInfo.IsActive,
                     UserRole = userRole,
-                    ChannelInfo = new
-                    {
-                        channelInfo.ChannelName,
-                        channelInfo.AppId,
-                        RtcToken = userToken,    // User-specific token
-                        Uid = userUid,          // User-specific UID
-                        channelInfo.MeetingUrl,
-                        channelInfo.StartTime,
-                        channelInfo.EndTime,
-                        IsActive = await _agoraService.IsChannelActiveAsync(channelInfo.ChannelName, DateTime.UtcNow)
-                    },
-                    TestingInfo = new
-                    {
-                        Instructions = "To test multiple users, call this endpoint with different userRole parameters (e.g., ?userRole=user1, ?userRole=user2)",
-                        Note = "Each user will get a unique UID and token, allowing them to see each other in the video call"
-                    }
-                });
+                    Message = "Test room created successfully - join now!"
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Agora 'Join Now' service test failed");
-                return StatusCode(500, new { Success = false, Error = ex.Message });
+                _logger.LogError(ex, "Error creating test Daily.co room");
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
         }
 
-        // Generate a test UID based on user role and appointment
-        private uint GenerateTestUid(string userRole, Guid appointmentId)
-        {
-            var combinedString = $"{userRole}-{appointmentId}";
-            var hash = combinedString.GetHashCode();
-            var uid = (uint)(Math.Abs(hash) % (int.MaxValue - 1)) + 1;
-            
-            _logger.LogInformation("Generated test UID {Uid} for user role {UserRole} in appointment {AppointmentId}", 
-                uid, userRole, appointmentId);
-            return uid;
-        }
-
-        [HttpGet("test-agora/{appointmentId}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> TestAgoraService( Guid appointmentId)
+        [HttpPost("hooks/meeting-join")]
+        public async Task<IActionResult> HandleMeetingJoinHook([FromBody] object hookData)
         {
             try
             {
-                var appointment = await _unitOfWork.GetRepository<Appointment>().FirstOrDefaultAsync(predicate: a => a.Id == appointmentId);
-                if (appointment == null)
-                {
-                    return NotFound("Appointment not found");
-                }
-
-                var channelInfo = await _agoraService.CreateChannelAsync(appointment);
-                return Ok(new
-                {
-                    Success = true,
-                    AppointmentId = appointmentId,
-                    ChannelInfo = new
-                    {
-                        channelInfo.ChannelName,
-                        channelInfo.AppId,
-                        channelInfo.RtcToken,
-                        channelInfo.MeetingUrl,
-                        channelInfo.StartTime,
-                        channelInfo.EndTime,
-                        channelInfo.IsActive
-                    },
-                    Message = "Agora service test completed successfully"
-                });
+                _logger.LogInformation("Received meeting join hook: {HookData}", hookData);
+                
+                // Process the webhook data as needed
+                // This can be used for logging, analytics, notifications, etc.
+                
+                return Ok(new { message = "Hook processed successfully" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Agora service test failed for appointment {AppointmentId}", appointmentId);
-                return StatusCode(500, new { Success = false, Error = ex.Message });
+                _logger.LogError(ex, "Error processing meeting join hook");
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
-        }
-
-        private DateTime GetAppointmentStartTime(Appointment appointment)
-        {
-            var baseDate = appointment.AppointmentDate.ToDateTime(TimeOnly.MinValue);
-            var localTime = appointment.Slot switch
-            {
-                ShiftSlot.Morning1 => baseDate.AddHours(8),
-                ShiftSlot.Morning2 => baseDate.AddHours(10),
-                ShiftSlot.Afternoon1 => baseDate.AddHours(13),
-                ShiftSlot.Afternoon2 => baseDate.AddHours(15),
-                _ => baseDate.AddHours(8)
-            };
-
-            try
-            {
-                // Note: Ensure the TimeZone ID is correct for your server environment.
-                // "SE Asia Standard Time" is for Windows. For Linux/macOS, it might be "Asia/Bangkok".
-                var targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-                return TimeZoneInfo.ConvertTimeToUtc(localTime, targetTimeZone);
-            }
-            catch (TimeZoneNotFoundException)
-            {
-                // Fallback for environments where the timezone ID might not be available
-                return DateTime.SpecifyKind(localTime, DateTimeKind.Utc);
-            }
-        }
-
-        private DateTime GetAppointmentEndTime(Appointment appointment)
-        {
-            var startTime = GetAppointmentStartTime(appointment);
-            return startTime.AddHours(2); // Each slot is 2 hours
         }
     }
 } 

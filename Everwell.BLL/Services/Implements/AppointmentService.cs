@@ -29,10 +29,35 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
 
     #region Helper methods
 
-    private bool IsValidDate(DateOnly date)
+    private bool IsValidDate(DateOnly date, ShiftSlot slot)
     {
-        // Check if the requested date is in the future
-        return date > DateOnly.FromDateTime(DateTime.UtcNow) ? true : false;
+        /*
+         * A date is considered valid when:
+         *   • It is strictly in the future, OR
+         *   • It is today and the selected slot's start-time has not yet passed.
+         */
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        // Future days are always valid
+        if (date > today)
+            return true;
+
+        // Past days are invalid
+        if (date < today)
+            return false;
+
+        // Same-day booking – ensure the slot has not started yet
+        int startHour = slot switch
+        {
+            ShiftSlot.Morning1 => 8,
+            ShiftSlot.Morning2 => 10,
+            ShiftSlot.Afternoon1 => 13,
+            ShiftSlot.Afternoon2 => 15,
+            _ => 0
+        };
+
+        var slotStart = date.ToDateTime(new TimeOnly(startHour, 0));
+        return DateTime.UtcNow < slotStart;
     }
     
     private bool IsCancelled(Appointment appointment)
@@ -238,7 +263,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                             if (request == null)
                                 throw new ArgumentNullException(nameof(request), "request cannot be null.");
                 
-                            if (!IsValidDate(request.AppointmentDate))
+                            if (!IsValidDate(request.AppointmentDate, request.Slot))
                             {
                                 _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
                                 return null;
@@ -278,12 +303,12 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                             // Set the virtual meeting flag as requested
                             newAppointment.IsVirtual = request.IsVirtual;
                             
-                            // Create Agora channel if appointment is virtual
+                            // Create Daily room if appointment is virtual
                             if (request.IsVirtual)
                             {
                                 try
                                 {
-                                    _logger.LogInformation("🔍 Creating Agora meeting for virtual appointment {AppointmentId}", newAppointment.Id);
+                                    _logger.LogInformation("🔍 Creating Daily meeting for virtual appointment {AppointmentId}", newAppointment.Id);
                                     var meetLink = await _calendarService.CreateVideoMeetingAsync(newAppointment);
                                     
                                     if (string.IsNullOrEmpty(meetLink))
@@ -291,20 +316,20 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                                         throw new Exception("Meeting link generation returned null or empty");
                                     }
                                     
-                                    newAppointment.GoogleMeetLink = meetLink; // Store Agora meeting URL
-                                    newAppointment.MeetingId = ExtractRoomNameFromUrl(meetLink); // Store channel name
+                                    newAppointment.GoogleMeetLink = meetLink; // Store Daily meeting URL
+                                    newAppointment.MeetingId = ExtractRoomNameFromUrl(meetLink); // Store room name
                                     
-                                    _logger.LogInformation("✅ Agora channel created successfully for appointment {AppointmentId}: {MeetLink}", 
+                                    _logger.LogInformation("✅ Daily room created successfully for appointment {AppointmentId}: {MeetLink}", 
                                         newAppointment.Id, meetLink);
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogError(ex, "❌ Failed to create Agora channel for appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", newAppointment.Id);
-                                    _logger.LogError("🔍 DEBUG - Agora error details: {ErrorMessage}", ex.Message);
-                                    _logger.LogError("🔍 DEBUG - Agora stack trace: {StackTrace}", ex.StackTrace);
+                                    _logger.LogError(ex, "❌ Failed to create Daily room for appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", newAppointment.Id);
+                                    _logger.LogError("🔍 DEBUG - Daily error details: {ErrorMessage}", ex.Message);
+                                    _logger.LogError("🔍 DEBUG - Daily stack trace: {StackTrace}", ex.StackTrace);
                                     
                                     // Set a fallback meeting URL so users can still access the meeting page
-                                    var fallbackUrl = $"{_configuration?["Agora:BaseUrl"] ?? "http://localhost:5173/meeting"}/{newAppointment.Id}";
+                                    var fallbackUrl = $"{_configuration?["Daily:BaseUrl"] ?? "http://localhost:5173/meeting"}/{newAppointment.Id}";
                                     newAppointment.GoogleMeetLink = fallbackUrl;
                                     newAppointment.MeetingId = newAppointment.Id.ToString();
                                     
@@ -344,7 +369,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                if (!IsValidDate(request.AppointmentDate))
+                if (!IsValidDate(request.AppointmentDate, request.Slot))
                 {
                     _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
                     return null;
@@ -391,7 +416,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 bool wasVirtual = existingAppointment.IsVirtual;
                 existingAppointment.IsVirtual = request.IsVirtual;
                 
-                // If changing from non-virtual to virtual, create Agora channel
+                // If changing from non-virtual to virtual, create Daily room
                 if (!wasVirtual && request.IsVirtual)
                 {
                     try
@@ -399,12 +424,12 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                         var meetLink = await _calendarService.CreateVideoMeetingAsync(existingAppointment);
                         existingAppointment.GoogleMeetLink = meetLink;
                         
-                        _logger.LogInformation("Agora channel created for updated appointment {AppointmentId}: {MeetLink}", 
+                        _logger.LogInformation("Daily room created for updated appointment {AppointmentId}: {MeetLink}", 
                             existingAppointment.Id, meetLink);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to create Agora channel for updated appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", existingAppointment.Id);
+                        _logger.LogError(ex, "Failed to create Daily room for updated appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", existingAppointment.Id);
                         // Keep the appointment as virtual even if video meeting creation fails
                     }
                 }

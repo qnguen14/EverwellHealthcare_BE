@@ -67,9 +67,10 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
-builder.Services.AddScoped<IAgoraService, AgoraService>();
+builder.Services.AddScoped<IDailyService, DailyService>();
+builder.Services.AddHttpClient(); // Add HttpClient for Daily.co API calls
 builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.MenstrualCycleNotificationService>();
-builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.AgoraChannelManagementService>();
+// Removed AgoraChannelManagementService – Agora has been deprecated
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

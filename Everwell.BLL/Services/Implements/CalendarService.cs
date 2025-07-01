@@ -11,7 +11,7 @@ namespace Everwell.BLL.Services.Implements;
 public class CalendarService : BaseService<CalendarService>, ICalendarService
 {
     private readonly IConfiguration _configuration;
-    private readonly IAgoraService _agoraService;
+    private readonly IDailyService _dailyService;
 
     public CalendarService(
         IUnitOfWork<EverwellDbContext> unitOfWork,
@@ -19,11 +19,11 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
         IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
         IConfiguration configuration,
-        IAgoraService agoraService)
+        IDailyService dailyService)
         : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _configuration = configuration;
-        _agoraService = agoraService;
+        _dailyService = dailyService;
     }
 
     public async Task<string> CreateVideoMeetingAsync(Appointment appointment)
@@ -37,30 +37,30 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
                 throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null");
             }
 
-            _logger.LogInformation("🔍 DEBUG - About to call _agoraService.CreateChannelAsync");
-            // Create Agora channel with time-based access
-            var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+            _logger.LogInformation("🔍 DEBUG - About to call _dailyService.CreatePreScheduledRoomAsync");
+            // Create Daily.co room with pre-scheduling
+            var roomInfo = await _dailyService.CreatePreScheduledRoomAsync(appointment);
             
-            if (channelInfo == null)
+            if (roomInfo == null)
             {
-                throw new Exception("AgoraService returned null channel info");
+                throw new Exception("DailyService returned null room info");
             }
 
-            if (string.IsNullOrEmpty(channelInfo.MeetingUrl))
+            if (string.IsNullOrEmpty(roomInfo.RoomUrl))
             {
-                throw new Exception("AgoraService returned empty meeting URL");
+                throw new Exception("DailyService returned empty room URL");
             }
 
-            _logger.LogInformation("🔍 DEBUG - _agoraService.CreateChannelAsync succeeded, channelInfo.MeetingUrl: {MeetingUrl}", channelInfo.MeetingUrl);
+            _logger.LogInformation("🔍 DEBUG - _dailyService.CreatePreScheduledRoomAsync succeeded, roomInfo.RoomUrl: {RoomUrl}", roomInfo.RoomUrl);
             
-            _logger.LogInformation("✅ Created Agora channel for appointment {AppointmentId}: {ChannelName} from {StartTime} to {EndTime}", 
-                appointment.Id, channelInfo.ChannelName, channelInfo.StartTime, channelInfo.EndTime);
+            _logger.LogInformation("✅ Created Daily.co room for appointment {AppointmentId}: {RoomName} from {StartTime} to {EndTime}", 
+                appointment.Id, roomInfo.RoomName, roomInfo.StartTime, roomInfo.EndTime);
             
-            return channelInfo.MeetingUrl;
+            return roomInfo.RoomUrl;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Failed to create Agora video meeting for appointment {AppointmentId}", appointment.Id);
+            _logger.LogError(ex, "❌ Failed to create Daily.co video meeting for appointment {AppointmentId}", appointment.Id);
             throw;
         }
     }
@@ -69,16 +69,17 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
     {
         try
         {
-            // Disable old channel and create new one for updated appointment
-            await _agoraService.DisableChannelAsync(eventId);
-            var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+            // For Daily.co, we'll delete the old room and create a new one
+            var oldRoomName = $"appointment-{appointment.Id:N}".ToLower();
+            await _dailyService.DeleteRoomAsync(oldRoomName);
+            var roomInfo = await _dailyService.CreatePreScheduledRoomAsync(appointment);
             
-            _logger.LogInformation("Updated Agora channel for appointment {AppointmentId}", appointment.Id);
+            _logger.LogInformation("Updated Daily.co room for appointment {AppointmentId}", appointment.Id);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to update Agora channel for appointment {AppointmentId}", appointment.Id);
+            _logger.LogError(ex, "Failed to update Daily.co room for appointment {AppointmentId}", appointment.Id);
             return false;
         }
     }
@@ -87,15 +88,15 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
     {
         try
         {
-            // Disable the Agora channel
-            var result = await _agoraService.DisableChannelAsync(eventId);
+            // Delete the Daily.co room
+            var result = await _dailyService.DeleteRoomAsync(eventId);
             
-            _logger.LogInformation("Disabled Agora channel {ChannelName}", eventId);
+            _logger.LogInformation("Deleted Daily.co room {RoomName}", eventId);
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to disable Agora channel {ChannelName}", eventId);
+            _logger.LogError(ex, "Failed to delete Daily.co room {RoomName}", eventId);
             return false;
         }
     }
@@ -104,16 +105,15 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
     {
         try
         {
-            // For Agora, we need the full appointment info to generate proper channel data
-            _logger.LogInformation("Generating new meeting link for channel {ChannelName}", eventId);
+            // For Daily.co, get the room URL directly
+            _logger.LogInformation("Generating meeting link for room {RoomName}", eventId);
             
-            // This is a simplified approach - in production you might want to store more info
-            // or reconstruct the appointment from the eventId
-            return $"{_configuration["Agora:BaseUrl"]}/{eventId}";
+            var roomUrl = await _dailyService.GetRoomUrlAsync(eventId);
+            return roomUrl ?? string.Empty;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to generate meeting link for channel {ChannelName}", eventId);
+            _logger.LogError(ex, "Failed to generate meeting link for room {RoomName}", eventId);
             return string.Empty;
         }
     }
@@ -122,8 +122,8 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
     {
         try
         {
-            // Create Agora channel with time-based access
-            var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+            // Create Daily.co room with pre-scheduling
+            var roomInfo = await _dailyService.CreatePreScheduledRoomAsync(appointment);
             
             _logger.LogInformation("Created simple calendar event for appointment {AppointmentId}", appointment.Id);
             return true;
