@@ -22,6 +22,27 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.MeetingController",
+    "Method": "DebugAppointmentAccess",
+    "RelativePath": "api/Meeting/appointment/{appointmentId}/debug",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appointmentId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.MeetingController",
     "Method": "GetMeetingInfo",
     "RelativePath": "api/Meeting/appointment/{appointmentId}/meeting-info",
     "HttpMethod": "GET",

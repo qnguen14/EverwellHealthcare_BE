@@ -108,13 +108,18 @@ public class DailyService : IDailyService
             
             var roomUrl = BuildRoomUrl(roomName);
             
+            // Convert UTC times back to local time (UTC+7) for frontend display
+            var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var startTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(startTime, utcPlus7);
+            var endTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(endTime, utcPlus7);
+
             var roomInfo = new DailyRoomInfo
             {
                 RoomName = roomName,
                 RoomUrl = roomUrl,
                 MeetingUrl = $"{_baseUrl}/{appointment.Id}",
-                StartTime = startTime,
-                EndTime = endTime,
+                StartTime = startTimeLocal,
+                EndTime = endTimeLocal,
                 IsActive = DateTime.UtcNow >= startTime && DateTime.UtcNow <= endTime,
                 IsPreScheduled = false
             };
@@ -139,9 +144,15 @@ public class DailyService : IDailyService
             var startTime = GetAppointmentStartTime(appointment);
             var endTime = GetAppointmentEndTime(appointment);
 
-            // Allow immediate access: always set nbf to "now - 30s" so room opens instantly
-            var nowUtc = DateTime.UtcNow;
-            var roomStartTime = nowUtc.AddSeconds(-30);
+            // Allow early access only 5 minutes before the scheduled appointment start
+            // (Daily uses UTC seconds since epoch)
+            var roomStartTime = startTime.AddMinutes(-5);
+
+            // If the appointment is already within the 5-minute window or has started, open immediately
+            if (roomStartTime < DateTime.UtcNow.AddSeconds(-30))
+            {
+                roomStartTime = DateTime.UtcNow.AddSeconds(-30); // keep Daily happy – cannot be in the past too far
+            }
 
             var roomConfig = new
             {
@@ -195,13 +206,18 @@ public class DailyService : IDailyService
             
             var roomUrl = BuildRoomUrl(roomName);
             
+            // Convert UTC times back to local time (UTC+7) for frontend display
+            var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var startTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(startTime, utcPlus7);
+            var endTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(endTime, utcPlus7);
+
             var roomInfo = new DailyRoomInfo
             {
                 RoomName = roomName,
                 RoomUrl = roomUrl,
                 MeetingUrl = $"{_baseUrl}/{appointment.Id}",
-                StartTime = startTime,
-                EndTime = endTime,
+                StartTime = startTimeLocal,
+                EndTime = endTimeLocal,
                 IsActive = DateTime.UtcNow >= roomStartTime && DateTime.UtcNow <= endTime,
                 IsPreScheduled = true
             };
@@ -281,17 +297,22 @@ public class DailyService : IDailyService
                 var roomData = JsonConvert.DeserializeObject<dynamic>(responseContent);
                 
                 var roomUrl = BuildRoomUrl(roomName);
-                var startTime = DateTimeOffset.FromUnixTimeSeconds((long)roomData.config.nbf).DateTime;
-                var endTime = DateTimeOffset.FromUnixTimeSeconds((long)roomData.config.exp).DateTime;
+                var startTimeUtc = DateTimeOffset.FromUnixTimeSeconds((long)roomData.config.nbf).DateTime;
+                var endTimeUtc = DateTimeOffset.FromUnixTimeSeconds((long)roomData.config.exp).DateTime;
+                
+                // Convert UTC times back to local time (UTC+7) for frontend display
+                var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                var startTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(startTimeUtc, utcPlus7);
+                var endTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(endTimeUtc, utcPlus7);
                 
                 return new DailyRoomInfo
                 {
                     RoomName = roomName,
                     RoomUrl = roomUrl,
                     MeetingUrl = roomUrl, // For Daily.co, these are the same
-                    StartTime = startTime,
-                    EndTime = endTime,
-                    IsActive = DateTime.UtcNow >= startTime && DateTime.UtcNow <= endTime,
+                    StartTime = startTimeLocal,
+                    EndTime = endTimeLocal,
+                    IsActive = DateTime.UtcNow >= startTimeUtc && DateTime.UtcNow <= endTimeUtc,
                     IsPreScheduled = roomData.config.enable_prejoin_ui == true
                 };
             }
@@ -331,10 +352,10 @@ public class DailyService : IDailyService
 
     private DateTime GetAppointmentStartTime(Appointment appointment)
     {
-        // Convert AppointmentDate (DateOnly) to DateTime at 00:00 local time
+        // Convert AppointmentDate (DateOnly) to DateTime at 00:00 local time (UTC+7)
         var baseDate = appointment.AppointmentDate.ToDateTime(TimeOnly.MinValue);
 
-        return appointment.Slot switch
+        var localTime = appointment.Slot switch
         {
             ShiftSlot.Morning1 => baseDate.AddHours(8),   // 08:00 – 10:00
             ShiftSlot.Morning2 => baseDate.AddHours(10),  // 10:00 – 12:00
@@ -342,6 +363,12 @@ public class DailyService : IDailyService
             ShiftSlot.Afternoon2 => baseDate.AddHours(15), // 15:00 – 17:00
             _ => baseDate.AddHours(8)
         };
+
+        // Convert from UTC+7 to UTC for Daily.co API
+        var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+        var utcTime = TimeZoneInfo.ConvertTimeToUtc(localTime, utcPlus7);
+        
+        return utcTime;
     }
 
     private DateTime GetAppointmentEndTime(Appointment appointment)

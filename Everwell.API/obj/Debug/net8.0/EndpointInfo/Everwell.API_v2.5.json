@@ -2155,6 +2155,36 @@
         }
       }
     },
+    "/api/Meeting/appointment/{appointmentId}/debug": {
+      "get": {
+        "tags": [
+          "Meeting"
+        ],
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Meeting/appointment/{appointmentId}/meeting-info": {
       "get": {
         "tags": [
@@ -7458,14 +7488,14 @@
         "required": [
           "appointmentId",
           "comment",
-          "consultantId",
           "rating"
         ],
         "type": "object",
         "properties": {
           "consultantId": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "nullable": true
           },
           "appointmentId": {
             "type": "string",
@@ -7479,7 +7509,7 @@
           },
           "comment": {
             "maxLength": 1000,
-            "minLength": 10,
+            "minLength": 1,
             "type": "string"
           }
         },

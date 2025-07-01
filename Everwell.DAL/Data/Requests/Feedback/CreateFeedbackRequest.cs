@@ -4,8 +4,7 @@ namespace Everwell.DAL.Data.Requests.Feedback;
 
 public class CreateFeedbackRequest
 {
-    [Required(ErrorMessage = "Consultant ID is required")]
-    public Guid ConsultantId { get; set; }
+    public Guid? ConsultantId { get; set; }
     
     [Required(ErrorMessage = "Appointment ID is required")]
     public Guid AppointmentId { get; set; }
@@ -16,6 +15,6 @@ public class CreateFeedbackRequest
     
     [Required(ErrorMessage = "Comment is required")]
     [StringLength(1000, ErrorMessage = "Comment cannot exceed 1000 characters")]
-    [MinLength(10, ErrorMessage = "Comment must be at least 10 characters")]
+    [MinLength(1, ErrorMessage = "Comment must be at least 1 character")]
     public string Comment { get; set; }
 } 

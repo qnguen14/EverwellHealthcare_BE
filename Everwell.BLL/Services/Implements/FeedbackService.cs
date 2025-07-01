@@ -150,9 +150,23 @@ public class FeedbackService : BaseService<FeedbackService>, IFeedbackService
 
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
+                // Map basic fields, then enrich with derived ids
                 var feedback = _mapper.Map<Feedback>(request);
                 feedback.Id = Guid.NewGuid();
                 feedback.CustomerId = currentUserId;
+
+                // Ensure ConsultantId is set based on the appointment if not supplied (or default)
+                if (feedback.ConsultantId == Guid.Empty)
+                {
+                    var appointment = await _unitOfWork.GetRepository<Appointment>()
+                        .FirstOrDefaultAsync(predicate: a => a.Id == request.AppointmentId);
+                    if (appointment == null)
+                    {
+                        throw new InvalidOperationException("Appointment not found while creating feedback");
+                    }
+                    feedback.ConsultantId = appointment.ConsultantId;
+                }
+
                 feedback.CreatedAt = DateOnly.FromDateTime(DateTime.UtcNow);
 
                 await _unitOfWork.GetRepository<Feedback>().InsertAsync(feedback);
@@ -333,8 +347,9 @@ public class FeedbackService : BaseService<FeedbackService>, IFeedbackService
                 return false;
             }
 
-            // Customer can only provide feedback for completed appointments
-            return appointment.Status == AppointmentStatus.Completed;
+            // Allow feedback for any appointment that belongs to the customer as long as it exists.
+            // This removes status restrictions and simplifies the flow.
+            return true;
         }
         catch (Exception ex)
         {
