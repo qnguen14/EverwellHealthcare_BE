@@ -344,4 +344,26 @@ public class AppointmentsController : ControllerBase
         }
     }
 
+    // ---------------- Check-in / Check-out ----------------
+
+    [HttpPost("api/v2.5/appointment/{id}/checkin")]
+    [Authorize]
+    public async Task<IActionResult> CheckIn(Guid id)
+    {
+        var appt = await _appointmentService.MarkCheckInAsync(id, User);
+        if (appt == null)
+            return NotFound(new { message = "Appointment not found" });
+        return Ok(new { checkInTimeUtc = appt.CheckInTimeUtc });
+    }
+
+    [HttpPost("api/v2.5/appointment/{id}/checkout")]
+    [Authorize]
+    public async Task<IActionResult> CheckOut(Guid id)
+    {
+        var appt = await _appointmentService.MarkCheckOutAsync(id, User);
+        if (appt == null)
+            return NotFound(new { message = "Appointment not found" });
+        return Ok(new { checkOutTimeUtc = appt.CheckOutTimeUtc });
+    }
+
 }

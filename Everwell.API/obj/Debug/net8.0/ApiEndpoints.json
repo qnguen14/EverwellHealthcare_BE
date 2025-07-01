@@ -627,6 +627,38 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.AppointmentsController",
+    "Method": "CheckIn",
+    "RelativePath": "api/v2.5/appointment/{id}/checkin",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AppointmentsController",
+    "Method": "CheckOut",
+    "RelativePath": "api/v2.5/appointment/{id}/checkout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AppointmentsController",
     "Method": "CancelAppointment",
     "RelativePath": "api/v2.5/appointment/cancel/{id}",
     "HttpMethod": "PUT",

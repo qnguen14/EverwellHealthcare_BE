@@ -73,4 +73,11 @@ public class Appointment
     [Required]
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Actual join/leave times (UTC)
+    [Column("check_in_utc")]
+    public DateTime? CheckInTimeUtc { get; set; }
+
+    [Column("check_out_utc")]
+    public DateTime? CheckOutTimeUtc { get; set; }
 }

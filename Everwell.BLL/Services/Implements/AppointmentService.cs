@@ -377,12 +377,10 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 
                 var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
                     .FirstOrDefaultAsync(
-                        predicate: a => a.Id == id 
-                                        && a.Customer.IsActive == true 
-                                        && a.Consultant.IsActive == true,
-                        include: a => a.Include(ap => ap.Customer)
+                        a => a.Id == id && a.Customer.IsActive && a.Consultant.IsActive,
+                        null,
+                        a => a.Include(ap => ap.Customer)
                             .Include(ap => ap.Consultant));
-                            // .Include(ap => ap.Service));
 
                 if (existingAppointment == null)
                 {
@@ -707,4 +705,63 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
             throw;
         }
     }
+
+    #region Check-in / Check-out
+
+    public async Task<Appointment?> MarkCheckInAsync(Guid id, System.Security.Claims.ClaimsPrincipal user)
+    {
+        try
+        {
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                var appt = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        a => a.Id == id && a.Customer.IsActive && a.Consultant.IsActive,
+                        null,
+                        a => a.Include(ap => ap.Customer)
+                              .Include(ap => ap.Consultant));
+                if (appt == null) return null;
+                // Check if the appointment is already checked in
+                if (appt.CheckInTimeUtc.HasValue)
+                {
+                    _logger.LogWarning("Appointment {Id} is already checked in at {CheckInTime}", id, appt.CheckInTimeUtc);
+                    return appt;
+                }
+                // Mark check-in time
+                appt.CheckInTimeUtc = DateTime.UtcNow;
+                appt.Status = AppointmentStatus.Temp; // Set to Temp status for check-in
+                await _unitOfWork.SaveChangesAsync();
+                
+                return appt;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to mark check-in for appointment {Id}", id);
+            throw;
+        }
+    }
+
+    public async Task<Appointment?> MarkCheckOutAsync(Guid id, System.Security.Claims.ClaimsPrincipal user)
+    {
+        try
+        {
+            var appt = await _unitOfWork.GetRepository<Appointment>()
+                .FirstOrDefaultAsync(a => a.Id == id, null, null);
+            if (appt == null) return null;
+
+            appt.CheckOutTimeUtc = DateTime.UtcNow;
+            appt.Status = AppointmentStatus.Completed;
+            await _unitOfWork.SaveChangesAsync();
+
+            return appt;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to mark check-out for appointment {Id}", id);
+            throw;
+        }
+    }
+
+    #endregion
 } 
