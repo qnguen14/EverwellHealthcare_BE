@@ -19,6 +19,6 @@ public interface IAppointmentService
     Task<GetScheduleResponse> CreateConsultantSchedule(CreateScheduleRequest request);
 
     // Meeting attendance tracking
-    Task<Appointment?> MarkCheckInAsync(Guid id, System.Security.Claims.ClaimsPrincipal user);
-    Task<Appointment?> MarkCheckOutAsync(Guid id, System.Security.Claims.ClaimsPrincipal user);
+    Task<CheckInResponse> MarkCheckInAsync(Guid id);
+    Task<CheckOutResponse> MarkCheckOutAsync(Guid id);
 }

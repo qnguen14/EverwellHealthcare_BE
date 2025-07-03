@@ -2,6 +2,7 @@ using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Everwell.DAL.Data.Exceptions;
 using Everwell.DAL.Data.Requests.Appointments;
 using Everwell.DAL.Data.Responses.Appointments;
@@ -708,7 +709,7 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
 
     #region Check-in / Check-out
 
-    public async Task<Appointment?> MarkCheckInAsync(Guid id, System.Security.Claims.ClaimsPrincipal user)
+    public async Task<CheckInResponse> MarkCheckInAsync(Guid id)
     {
         try
         {
@@ -725,14 +726,13 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 if (appt.CheckInTimeUtc.HasValue)
                 {
                     _logger.LogWarning("Appointment {Id} is already checked in at {CheckInTime}", id, appt.CheckInTimeUtc);
-                    return appt;
+                    return _mapper.Map<CheckInResponse>(appt);
                 }
                 // Mark check-in time
                 appt.CheckInTimeUtc = DateTime.UtcNow;
                 appt.Status = AppointmentStatus.Temp; // Set to Temp status for check-in
-                await _unitOfWork.SaveChangesAsync();
                 
-                return appt;
+                return _mapper.Map<CheckInResponse>(appt);
             });
         }
         catch (Exception ex)
@@ -742,19 +742,30 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         }
     }
 
-    public async Task<Appointment?> MarkCheckOutAsync(Guid id, System.Security.Claims.ClaimsPrincipal user)
+    public async Task<CheckOutResponse> MarkCheckOutAsync(Guid id)
     {
         try
         {
             var appt = await _unitOfWork.GetRepository<Appointment>()
-                .FirstOrDefaultAsync(a => a.Id == id, null, null);
+                .FirstOrDefaultAsync(
+                    a => a.Id == id && a.Customer.IsActive && a.Consultant.IsActive,
+                    null,
+                    a => a.Include(ap => ap.Customer)
+                        .Include(ap => ap.Consultant));
+            
             if (appt == null) return null;
+            
+            if (appt.CheckOutTimeUtc.HasValue)
+            {
+                _logger.LogWarning("Appointment {Id} is already checked out at {CheckOutTime}", id, appt.CheckOutTimeUtc);
+                return _mapper.Map<CheckOutResponse>(appt);
+            }
 
             appt.CheckOutTimeUtc = DateTime.UtcNow;
             appt.Status = AppointmentStatus.Completed;
             await _unitOfWork.SaveChangesAsync();
 
-            return appt;
+            return _mapper.Map<CheckOutResponse>(appt);
         }
         catch (Exception ex)
         {

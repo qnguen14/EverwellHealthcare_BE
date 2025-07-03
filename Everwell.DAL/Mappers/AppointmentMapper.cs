@@ -63,6 +63,20 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
+            CreateMap<Appointment, CheckOutResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.Consultant, opt => opt.MapFrom(src => src.Consultant))
+                .ForMember(dest => dest.CheckOutTime, opt => opt.MapFrom(src => src.CheckOutTimeUtc));
+            
+            CreateMap<Appointment,CheckInResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.Consultant, opt => opt.MapFrom(src => src.Consultant))
+                .ForMember(dest => dest.CheckInTime, opt => opt.MapFrom(src => src.CheckInTimeUtc));
+            
             // User to GetUserResponse (needed for mapping Customer and Consultant)
             CreateMap<User, GetUserResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
