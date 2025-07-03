@@ -202,6 +202,65 @@ public class AppointmentsController : ControllerBase
             return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
+    
+    // ---------------- Check-in / Check-out ----------------
+
+    [HttpPut(ApiEndpointConstants.Appointment.MarkCheckInEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CheckInResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin, Customer, Consultant")]
+    public async Task<IActionResult> CheckIn(Guid id)
+    {
+        try
+        {
+            var response = await _appointmentService.MarkCheckInAsync(id);
+            if (response == null)
+                return NotFound(new { message = "Cuộc hẹn không tồn tại." });
+
+            var apiResponse = new ApiResponse<CheckInResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Check-in thành công",
+                IsSuccess = true,
+                Data = response
+            };
+
+            return Ok(apiResponse);
+            
+        } catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
+
+    [HttpPut(ApiEndpointConstants.Appointment.MarkCheckOutEndpoint)]
+    [ProducesResponseType(typeof(ApiResponse<CheckOutResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin, Customer, Consultant")]
+    public async Task<IActionResult> CheckOut(Guid id)
+    {
+        try
+        {
+            var response = await _appointmentService.MarkCheckOutAsync(id);
+            if (response == null)
+                return NotFound(new { message = "Cuộc hẹn không tồn tại." });
+            var apiResponse = new ApiResponse<CheckOutResponse>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Check-out thành công",
+                IsSuccess = true,
+                Data = response
+            };
+            
+            return Ok(apiResponse);
+
+        } catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
+    }
 
     [HttpPut(ApiEndpointConstants.Appointment.CancelAppointmentEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
@@ -344,26 +403,6 @@ public class AppointmentsController : ControllerBase
         }
     }
 
-    // ---------------- Check-in / Check-out ----------------
-
-    [HttpPost("api/v2.5/appointment/{id}/checkin")]
-    [Authorize]
-    public async Task<IActionResult> CheckIn(Guid id)
-    {
-        var appt = await _appointmentService.MarkCheckInAsync(id, User);
-        if (appt == null)
-            return NotFound(new { message = "Appointment not found" });
-        return Ok(new { checkInTimeUtc = appt.CheckInTimeUtc });
-    }
-
-    [HttpPost("api/v2.5/appointment/{id}/checkout")]
-    [Authorize]
-    public async Task<IActionResult> CheckOut(Guid id)
-    {
-        var appt = await _appointmentService.MarkCheckOutAsync(id, User);
-        if (appt == null)
-            return NotFound(new { message = "Appointment not found" });
-        return Ok(new { checkOutTimeUtc = appt.CheckOutTimeUtc });
-    }
+    
 
 }
