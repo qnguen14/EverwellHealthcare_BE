@@ -144,6 +144,14 @@ public class DailyService : IDailyService
             var startTime = GetAppointmentStartTime(appointment);
             var endTime = GetAppointmentEndTime(appointment);
 
+            // Check if appointment has already ended
+            if (DateTime.UtcNow > endTime)
+            {
+                var message = $"Cannot create room for appointment {appointment.Id} - appointment has already ended at {endTime:yyyy-MM-dd HH:mm:ss} UTC";
+                _logger.LogWarning(message);
+                throw new InvalidOperationException(message);
+            }
+
             // Allow early access only 5 minutes before the scheduled appointment start
             // (Daily uses UTC seconds since epoch)
             var roomStartTime = startTime.AddMinutes(-5);

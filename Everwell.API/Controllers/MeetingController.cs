@@ -172,9 +172,43 @@ namespace Everwell.API.Controllers
                 // Get room info from Daily.co
                 var roomInfo = await _dailyService.GetRoomInfoAsync(roomName);
                 
+                // Get timezone info once for the entire method
+                var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                
                 if (roomInfo == null)
                 {
-                    // Create room if it doesn't exist
+                    // Check if appointment is already finished before trying to create a new room
+                    var appointmentEndTime = GetAppointmentEndTimeUtc(appointment);
+                    var currentTimeUtc = DateTime.UtcNow;
+                    
+                    if (currentTimeUtc > appointmentEndTime)
+                    {
+                        // Appointment is already finished, don't create a new room
+                        _logger.LogInformation("Appointment {AppointmentId} has already ended at {EndTime}. Current time: {CurrentTime}", 
+                            appointmentId, appointmentEndTime, currentTimeUtc);
+                        
+                        // Return meeting info indicating the session has ended
+                        var appointmentStartTimeUtc = GetAppointmentStartTimeUtc(appointment);
+                        var startTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(appointmentStartTimeUtc, utcPlus7);
+                        var endTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(appointmentEndTime, utcPlus7);
+                        
+                        return Ok(new
+                        {
+                            AppointmentId = appointmentId,
+                            RoomName = roomName,
+                            RoomUrl = (string)null,
+                            MeetingUrl = (string)null,
+                            MeetingToken = (string)null,
+                            StartTime = startTimeLocal,
+                            EndTime = endTimeLocal,
+                            IsActive = false,
+                            IsExpired = true,
+                            CanJoinEarly = false,
+                            Message = "Cuộc hẹn đã kết thúc"
+                        });
+                    }
+                    
+                    // Create room if appointment is still valid
                     roomInfo = await _dailyService.CreatePreScheduledRoomAsync(appointment);
                 }
 
@@ -182,7 +216,6 @@ namespace Everwell.API.Controllers
                 string meetingToken = null;
 
                 // Convert current UTC time to local time (UTC+7) for comparison
-                var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
                 var currentTimeLocal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, utcPlus7);
                 
                 // Room info StartTime is already in local time, so we can compare directly
@@ -399,6 +432,79 @@ namespace Everwell.API.Controllers
                 _logger.LogError(ex, "Error processing meeting join hook");
                 return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
+        }
+
+        [HttpGet("test/expired-appointment")]
+        [Authorize]
+        public async Task<IActionResult> TestExpiredAppointmentHandling()
+        {
+            try
+            {
+                _logger.LogInformation("Testing expired appointment handling");
+
+                // Create a test appointment that would be expired
+                var yesterday = DateTime.UtcNow.AddDays(-1);
+                var testAppointment = new Appointment
+                {
+                    Id = Guid.NewGuid(),
+                    Status = AppointmentStatus.Scheduled,
+                    AppointmentDate = DateOnly.FromDateTime(yesterday),
+                    Slot = ShiftSlot.Morning1,
+                    IsVirtual = true,
+                    CreatedAt = yesterday
+                };
+
+                var appointmentEndTime = GetAppointmentEndTimeUtc(testAppointment);
+                var currentTimeUtc = DateTime.UtcNow;
+                var isExpired = currentTimeUtc > appointmentEndTime;
+
+                return Ok(new
+                {
+                    Message = "Testing expired appointment handling",
+                    TestAppointment = new
+                    {
+                        Id = testAppointment.Id,
+                        AppointmentDate = testAppointment.AppointmentDate,
+                        Slot = testAppointment.Slot
+                    },
+                    AppointmentEndTimeUtc = appointmentEndTime,
+                    CurrentTimeUtc = currentTimeUtc,
+                    IsExpired = isExpired,
+                    TimeDifference = $"{(currentTimeUtc - appointmentEndTime).TotalHours:F2} hours past end time"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error testing expired appointment handling");
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        private DateTime GetAppointmentStartTimeUtc(Appointment appointment)
+        {
+            // Convert AppointmentDate (DateOnly) to DateTime at 00:00 local time (UTC+7)
+            var baseDate = appointment.AppointmentDate.ToDateTime(TimeOnly.MinValue);
+
+            var localTime = appointment.Slot switch
+            {
+                ShiftSlot.Morning1 => baseDate.AddHours(8),   // 08:00 – 10:00
+                ShiftSlot.Morning2 => baseDate.AddHours(10),  // 10:00 – 12:00
+                ShiftSlot.Afternoon1 => baseDate.AddHours(13), // 13:00 – 15:00
+                ShiftSlot.Afternoon2 => baseDate.AddHours(15), // 15:00 – 17:00
+                _ => baseDate.AddHours(8)
+            };
+
+            // Convert from UTC+7 to UTC
+            var utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var utcTime = TimeZoneInfo.ConvertTimeToUtc(localTime, utcPlus7);
+            
+            return utcTime;
+        }
+
+        private DateTime GetAppointmentEndTimeUtc(Appointment appointment)
+        {
+            // Each time slot lasts 2 hours
+            return GetAppointmentStartTimeUtc(appointment).AddHours(2);
         }
     }
 } 

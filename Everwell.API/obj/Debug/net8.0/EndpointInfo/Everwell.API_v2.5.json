@@ -2337,6 +2337,18 @@
         }
       }
     },
+    "/api/Meeting/test/expired-appointment": {
+      "get": {
+        "tags": [
+          "Meeting"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/menstrual-cycle-trackings": {
       "get": {
         "tags": [

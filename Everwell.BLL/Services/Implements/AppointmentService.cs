@@ -29,36 +29,36 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
 
     #region Helper methods
 
-    private bool IsValidDate(DateOnly date, ShiftSlot slot)
-    {
-        /*
-         * A date is considered valid when:
-         *   • It is strictly in the future, OR
-         *   • It is today and the selected slot's start-time has not yet passed.
-         */
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    //private bool IsValidDate(DateOnly date, ShiftSlot slot)
+    //{
+    //    /*
+    //     * A date is considered valid when:
+    //     *   • It is strictly in the future, OR
+    //     *   • It is today and the selected slot's start-time has not yet passed.
+    //     */
+    //    var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        // Future days are always valid
-        if (date > today)
-            return true;
+    //    // Future days are always valid
+    //    if (date > today)
+    //        return true;
 
-        // Past days are invalid
-        if (date < today)
-            return false;
+    //    // Past days are invalid
+    //    if (date < today)
+    //        return false;
 
-        // Same-day booking – ensure the slot has not started yet
-        int startHour = slot switch
-        {
-            ShiftSlot.Morning1 => 8,
-            ShiftSlot.Morning2 => 10,
-            ShiftSlot.Afternoon1 => 13,
-            ShiftSlot.Afternoon2 => 15,
-            _ => 0
-        };
+    //    // Same-day booking – ensure the slot has not started yet
+    //    int startHour = slot switch
+    //    {
+    //        ShiftSlot.Morning1 => 8,
+    //        ShiftSlot.Morning2 => 10,
+    //        ShiftSlot.Afternoon1 => 13,
+    //        ShiftSlot.Afternoon2 => 15,
+    //        _ => 0
+    //    };
 
-        var slotStart = date.ToDateTime(new TimeOnly(startHour, 0));
-        return DateTime.UtcNow < slotStart;
-    }
+    //    var slotStart = date.ToDateTime(new TimeOnly(startHour, 0));
+    //    return DateTime.UtcNow < slotStart;
+    //}
     
     private bool IsCancelled(Appointment appointment)
     {
@@ -263,11 +263,11 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                             if (request == null)
                                 throw new ArgumentNullException(nameof(request), "request cannot be null.");
                 
-                            if (!IsValidDate(request.AppointmentDate, request.Slot))
-                            {
-                                _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
-                                return null;
-                            }
+                            //if (!IsValidDate(request.AppointmentDate, request.Slot))
+                            //{
+                            //    _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
+                            //    return null;
+                            //}
                 
                             var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
                                 .FirstOrDefaultAsync(
@@ -369,11 +369,11 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                if (!IsValidDate(request.AppointmentDate, request.Slot))
-                {
-                    _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
-                    return null;
-                }
+                //if (!IsValidDate(request.AppointmentDate, request.Slot))
+                //{
+                //    _logger.LogWarning("Invalid appointment date: {AppointmentDate}", request.AppointmentDate);
+                //    return null;
+                //}
                 
                 var existingAppointment = await _unitOfWork.GetRepository<Appointment>()
                     .FirstOrDefaultAsync(

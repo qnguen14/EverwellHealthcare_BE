@@ -127,6 +127,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Everwell.API.Controllers.MeetingController",
+    "Method": "TestExpiredAppointmentHandling",
+    "RelativePath": "api/Meeting/test/expired-appointment",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Everwell.API.Controllers.MenstrualCycleTrackingsController",
     "Method": "GetAllMenstrualCycleTrackings",
     "RelativePath": "api/menstrual-cycle-trackings",
