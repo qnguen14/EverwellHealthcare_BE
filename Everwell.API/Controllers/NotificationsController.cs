@@ -23,7 +23,7 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<GetNotificationResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin,Customer,Consultant")]
+    [Authorize(Roles = "Admin,Customer,Consultant,Staff")]
     public async Task<IActionResult> GetUserNotifications()
     {
         var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
@@ -39,7 +39,7 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<GetNotificationResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin,Customer,Consultant")]
+    [Authorize(Roles = "Admin,Customer,Consultant,Staff")]
     public async Task<IActionResult> MarkAsRead(Guid id)
     {
         var result = await _notificationService.MarkAsRead(id);
@@ -64,7 +64,7 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<GetNotificationResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin,Customer,Consultant")]
+    [Authorize(Roles = "Admin,Customer,Consultant,Staff")]
     public async Task<IActionResult> DeleteNotification(Guid id)
     {
         var result = await _notificationService.DeleteNotification(id);
