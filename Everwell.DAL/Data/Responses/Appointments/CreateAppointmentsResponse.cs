@@ -32,4 +32,8 @@ public class CreateAppointmentsResponse
     public bool IsVirtual { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    // Thêm thời gian check-in / check-out
+    public DateTime? CheckInTimeUtc { get; set; }
+    public DateTime? CheckOutTimeUtc { get; set; }
 }
