@@ -61,6 +61,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Slot, opt => opt.MapFrom(src => src.Slot))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                .ForMember(dest => dest.CheckInTimeUtc, opt => opt.MapFrom(src => src.CheckInTimeUtc))
+                .ForMember(dest => dest.CheckOutTimeUtc, opt => opt.MapFrom(src => src.CheckOutTimeUtc))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
             CreateMap<Appointment, CheckOutResponse>()

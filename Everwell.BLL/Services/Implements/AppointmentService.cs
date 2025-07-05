@@ -732,6 +732,8 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 appt.CheckInTimeUtc = DateTime.UtcNow;
                 appt.Status = AppointmentStatus.Temp; // Set to Temp status for check-in
                 
+                await _unitOfWork.SaveChangesAsync();
+                
                 return _mapper.Map<CheckInResponse>(appt);
             });
         }
