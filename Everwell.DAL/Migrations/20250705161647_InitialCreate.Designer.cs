@@ -12,15 +12,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Everwell.DAL.Migrations
 {
     [DbContext(typeof(EverwellDbContext))]
-    [Migration("20250622082200_MakeConsultantIdNullableInQuestions")]
-    partial class MakeConsultantIdNullableInQuestions
+    [Migration("20250705161647_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("EverWellDB_v2.5")
                 .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -37,6 +36,14 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("date")
                         .HasColumnName("appointment_date");
 
+                    b.Property<DateTime?>("CheckInTimeUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_in_utc");
+
+                    b.Property<DateTime?>("CheckOutTimeUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_out_utc");
+
                     b.Property<Guid>("ConsultantId")
                         .HasColumnType("uuid")
                         .HasColumnName("consultant_id");
@@ -48,6 +55,22 @@ namespace Everwell.DAL.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid")
                         .HasColumnName("customer_id");
+
+                    b.Property<string>("GoogleEventId")
+                        .HasColumnType("text")
+                        .HasColumnName("google_event_id");
+
+                    b.Property<string>("GoogleMeetLink")
+                        .HasColumnType("text")
+                        .HasColumnName("google_meet_url");
+
+                    b.Property<bool>("IsVirtual")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_virtual");
+
+                    b.Property<string>("MeetingId")
+                        .HasColumnType("text")
+                        .HasColumnName("meeting_id");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text")
@@ -67,7 +90,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Appointment", "EverWellDB_v2.5");
+                    b.ToTable("Appointment");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.BlacklistedToken", b =>
@@ -98,7 +121,7 @@ namespace Everwell.DAL.Migrations
                     b.HasIndex("TokenHash")
                         .IsUnique();
 
-                    b.ToTable("BlacklistedTokens", "EverWellDB_v2.5");
+                    b.ToTable("BlacklistedTokens");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.ConsultantSchedule", b =>
@@ -133,7 +156,7 @@ namespace Everwell.DAL.Migrations
                     b.HasIndex("ConsultantId", "WorkDate", "Slot")
                         .IsUnique();
 
-                    b.ToTable("ConsultantSchedule", "EverWellDB_v2.5");
+                    b.ToTable("ConsultantSchedule");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Feedback", b =>
@@ -176,7 +199,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Feedback", "EverWellDB_v2.5");
+                    b.ToTable("Feedback");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.MenstrualCycleNotification", b =>
@@ -211,7 +234,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("TrackingId");
 
-                    b.ToTable("MenstrualCycleNotification", "EverWellDB_v2.5");
+                    b.ToTable("MenstrualCycleNotification");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.MenstrualCycleTracking", b =>
@@ -257,7 +280,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("MenstrualCycleTracking", "EverWellDB_v2.5");
+                    b.ToTable("MenstrualCycleTracking");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Notification", b =>
@@ -331,7 +354,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", "EverWellDB_v2.5");
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.PaymentTransaction", b =>
@@ -372,7 +395,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("StiTestingId");
 
-                    b.ToTable("PaymentTransactions", "EverWellDB_v2.5");
+                    b.ToTable("PaymentTransactions");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Post", b =>
@@ -417,7 +440,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("Post", "EverWellDB_v2.5");
+                    b.ToTable("Post");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Question", b =>
@@ -468,7 +491,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Questions", "EverWellDB_v2.5");
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Role", b =>
@@ -487,7 +510,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", "EverWellDB_v2.5");
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.STITesting", b =>
@@ -549,7 +572,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("STITesting", "EverWellDB_v2.5");
+                    b.ToTable("STITesting");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.TestResult", b =>
@@ -592,7 +615,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("TestResults", "EverWellDB_v2.5");
+                    b.ToTable("TestResults");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.User", b =>
@@ -647,7 +670,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", "EverWellDB_v2.5");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Appointment", b =>

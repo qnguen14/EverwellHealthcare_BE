@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Everwell.DAL.Migrations
 {
     [DbContext(typeof(EverwellDbContext))]
-    [Migration("20250605142524_updatedappointmentv2")]
-    partial class updatedappointmentv2
+    [Migration("20250705162602_changeSchema")]
+    partial class changeSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("EverWellDB_v1")
+                .HasDefaultSchema("EverWellDB_v2.5")
                 .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -37,6 +37,14 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("date")
                         .HasColumnName("appointment_date");
 
+                    b.Property<DateTime?>("CheckInTimeUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_in_utc");
+
+                    b.Property<DateTime?>("CheckOutTimeUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_out_utc");
+
                     b.Property<Guid>("ConsultantId")
                         .HasColumnType("uuid")
                         .HasColumnName("consultant_id");
@@ -49,13 +57,25 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("customer_id");
 
+                    b.Property<string>("GoogleEventId")
+                        .HasColumnType("text")
+                        .HasColumnName("google_event_id");
+
+                    b.Property<string>("GoogleMeetLink")
+                        .HasColumnType("text")
+                        .HasColumnName("google_meet_url");
+
+                    b.Property<bool>("IsVirtual")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_virtual");
+
+                    b.Property<string>("MeetingId")
+                        .HasColumnType("text")
+                        .HasColumnName("meeting_id");
+
                     b.Property<string>("Notes")
                         .HasColumnType("text")
                         .HasColumnName("notes");
-
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("service_id");
 
                     b.Property<int>("Slot")
                         .HasColumnType("integer")
@@ -71,14 +91,43 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("ServiceId");
+                    b.ToTable("Appointment", "EverWellDB_v2.5");
+                });
 
-                    b.ToTable("Appointment", "EverWellDB_v1");
+            modelBuilder.Entity("Everwell.DAL.Data.Entities.BlacklistedToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("BlacklistedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("blacklistedAt");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expiresAt");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("tokenHash");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.ToTable("BlacklistedTokens", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.ConsultantSchedule", b =>
                 {
-                    b.Property<Guid>("ScheduleId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("schedule_id");
@@ -87,11 +136,15 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("consultant_id");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean")
                         .HasColumnName("is_available");
 
-                    b.Property<int>("ShiftSlot")
+                    b.Property<int>("Slot")
                         .HasColumnType("integer")
                         .HasColumnName("shift_slot");
 
@@ -99,12 +152,12 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("date")
                         .HasColumnName("work_date");
 
-                    b.HasKey("ScheduleId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ConsultantId", "WorkDate", "ShiftSlot")
+                    b.HasIndex("ConsultantId", "WorkDate", "Slot")
                         .IsUnique();
 
-                    b.ToTable("ConsultantSchedule", "EverWellDB_v1");
+                    b.ToTable("ConsultantSchedule", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Feedback", b =>
@@ -139,10 +192,6 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("rating");
 
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("service_id");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AppointmentId");
@@ -151,9 +200,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("Feedback", "EverWellDB_v1");
+                    b.ToTable("Feedback", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.MenstrualCycleNotification", b =>
@@ -162,6 +209,10 @@ namespace Everwell.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("notification_id");
+
+                    b.Property<bool>("IsSent")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_sent");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -184,7 +235,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("TrackingId");
 
-                    b.ToTable("MenstrualCycleNotification", "EverWellDB_v1");
+                    b.ToTable("MenstrualCycleNotification", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.MenstrualCycleTracking", b =>
@@ -230,7 +281,122 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("MenstrualCycleTracking", "EverWellDB_v1");
+                    b.ToTable("MenstrualCycleTracking", "EverWellDB_v2.5");
+                });
+
+            modelBuilder.Entity("Everwell.DAL.Data.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AppointmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("appointment_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_read");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("message");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<Guid?>("QuestionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("question_id");
+
+                    b.Property<Guid?>("STITestingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("stitesting_id");
+
+                    b.Property<Guid?>("TestResultId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("test_result_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("title");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("notification_type");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("IsRead");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("STITestingId");
+
+                    b.HasIndex("TestResultId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications", "EverWellDB_v2.5");
+                });
+
+            modelBuilder.Entity("Everwell.DAL.Data.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OrderInfo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResponseCode")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("StiTestingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StiTestingId");
+
+                    b.ToTable("PaymentTransactions", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Post", b =>
@@ -249,9 +415,14 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("text")
                         .HasColumnName("content");
 
-                    b.Property<DateOnly>("CreatedAt")
-                        .HasColumnType("date")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
 
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uuid")
@@ -270,7 +441,7 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("Post", "EverWellDB_v1");
+                    b.ToTable("Post", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Question", b =>
@@ -288,7 +459,7 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("answered_at");
 
-                    b.Property<Guid>("ConsultantId")
+                    b.Property<Guid?>("ConsultantId")
                         .HasColumnType("uuid")
                         .HasColumnName("consultant_id");
 
@@ -321,7 +492,26 @@ namespace Everwell.DAL.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Questions", "EverWellDB_v1");
+                    b.ToTable("Questions", "EverWellDB_v2.5");
+                });
+
+            modelBuilder.Entity("Everwell.DAL.Data.Entities.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.STITesting", b =>
@@ -331,77 +521,59 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("AppointmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("appointment_id");
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
 
-                    b.Property<DateOnly?>("CollectedDate")
-                        .HasColumnType("date")
-                        .HasColumnName("collected_date");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid")
                         .HasColumnName("customer_id");
 
-                    b.Property<int>("Method")
-                        .HasColumnType("integer")
-                        .HasColumnName("method");
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_paid");
 
-                    b.Property<int>("Status")
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("notes");
+
+                    b.Property<DateTime?>("SampleTakenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sample_taken_at");
+
+                    b.Property<DateOnly?>("ScheduleDate")
+                        .IsRequired()
+                        .HasColumnType("date")
+                        .HasColumnName("schedule_date");
+
+                    b.Property<int>("Slot")
                         .HasColumnType("integer")
+                        .HasColumnName("slot");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("status");
 
-                    b.Property<int>("TestType")
-                        .HasColumnType("integer")
-                        .HasColumnName("test_type");
+                    b.Property<string>("TestPackage")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("test_package");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_price");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppointmentId");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("STITesting", "EverWellDB_v1");
-                });
-
-            modelBuilder.Entity("Everwell.DAL.Data.Entities.Service", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateOnly>("CreatedAt")
-                        .HasColumnType("date")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
-
-                    b.Property<DateOnly>("UpdatedAt")
-                        .HasColumnType("date")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Service", "EverWellDB_v1");
+                    b.ToTable("STITesting", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.TestResult", b =>
@@ -411,54 +583,40 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("customer_id");
+                    b.Property<string>("Comments")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("comments");
 
-                    b.Property<DateTime?>("ExaminedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("examined_at");
-
-                    b.Property<string>("ResultData")
+                    b.Property<string>("Outcome")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("result_data");
+                        .HasColumnName("outcome");
+
+                    b.Property<string>("Parameter")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("parameter");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_at");
 
                     b.Property<Guid>("STITestingId")
                         .HasColumnType("uuid")
                         .HasColumnName("sti_testing_id");
 
-                    b.Property<DateTime?>("SentAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("sent_at");
-
                     b.Property<Guid?>("StaffId")
                         .HasColumnType("uuid")
                         .HasColumnName("staff_id");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
 
                     b.HasIndex("STITestingId");
 
                     b.HasIndex("StaffId");
 
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("TestResults", "EverWellDB_v1");
+                    b.ToTable("TestResults", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.User", b =>
@@ -505,13 +663,15 @@ namespace Everwell.DAL.Migrations
                         .HasColumnType("character varying(10)")
                         .HasColumnName("phone_number");
 
-                    b.Property<int>("Role")
+                    b.Property<int>("RoleId")
                         .HasColumnType("integer")
-                        .HasColumnName("role");
+                        .HasColumnName("role_id");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", "EverWellDB_v1");
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Users", "EverWellDB_v2.5");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Appointment", b =>
@@ -528,17 +688,9 @@ namespace Everwell.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Everwell.DAL.Data.Entities.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Consultant");
 
                     b.Navigation("Customer");
-
-                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.ConsultantSchedule", b =>
@@ -572,19 +724,11 @@ namespace Everwell.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Everwell.DAL.Data.Entities.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Appointment");
 
                     b.Navigation("Consultant");
 
                     b.Navigation("Customer");
-
-                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.MenstrualCycleNotification", b =>
@@ -609,6 +753,55 @@ namespace Everwell.DAL.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Everwell.DAL.Data.Entities.Notification", b =>
+                {
+                    b.HasOne("Everwell.DAL.Data.Entities.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Everwell.DAL.Data.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId");
+
+                    b.HasOne("Everwell.DAL.Data.Entities.STITesting", "STITesting")
+                        .WithMany()
+                        .HasForeignKey("STITestingId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Everwell.DAL.Data.Entities.TestResult", "TestResult")
+                        .WithMany()
+                        .HasForeignKey("TestResultId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Everwell.DAL.Data.Entities.User", "Customer")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("STITesting");
+
+                    b.Navigation("TestResult");
+                });
+
+            modelBuilder.Entity("Everwell.DAL.Data.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("Everwell.DAL.Data.Entities.STITesting", "StiTesting")
+                        .WithMany()
+                        .HasForeignKey("StiTestingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StiTesting");
+                });
+
             modelBuilder.Entity("Everwell.DAL.Data.Entities.Post", b =>
                 {
                     b.HasOne("Everwell.DAL.Data.Entities.User", "Staff")
@@ -625,8 +818,7 @@ namespace Everwell.DAL.Migrations
                     b.HasOne("Everwell.DAL.Data.Entities.User", "Consultant")
                         .WithMany()
                         .HasForeignKey("ConsultantId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Everwell.DAL.Data.Entities.User", "Customer")
                         .WithMany()
@@ -641,30 +833,17 @@ namespace Everwell.DAL.Migrations
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.STITesting", b =>
                 {
-                    b.HasOne("Everwell.DAL.Data.Entities.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Everwell.DAL.Data.Entities.User", "Customer")
                         .WithMany("STITests")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Appointment");
-
                     b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.TestResult", b =>
                 {
-                    b.HasOne("Everwell.DAL.Data.Entities.User", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Everwell.DAL.Data.Entities.STITesting", "STITesting")
                         .WithMany("TestResults")
                         .HasForeignKey("STITestingId")
@@ -672,23 +851,24 @@ namespace Everwell.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("Everwell.DAL.Data.Entities.User", "Staff")
-                        .WithMany()
+                        .WithMany("TestResultsExamined")
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Everwell.DAL.Data.Entities.User", null)
-                        .WithMany("TestResultsExamined")
-                        .HasForeignKey("UserId");
-
-                    b.HasOne("Everwell.DAL.Data.Entities.User", null)
-                        .WithMany("TestResultsSent")
-                        .HasForeignKey("UserId1");
-
-                    b.Navigation("Customer");
 
                     b.Navigation("STITesting");
 
                     b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Everwell.DAL.Data.Entities.User", b =>
+                {
+                    b.HasOne("Everwell.DAL.Data.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.MenstrualCycleTracking", b =>
@@ -703,13 +883,13 @@ namespace Everwell.DAL.Migrations
 
             modelBuilder.Entity("Everwell.DAL.Data.Entities.User", b =>
                 {
+                    b.Navigation("Notifications");
+
                     b.Navigation("Posts");
 
                     b.Navigation("STITests");
 
                     b.Navigation("TestResultsExamined");
-
-                    b.Navigation("TestResultsSent");
                 });
 #pragma warning restore 612, 618
         }
