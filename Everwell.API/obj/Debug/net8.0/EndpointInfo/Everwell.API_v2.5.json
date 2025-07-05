@@ -2463,6 +2463,36 @@
         }
       }
     },
+    "/api/Meeting/appointment/{appointmentId}/agora-info": {
+      "get": {
+        "tags": [
+          "Meeting"
+        ],
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/menstrual-cycle-trackings": {
       "get": {
         "tags": [

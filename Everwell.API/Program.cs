@@ -71,6 +71,7 @@ builder.Services.AddScoped<IDailyService, DailyService>();
 builder.Services.AddHttpClient(); // Add HttpClient for Daily.co API calls
 builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.MenstrualCycleNotificationService>();
 // Removed AgoraChannelManagementService – Agora has been deprecated
+builder.Services.AddScoped<IAgoraService, AgoraService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

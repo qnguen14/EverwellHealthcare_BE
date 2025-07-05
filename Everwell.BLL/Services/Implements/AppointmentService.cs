@@ -307,36 +307,13 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                             // Create Daily room if appointment is virtual
                             if (request.IsVirtual)
                             {
-                                try
-                                {
-                                    _logger.LogInformation("🔍 Creating Daily meeting for virtual appointment {AppointmentId}", newAppointment.Id);
-                                    var meetLink = await _calendarService.CreateVideoMeetingAsync(newAppointment);
-                                    
-                                    if (string.IsNullOrEmpty(meetLink))
-                                    {
-                                        throw new Exception("Meeting link generation returned null or empty");
-                                    }
-                                    
-                                    newAppointment.GoogleMeetLink = meetLink; // Store Daily meeting URL
-                                    newAppointment.MeetingId = ExtractRoomNameFromUrl(meetLink); // Store room name
-                                    
-                                    _logger.LogInformation("✅ Daily room created successfully for appointment {AppointmentId}: {MeetLink}", 
-                                        newAppointment.Id, meetLink);
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogError(ex, "❌ Failed to create Daily room for appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", newAppointment.Id);
-                                    _logger.LogError("🔍 DEBUG - Daily error details: {ErrorMessage}", ex.Message);
-                                    _logger.LogError("🔍 DEBUG - Daily stack trace: {StackTrace}", ex.StackTrace);
-                                    
-                                    // Set a fallback meeting URL so users can still access the meeting page
-                                    var fallbackUrl = $"{_configuration?["Daily:BaseUrl"] ?? "http://localhost:5173/meeting"}/{newAppointment.Id}";
-                                    newAppointment.GoogleMeetLink = fallbackUrl;
-                                    newAppointment.MeetingId = newAppointment.Id.ToString();
-                                    
-                                    _logger.LogWarning("⚠️ Set fallback meeting URL for appointment {AppointmentId}: {FallbackUrl}", 
-                                        newAppointment.Id, fallbackUrl);
-                                }
+                                // Set Agora meeting URL - no need to create room in advance
+                                var agoraMeetingUrl = $"{_configuration?["Frontend:BaseUrl"] ?? "http://localhost:5173"}/meeting/{newAppointment.Id}";
+                                newAppointment.GoogleMeetLink = agoraMeetingUrl;
+                                newAppointment.MeetingId = newAppointment.Id.ToString();
+                                
+                                _logger.LogInformation("✅ Agora meeting URL set for appointment {AppointmentId}: {MeetingUrl}", 
+                                    newAppointment.Id, agoraMeetingUrl);
                             }
                 
                             await _unitOfWork.GetRepository<Appointment>().InsertAsync(newAppointment);
@@ -415,22 +392,15 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                 bool wasVirtual = existingAppointment.IsVirtual;
                 existingAppointment.IsVirtual = request.IsVirtual;
                 
-                // If changing from non-virtual to virtual, create Daily room
+                // If changing from non-virtual to virtual, set Agora meeting URL
                 if (!wasVirtual && request.IsVirtual)
                 {
-                    try
-                    {
-                        var meetLink = await _calendarService.CreateVideoMeetingAsync(existingAppointment);
-                        existingAppointment.GoogleMeetLink = meetLink;
-                        
-                        _logger.LogInformation("Daily room created for updated appointment {AppointmentId}: {MeetLink}", 
-                            existingAppointment.Id, meetLink);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to create Daily room for updated appointment {AppointmentId}. Appointment will remain virtual but without meeting link.", existingAppointment.Id);
-                        // Keep the appointment as virtual even if video meeting creation fails
-                    }
+                    var agoraMeetingUrl = $"{_configuration?["Frontend:BaseUrl"] ?? "http://localhost:5173"}/meeting/{existingAppointment.Id}";
+                    existingAppointment.GoogleMeetLink = agoraMeetingUrl;
+                    existingAppointment.MeetingId = existingAppointment.Id.ToString();
+                    
+                    _logger.LogInformation("Agora meeting URL set for updated appointment {AppointmentId}: {MeetingUrl}", 
+                        existingAppointment.Id, agoraMeetingUrl);
                 }
                 // If changing from virtual to non-virtual, remove video meeting
                 else if (wasVirtual && !request.IsVirtual)

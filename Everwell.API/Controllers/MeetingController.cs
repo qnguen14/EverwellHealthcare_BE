@@ -20,15 +20,18 @@ namespace Everwell.API.Controllers
         private readonly ILogger<MeetingController> _logger;
         private readonly IUnitOfWork<EverwellDbContext> _unitOfWork;
         private readonly IDailyService _dailyService;
+        private readonly IAgoraService _agoraService;
 
         public MeetingController(
             ILogger<MeetingController> logger,
             IUnitOfWork<EverwellDbContext> unitOfWork,
-            IDailyService dailyService)
+            IDailyService dailyService,
+            IAgoraService agoraService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _dailyService = dailyService;
+            _agoraService = agoraService;
         }
 
         [HttpGet("appointment/{appointmentId}/debug")]
@@ -476,6 +479,78 @@ namespace Everwell.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error testing expired appointment handling");
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
+        [HttpGet("appointment/{appointmentId}/agora-info")]
+        [Authorize]
+        public async Task<IActionResult> GetAgoraMeetingInfo(Guid appointmentId, [FromQuery] string userId = null)
+        {
+            try
+            {
+                var appointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(
+                        predicate: a => a.Id == appointmentId,
+                        include: a => a.Include(ap => ap.Customer).Include(ap => ap.Consultant)
+                    );
+
+                if (appointment == null)
+                {
+                    return NotFound(new { message = "Appointment not found" });
+                }
+
+                Guid? callerId = null;
+                if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out var parsed))
+                {
+                    callerId = parsed;
+                }
+                else
+                {
+                    var subClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    if (Guid.TryParse(subClaim, out var claimGuid)) callerId = claimGuid;
+                }
+
+                if (!callerId.HasValue)
+                {
+                    return Unauthorized("User identification required");
+                }
+
+                var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+                bool isDirectlyAuthorized = appointment.CustomerId == callerId || appointment.ConsultantId == callerId;
+                bool isAdmin = userRole == "Admin";
+
+                if (!isAdmin && !isDirectlyAuthorized)
+                {
+                    return Forbid();
+                }
+
+                // Xác định vai trò host (bác sĩ)
+                bool isHost = appointment.ConsultantId == callerId;
+
+                var channelName = _agoraService.BuildChannelName(appointment);
+                uint uid = (uint)(callerId.Value.GetHashCode() & 0x7FFFFFFF);
+                var rtcToken = _agoraService.GenerateRtcToken(channelName, uid, isHost);
+
+                var startUtc = GetAppointmentStartTimeUtc(appointment);
+                var endUtc = GetAppointmentEndTimeUtc(appointment);
+                var tz = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+
+                return Ok(new
+                {
+                    AppointmentId = appointmentId,
+                    AppId = _agoraService.GetAppId(),
+                    ChannelName = channelName,
+                    RtcToken = rtcToken,
+                    Uid = uid,
+                    IsHost = isHost,
+                    StartTime = TimeZoneInfo.ConvertTimeFromUtc(startUtc, tz),
+                    EndTime = TimeZoneInfo.ConvertTimeFromUtc(endUtc, tz)
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating Agora meeting info for {AppointmentId}", appointmentId);
                 return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
         }
