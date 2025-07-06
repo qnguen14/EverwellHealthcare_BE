@@ -9,6 +9,8 @@ using Everwell.DAL.Data.Requests.Questions;
 using Everwell.DAL.Data.Responses.Questions;
 using Everwell.DAL.Data.Requests.Notifications;
 using System.Security.Claims;
+using System.Linq;
+using Everwell.DAL.Data.Entities;
 
 namespace Everwell.BLL.Services.Implements;
 
@@ -76,9 +78,33 @@ public class QuestionService : BaseService<QuestionService>, IQuestionService
                 question.Status = QuestionStatus.Pending;
                 // ConsultantId remains null for unassigned questions
                 
+                // Add random consultant assignment
+                Guid? assignedConsultantId = null;
+                if (request.ConsultantId != null)
+                {
+                    assignedConsultantId = request.ConsultantId;
+                }
+                else
+                {
+                    // Lấy tất cả consultant đang hoạt động
+                    var consultants = await _unitOfWork.GetRepository<User>()
+                        .GetListAsync(predicate: u => u.RoleId == (int)RoleName.Consultant && u.IsActive);
+
+                    if (consultants.Any())
+                    {
+                        // Chọn ngẫu nhiên
+                        var random = new Random();
+                        var selected = consultants.ElementAt(random.Next(consultants.Count()));
+                        assignedConsultantId = selected.Id;
+                    }
+                }
+
+                question.ConsultantId = assignedConsultantId;
+                question.Status = assignedConsultantId != null ? QuestionStatus.Assigned : QuestionStatus.Pending;
+                
                 await _unitOfWork.GetRepository<Question>().InsertAsync(question);
                 
-                // Notify all consultants about the new question
+                // Luôn gửi thông báo cho TẤT CẢ consultant để họ theo dõi
                 await NotifyConsultantsAboutNewQuestion(question);
                 
                 return _mapper.Map<CreateQuestionResponse>(question);
@@ -203,8 +229,6 @@ public class QuestionService : BaseService<QuestionService>, IQuestionService
         }
     }
 
-
-
     public async Task<QuestionResponse?> AssignQuestionToConsultantAsync(Guid questionId, Guid consultantId)
     {
         try
@@ -266,7 +290,17 @@ public class QuestionService : BaseService<QuestionService>, IQuestionService
                 question.AnsweredAt = DateTime.UtcNow;
                 
                 _unitOfWork.GetRepository<Question>().UpdateAsync(question);
-                return _mapper.Map<QuestionResponse>(question);
+                var mapped = _mapper.Map<QuestionResponse>(question);
+                try
+                {
+                    await NotifyCustomerQuestionAnswered(question);
+                }
+                catch (Exception notifyEx)
+                {
+                    _logger.LogError(notifyEx, "Failed to notify customer about answered question {QuestionId}", id);
+                }
+
+                return mapped;
             });
         }
         catch (Exception ex)
@@ -343,5 +377,46 @@ public class QuestionService : BaseService<QuestionService>, IQuestionService
             _logger.LogError(ex, "Failed to notify consultants about new question {QuestionId}", question.QuestionId);
             // Don't throw here - notification failure shouldn't prevent question creation
         }
+    }
+
+    private async Task NotifySingleConsultant(Question question, Guid consultantId)
+    {
+        try
+        {
+            var consultant = await _unitOfWork.GetRepository<User>().FirstOrDefaultAsync(predicate: u => u.Id == consultantId, include: u => u.Include(x => x.Role));
+            if (consultant == null) return;
+
+            var notificationRequest = new CreateNotificationRequest
+            {
+                UserId = consultant.Id,
+                Title = "New Question Assigned",
+                Message = $"A new question titled '{question.Title}' has been assigned to you.",
+                Type = NotificationType.Question,
+                Priority = NotificationPriority.Medium,
+                QuestionId = question.QuestionId
+            };
+            await _notificationService.CreateNotification(notificationRequest);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to notify consultant {ConsultantId} about question {QuestionId}", consultantId, question.QuestionId);
+        }
+    }
+
+    private async Task NotifyCustomerQuestionAnswered(Question question)
+    {
+        if (question.CustomerId == Guid.Empty) return;
+
+        var notificationRequest = new CreateNotificationRequest
+        {
+            UserId = question.CustomerId,
+            Title = "Câu hỏi của bạn đã được trả lời",
+            Message = $"Câu hỏi '{question.Title}' đã có câu trả lời từ tư vấn viên.",
+            Type = NotificationType.Question,
+            Priority = NotificationPriority.Medium,
+            QuestionId = question.QuestionId
+        };
+
+        await _notificationService.CreateNotification(notificationRequest);
     }
 } 
