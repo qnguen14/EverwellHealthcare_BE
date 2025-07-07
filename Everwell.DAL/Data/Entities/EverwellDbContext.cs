@@ -203,6 +203,23 @@ namespace Everwell.DAL.Data.Entities
                 entity.HasIndex(n => n.CreatedAt);
             });
             
+            // ChatMessage relationships
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.HasOne(cm => cm.Appointment)
+                    .WithMany()
+                    .HasForeignKey(cm => cm.AppointmentId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cm => cm.Sender)
+                    .WithMany()
+                    .HasForeignKey(cm => cm.SenderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Create indexes for common query patterns
+                entity.HasIndex(cm => new { cm.AppointmentId, cm.SentAt });
+                entity.HasIndex(cm => cm.SenderId);
+            });
             
         }
 
@@ -221,5 +238,6 @@ namespace Everwell.DAL.Data.Entities
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Role> Roles { get; set; }
         public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
     }
 }

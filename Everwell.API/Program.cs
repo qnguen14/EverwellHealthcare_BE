@@ -45,7 +45,7 @@ builder.Services.AddDbContext<EverwellDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork<EverwellDbContext>, UnitOfWork<EverwellDbContext>>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAutoMapper(typeof(UserMapper));
+builder.Services.AddAutoMapper(typeof(UserMapper), typeof(ChatMapper));
 
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -68,7 +68,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<IDailyService, DailyService>();
-builder.Services.AddHttpClient(); // Add HttpClient for Daily.co API calls
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddHttpClient<IAiChatService, EnhancedGeminiChatService>();
 builder.Services.AddHostedService<Everwell.BLL.Services.BackgroundServices.MenstrualCycleNotificationService>();
 // Removed AgoraChannelManagementService – Agora has been deprecated
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
