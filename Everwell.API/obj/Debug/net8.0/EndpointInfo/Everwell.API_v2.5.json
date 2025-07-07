@@ -6,6 +6,68 @@
     "version": "v2.5"
   },
   "paths": {
+    "/api/v2.5/chat/gemini": {
+      "post": {
+        "tags": [
+          "AiChat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromptDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromptDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v2.5/chat/gemini/validate-domain": {
+      "post": {
+        "tags": [
+          "AiChat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateDomainRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateDomainRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateDomainRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v2.5/appointment/getall": {
       "get": {
         "tags": [
@@ -10267,6 +10329,16 @@
         "type": "integer",
         "format": "int32"
       },
+      "PromptDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "QuestionResponse": {
         "type": "object",
         "properties": {
@@ -11554,6 +11626,16 @@
             "items": {
               "$ref": "#/components/schemas/UserRegistrationTrend"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValidateDomainRequest": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
             "nullable": true
           }
         },

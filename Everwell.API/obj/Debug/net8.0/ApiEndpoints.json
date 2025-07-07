@@ -1328,6 +1328,38 @@
     ]
   },
   {
+    "ContainingType": "Everwell.API.Controllers.AiChatController",
+    "Method": "Ask",
+    "RelativePath": "api/v2.5/chat/gemini",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "Everwell.API.Controllers.AiChatController\u002BPromptDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.AiChatController",
+    "Method": "ValidateDomain",
+    "RelativePath": "api/v2.5/chat/gemini/validate-domain",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Everwell.API.Controllers.AiChatController\u002BValidateDomainRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Everwell.API.Controllers.DashboardController",
     "Method": "GetAppointmentsByStatus",
     "RelativePath": "api/v2.5/dashboard/appointments-by-status",
