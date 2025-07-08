@@ -20,6 +20,7 @@ An integrated web-based platform for managing services related to sexual and rep
 - JWT Bearer authentication.
 - BCrypt.NET for encryptions.
 - Swagger/OpenAPI documentation.
+- **Agora.io** for video consultations (see [AGORA_SETUP.md](Everwell.API/AGORA_SETUP.md))
 
 ### Database & Storage (not yet implemented): 
 - PostgreSQL (Azure DB).

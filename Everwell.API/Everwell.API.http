@@ -4,3 +4,58 @@ GET {{SexCare.API_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+### Agora API Testing
+### Note: You need to be authenticated first. Use your JWT token below:
+@auth_token = YOUR_JWT_TOKEN_HERE
+
+### 1. Test Agora Channel Creation
+POST {{SexCare.API_HostAddress}}/api/agora/test-channel
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### 2. Test Agora Channel Creation with Specific Appointment ID
+POST {{SexCare.API_HostAddress}}/api/agora/test-channel?appointmentId=550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### 3. Test Agora Token Generation - Default Parameters
+POST {{SexCare.API_HostAddress}}/api/agora/generate-token
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### 4. Test Agora Token Generation - Custom Parameters
+POST {{SexCare.API_HostAddress}}/api/agora/generate-token?channelName=my-test-channel&userId=67890
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### 5. Test Real Appointment Channel Creation (Replace with actual appointment ID)
+GET {{SexCare.API_HostAddress}}/api/agora/test-real-appointment/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### Authentication Endpoints (Get your JWT token here first)
+### 6. Login to get JWT token
+POST {{SexCare.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "your-email@example.com",
+  "password": "your-password"
+}
+
+### 7. Register new account (if needed)
+POST {{SexCare.API_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test123!",
+  "name": "Test User",
+  "phoneNumber": "1234567890"
+}
+
+### Health Check
+### 8. Basic Health Check
+GET {{SexCare.API_HostAddress}}/api/health
+Accept: application/json

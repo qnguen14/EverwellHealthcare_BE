@@ -60,10 +60,30 @@
             background-color: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
+            padding: 15px;
         }
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        a.button {
+            display: inline-block;
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+        }
+        a.button:hover {
+            background: #005a85;
         }
     </style>
 </head>
@@ -74,8 +94,12 @@
         <div class="test-section">
             <h3>Test Agora Service (No Auth Required)</h3>
             <p>This will test your Agora implementation and create a room you can join immediately.</p>
-            <button onclick="testAgoraService()">Create Test Room</button>
-            <div id="testResult"></div>
+            <a href="https://localhost:7050/api/Meeting/test-agora/123e4567-e89b-12d3-a456-426614174000" target="_blank" class="button">
+                Create Test Room
+            </a>
+            <div class="info" style="margin-top: 15px;">
+                <p>Click the button above to open the test endpoint directly in your browser</p>
+            </div>
         </div>
 
         <div class="test-section">
@@ -83,127 +107,53 @@
             <p>This bypasses time validation so you can join any time.</p>
             <input type="text" id="appointmentId" placeholder="Enter Appointment ID" 
                    value="123e4567-e89b-12d3-a456-426614174000" style="width: 300px; padding: 5px;">
-            <button onclick="joinWithBypass()">Join Room (Bypass Time)</button>
-            <div id="joinResult"></div>
+            <a id="bypassLink" href="https://localhost:7050/api/Meeting/join/123e4567-e89b-12d3-a456-426614174000?bypass=true" target="_blank" class="button">
+                Join Room (Bypass Time)
+            </a>
+            <div class="info" style="margin-top: 15px;">
+                <p><strong>Note:</strong> You'll need to be authenticated to use this endpoint.</p>
+            </div>
         </div>
-
+        
         <div class="test-section">
-            <h3>Quick Links</h3>
-            <p>Use these URLs directly in Postman or browser:</p>
-            <div class="info">
-                <strong>Test Endpoint (No Auth):</strong><br>
-                GET http://localhost:7050/api/Meeting/test-agora/123e4567-e89b-12d3-a456-426614174000
-            </div>
-            <br>
-            <div class="info">
-                <strong>Join with Bypass (With Auth):</strong><br>
-                POST http://localhost:7050/api/Meeting/join/123e4567-e89b-12d3-a456-426614174000?bypass=true
-            </div>
+            <h3>Testing Meeting URL</h3>
+            <p>To test a meeting URL like <code>http://localhost:5173/meeting/8db052ff-7acb-4333-9071-d03abac121cf</code>:</p>
+            <ol>
+                <li>Make sure your frontend application is running at <code>http://localhost:5173</code></li>
+                <li>The frontend should have the Agora SDK integrated</li>
+                <li>The frontend should handle URLs in the format <code>/meeting/{appointmentId}</code></li>
+            </ol>
+            <p>If you don't have a frontend yet, the meeting URL won't work when clicked.</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>API Response Example</h3>
+            <p>When successful, the API will return a response like this:</p>
+            <pre class="info">{
+  "data": {
+    "MeetingUrl": "http://localhost:5173/meeting/8db052ff-7acb-4333-9071-d03abac121cf",
+    "ChannelName": "appointment_8db052ff-7acb-4333-9071-d03abac121cf",
+    "Token": "1767daa444094beb975260eb5563925e:your-token-here:1720603469",
+    "AppId": "1767daa444094beb975260eb5563925e",
+    "StartTime": "2024-07-08T16:00:00+07:00",
+    "EndTime": "2024-07-08T17:00:00+07:00"
+  },
+  "isSuccess": true,
+  "statusCode": 200,
+  "message": "Meeting created successfully"
+}</pre>
         </div>
     </div>
 
     <script>
-        const baseUrl = 'http://localhost:7050';
-
-        async function testAgoraService() {
-            const resultDiv = document.getElementById('testResult');
-            resultDiv.innerHTML = '<div class="info">Testing Agora service...</div>';
-
-            try {
-                const response = await fetch(`${baseUrl}/api/Meeting/test-agora/123e4567-e89b-12d3-a456-426614174000`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <h4>✅ SUCCESS! Room Created:</h4>
-                            <pre>${JSON.stringify(data, null, 2)}</pre>
-                            ${data.data && data.data.MeetingUrl ? 
-                                `<br><strong>Meeting URL:</strong> <a href="${data.data.MeetingUrl}" target="_blank">${data.data.MeetingUrl}</a>` 
-                                : ''}
-                        </div>
-                    `;
-                } else {
-                    resultDiv.innerHTML = `
-                        <div class="error">
-                            <h4>❌ Error:</h4>
-                            <pre>${JSON.stringify(data, null, 2)}</pre>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `
-                    <div class="error">
-                        <h4>❌ Network Error:</h4>
-                        <p>${error.message}</p>
-                        <p>Make sure the API is running on http://localhost:7050</p>
-                    </div>
-                `;
+        // Update the bypass link when appointment ID changes
+        document.getElementById('appointmentId').addEventListener('input', function() {
+            const id = this.value;
+            if (id) {
+                const link = `https://localhost:7050/api/Meeting/join/${id}?bypass=true`;
+                document.getElementById('bypassLink').href = link;
             }
-        }
-
-        async function joinWithBypass() {
-            const appointmentId = document.getElementById('appointmentId').value;
-            const resultDiv = document.getElementById('joinResult');
-            
-            if (!appointmentId) {
-                resultDiv.innerHTML = '<div class="error">Please enter an appointment ID</div>';
-                return;
-            }
-
-            resultDiv.innerHTML = '<div class="info">Attempting to join room with bypass...</div>';
-
-            try {
-                const response = await fetch(`${baseUrl}/api/Meeting/join/${appointmentId}?bypass=true`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': 'Bearer YOUR_JWT_TOKEN' // You'll need a real token
-                    }
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <h4>✅ SUCCESS! You can join this room:</h4>
-                            <pre>${JSON.stringify(data, null, 2)}</pre>
-                            ${data.MeetingUrl ? 
-                                `<br><strong>Meeting URL:</strong> <a href="${data.MeetingUrl}" target="_blank">${data.MeetingUrl}</a>` 
-                                : ''}
-                        </div>
-                    `;
-                } else {
-                    resultDiv.innerHTML = `
-                        <div class="error">
-                            <h4>❌ Error (Need valid JWT token):</h4>
-                            <pre>${JSON.stringify(data, null, 2)}</pre>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `
-                    <div class="error">
-                        <h4>❌ Network Error:</h4>
-                        <p>${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Auto-test on page load
-        window.onload = function() {
-            setTimeout(() => {
-                testAgoraService();
-            }, 1000);
-        };
+        });
     </script>
 </body>
-</html> 
+</html>

@@ -12,6 +12,7 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
 {
     private readonly IConfiguration _configuration;
     private readonly IDailyService _dailyService;
+    private readonly IAgoraService _agoraService;
 
     public CalendarService(
         IUnitOfWork<EverwellDbContext> unitOfWork,
@@ -19,16 +20,52 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
         IMapper mapper,
         IHttpContextAccessor httpContextAccessor,
         IConfiguration configuration,
-        IDailyService dailyService)
+        IDailyService dailyService,
+        IAgoraService agoraService)
         : base(unitOfWork, logger, mapper, httpContextAccessor)
     {
         _configuration = configuration;
         _dailyService = dailyService;
+        _agoraService = agoraService;
     }
 
-    public async Task<string> CreateVideoMeetingAsync(Appointment appointment)
+    #region Daily Service
+
+        public async Task<string> CreateVideoMeetingAsync(Appointment appointment)
     {
         _logger.LogInformation("🔍 DEBUG - CalendarService.CreateVideoMeetingAsync called for appointment {AppointmentId}", appointment.Id);
+        
+        try
+        {
+            if (appointment == null)
+            {
+                throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null");
+            }
+
+            // Check configuration to determine which service to use (default to Agora)
+            var useAgora = _configuration.GetValue<bool?>("VideoMeeting:UseAgora") ?? true;
+            
+            if (useAgora)
+            {
+                _logger.LogInformation("🔍 DEBUG - Using Agora service for video meeting");
+                return await CreateAgoraVideoMeetingAsync(appointment);
+            }
+            else
+            {
+                _logger.LogInformation("🔍 DEBUG - Using Daily.co service for video meeting");
+                return await CreateDailyVideoMeetingAsync(appointment);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Failed to create video meeting for appointment {AppointmentId}", appointment.Id);
+            throw;
+        }
+    }
+
+    private async Task<string> CreateDailyVideoMeetingAsync(Appointment appointment)
+    {
+        _logger.LogInformation("🔍 DEBUG - CalendarService.CreateDailyVideoMeetingAsync called for appointment {AppointmentId}", appointment.Id);
         
         try
         {
@@ -134,4 +171,52 @@ public class CalendarService : BaseService<CalendarService>, ICalendarService
             return false;
         }
     }
+
+    #endregion
+
+    #region Agora Service
+
+    
+    public async Task<string> CreateAgoraVideoMeetingAsync(Appointment appointment)
+    {
+        _logger.LogInformation("🔍 DEBUG - CalendarService.CreateVideoMeetingAsync called for appointment {AppointmentId}", appointment.Id);
+        
+        try
+        {
+            if (appointment == null)
+            {
+                throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null");
+            }
+
+            _logger.LogInformation("🔍 DEBUG - About to call _agoraService.CreateChannelAsync");
+            // Create Agora channel
+            var channelInfo = await _agoraService.CreateChannelAsync(appointment);
+            
+            if (channelInfo == null)
+            {
+                throw new Exception("AgoraService returned null channel info");
+            }
+
+            if (string.IsNullOrEmpty(channelInfo.ChannelUrl))
+            {
+                throw new Exception("AgoraService returned empty channel URL");
+            }
+            
+            _logger.LogInformation("🔍 DEBUG - _agoraService.CreateChannelAsync succeeded, channelInfo.ChannelUrl: {ChannelUrl}", channelInfo.ChannelUrl);
+            
+            _logger.LogInformation("✅ Created Agora channel for appointment {AppointmentId}: {ChannelName} from {StartTime} to {EndTime}", 
+                appointment.Id, channelInfo.ChannelName, channelInfo.StartTime, channelInfo.EndTime);
+            
+            return channelInfo.ChannelUrl;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Failed to create Agora video meeting for appointment {AppointmentId}", appointment.Id);
+            throw;
+        }
+    }
+
+    #endregion
+    
+
 } 
