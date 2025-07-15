@@ -11552,6 +11552,9 @@
           "role": {
             "type": "string",
             "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

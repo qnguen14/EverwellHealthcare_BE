@@ -51,8 +51,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.Name));
-                // .ForMember(dest => dest.IsActive, opt => opt.Ignore());
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.Name))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
             // User to GetUserResponse
             CreateMap<User, GetUserResponse>()
