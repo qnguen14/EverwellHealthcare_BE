@@ -27,6 +27,7 @@
             public const string CreateUserEndpoint = UserEndpoint + "/create";
             public const string UpdateUserEndpoint = UserEndpoint + "/update/{id}";
             public const string DeleteUserEndpoint = UserEndpoint + "/delete/{id}";
+            public const string ToggleUserStatusEndpoint = UserEndpoint + "/toggle-status/{id}";
             
             // Profile endpoints
             public const string GetMyProfileEndpoint = UserEndpoint + "/profile/me";

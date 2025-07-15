@@ -184,6 +184,45 @@ namespace Everwell.API.Controllers
             }
         }
 
+        [HttpPut(ApiEndpointConstants.User.ToggleUserStatusEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<UpdateUserResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<UpdateUserResponse>> ToggleUserStatus(Guid id)
+        {
+            try
+            {
+                var response = await _userService.ToggleUserStatus(id);
+                
+                if (response == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy người dùng." });
+                }
+                
+                var apiResponse = new ApiResponse<UpdateUserResponse>
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "User status toggled successfully",
+                    IsSuccess = true,
+                    Data = response
+                };
+                return Ok(apiResponse);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
         [HttpPut(ApiEndpointConstants.User.SetRoleEndpoint)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UpdateUserResponse>> SetUserRole(Guid id, SetUserRoleRequest request)

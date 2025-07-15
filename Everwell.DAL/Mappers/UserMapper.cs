@@ -42,7 +42,7 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.Password, opt => opt.Ignore()) // Don't return password in response
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => 
                     src.Role.Name))
-                .ForMember(dest => dest.IsActive, opt => opt.Ignore());
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
             // User to UpdateUserResponse
             CreateMap<User, UpdateUserResponse>()
@@ -62,8 +62,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.Name))
-                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl));
-                // .ForMember(dest => dest.IsActive, opt => opt.Ignore());
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
             // CreateUserResponse to GetUserResponse
             CreateMap<CreateUserResponse, GetUserResponse>()
@@ -73,8 +73,8 @@ namespace Everwell.DAL.Mappers
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
-                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => (string)null)); // Default null since CreateUserResponse doesn't have this
-                // .ForMember(dest => dest.IsActive, opt => opt.Ignore());
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => (string)null)) // Default null since CreateUserResponse doesn't have this
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
             // UpdateProfileRequest to User (partial mapping)
             CreateMap<UpdateProfileRequest, User>()

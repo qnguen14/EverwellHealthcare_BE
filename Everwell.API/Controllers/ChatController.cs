@@ -216,6 +216,69 @@ namespace Everwell.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Debug endpoint để kiểm tra thông tin appointment và user
+        /// </summary>
+        /// <param name="appointmentId">ID cuộc hẹn</param>
+        /// <returns>Thông tin debug</returns>
+        [HttpGet("debug/{appointmentId}")]
+        public async Task<ActionResult> DebugAppointmentInfo(Guid appointmentId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var result = await _chatService.GetDebugInfoAsync(appointmentId, userId.Value);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in DebugAppointmentInfo endpoint");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        /// <summary>
+        /// Sync tin nhắn từ Daily.co vào database
+        /// </summary>
+        /// <param name="request">Thông tin tin nhắn từ Daily.co</param>
+        /// <returns>Tin nhắn đã được lưu</returns>
+        [HttpPost("sync-daily-message")]
+        public async Task<ActionResult<ApiResponse<ChatMessageResponse>>> SyncDailyMessage([FromBody] SyncDailyMessageRequest request)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                {
+                    return Unauthorized(ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 401, "User not authenticated", "Unauthorized"));
+                }
+
+                var result = await _chatService.SyncDailyMessageAsync(request, userId.Value);
+                
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                
+                return result.StatusCode switch
+                {
+                    404 => NotFound(result),
+                    403 => Forbid(),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in SyncDailyMessage endpoint");
+                return StatusCode(500, ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 500, "Internal server error", "Internal server error"));
+            }
+        }
+
         private Guid? GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

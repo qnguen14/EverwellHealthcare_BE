@@ -132,20 +132,27 @@ app.UseCors(options =>
 {
     if (app.Environment.IsDevelopment())
     {
-        // Development: Allow localhost
+        // Development: Allow localhost and Daily.co domains
         options.SetIsOriginAllowed(origin =>
-                origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
+                origin.StartsWith("http://localhost:") || 
+                origin.StartsWith("https://localhost:") ||
+                origin.EndsWith(".daily.co") ||
+                origin == "https://everwell.daily.co")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
     }
     else
     {
-        // Production: Specify exact domains
+        // Production: Specify exact domains including Daily.co
         var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
-            ?? new[] { "https://your-production-domain.com" };
+            ?? new[] { "https://your-production-domain.com", "https://everwell.daily.co" };
             
-        options.WithOrigins(allowedOrigins)
+        // Add Daily.co domains to allowed origins
+        var dailyOrigins = new[] { "https://everwell.daily.co", "https://app.daily.co" };
+        var allOrigins = allowedOrigins.Concat(dailyOrigins).ToArray();
+            
+        options.WithOrigins(allOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();

@@ -34,14 +34,14 @@ namespace Everwell.BLL.Services.Implements
             {
                 var users = await _unitOfWork.GetRepository<User>()
                     .GetListAsync(
-                        predicate: u => u.IsActive,
+                        predicate: null, // Get all users (both active and inactive)
                         include: u => u.Include(x => x.Role),
                         orderBy: u => u.OrderBy(n => n.Name)
                     );
 
                 if (users == null || !users.Any())
                 {
-                    throw new NotFoundException("No active users found.");
+                    throw new NotFoundException("No users found.");
                 }
 
                 return _mapper.Map<IEnumerable<CreateUserResponse>>(users);
@@ -228,8 +228,33 @@ namespace Everwell.BLL.Services.Implements
                         }
                     }
 
-                    // Map the request to the existing user
-                    _mapper.Map(request, existingUser);
+                    // Map the basic fields (excluding Role)
+                    existingUser.Name = request.Name;
+                    existingUser.Email = request.Email;
+                    existingUser.PhoneNumber = request.PhoneNumber;
+                    existingUser.Address = request.Address;
+
+                    // Handle Role conversion from string to RoleId
+                    if (!string.IsNullOrEmpty(request.Role))
+                    {
+                        if (Enum.TryParse<RoleName>(request.Role, true, out var roleName))
+                        {
+                            var role = await _unitOfWork.GetRepository<Role>()
+                                .FirstOrDefaultAsync(predicate: r => r.Name == roleName);
+
+                            if (role == null)
+                            {
+                                throw new NotFoundException($"Role not found: {roleName}");
+                            }
+
+                            existingUser.RoleId = role.Id;
+                            existingUser.Role = role;
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Invalid role: {request.Role}. Valid roles are: {string.Join(", ", Enum.GetNames(typeof(RoleName)))}");
+                        }
+                    }
 
                     // Update the user
                     _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
@@ -265,6 +290,36 @@ namespace Everwell.BLL.Services.Implements
                     _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
 
                     return true;
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<UpdateUserResponse> ToggleUserStatus(Guid id)
+        {
+            try
+            {
+                return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+                {
+                    var existingUser = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(
+                            predicate: u => u.Id == id,
+                            include: u => u.Include(x => x.Role)
+                        );
+
+                    if (existingUser == null)
+                    {
+                        throw new NotFoundException("User not found.");
+                    }
+
+                    // Toggle the IsActive status
+                    existingUser.IsActive = !existingUser.IsActive;
+                    _unitOfWork.GetRepository<User>().UpdateAsync(existingUser);
+
+                    return _mapper.Map<UpdateUserResponse>(existingUser);
                 });
             }
             catch (Exception ex)

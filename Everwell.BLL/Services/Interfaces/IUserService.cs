@@ -17,6 +17,7 @@ namespace Everwell.BLL.Services.Interfaces
         Task<CreateUserResponse> CreateUser(CreateUserRequest request);
         Task<UpdateUserResponse> UpdateUser(Guid id, UpdateUserRequest request);
         Task<bool> DeleteUser(Guid id);
+        Task<UpdateUserResponse> ToggleUserStatus(Guid id);
         
         
         // Add these new methods for password reset functionality

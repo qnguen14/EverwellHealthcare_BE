@@ -28,28 +28,49 @@ namespace Everwell.BLL.Services.Implements
                 _logger.LogInformation("Sending chat message for appointment {AppointmentId} from user {SenderId}", 
                     request.AppointmentId, senderId);
 
+                // Validate input
+                if (request == null)
+                {
+                    _logger.LogWarning("SendChatMessageRequest is null");
+                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 400, "Invalid request", "Bad request");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Message))
+                {
+                    _logger.LogWarning("Message is null or empty");
+                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 400, "Message cannot be empty", "Bad request");
+                }
+
                 // Verify appointment exists and user has access
                 var appointment = await _unitOfWork.GetRepository<Appointment>()
                     .FirstOrDefaultAsync(predicate: a => a.Id == request.AppointmentId);
                 
                 if (appointment == null)
                 {
-                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 404, "Appointment not found", "Appointment not found");
+                    _logger.LogWarning("Appointment {AppointmentId} not found", request.AppointmentId);
+                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 404, "Cuộc hẹn không tồn tại", "Appointment not found");
                 }
 
                 // Check if user is participant in the appointment
                 if (!request.IsSystemMessage && appointment.CustomerId != senderId && appointment.ConsultantId != senderId)
                 {
-                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 403, "User is not a participant in this appointment", "Forbidden");
+                    _logger.LogWarning("User {SenderId} is not a participant in appointment {AppointmentId}. Customer: {CustomerId}, Consultant: {ConsultantId}", 
+                        senderId, request.AppointmentId, appointment.CustomerId, appointment.ConsultantId);
+                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 403, "Bạn không có quyền gửi tin nhắn trong cuộc hẹn này", "Forbidden");
                 }
 
                 // Get sender information
-                var sender = await _unitOfWork.GetRepository<User>()
-                    .FirstOrDefaultAsync(predicate: u => u.Id == senderId);
-
-                if (sender == null && !request.IsSystemMessage)
+                User sender = null;
+                if (!request.IsSystemMessage)
                 {
-                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 404, "Sender not found", "Sender not found");
+                    sender = await _unitOfWork.GetRepository<User>()
+                        .FirstOrDefaultAsync(predicate: u => u.Id == senderId);
+
+                    if (sender == null)
+                    {
+                        _logger.LogWarning("Sender {SenderId} not found", senderId);
+                        return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 404, "Người gửi không tồn tại", "Sender not found");
+                    }
                 }
 
                 // Create chat message
@@ -65,10 +86,13 @@ namespace Everwell.BLL.Services.Implements
                     IsSystemMessage = request.IsSystemMessage
                 };
 
-                await _unitOfWork.GetRepository<ChatMessage>().InsertAsync(chatMessage);
-                await _unitOfWork.SaveChangesAsync();
+                _logger.LogInformation("Attempting to save chat message with ID {MessageId}", chatMessage.Id);
 
-                _logger.LogInformation("Chat message sent successfully with ID {MessageId}", chatMessage.Id);
+                await _unitOfWork.GetRepository<ChatMessage>().InsertAsync(chatMessage);
+                var saveResult = await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Chat message saved successfully with ID {MessageId}. SaveChanges result: {SaveResult}", 
+                    chatMessage.Id, saveResult);
 
                 var response = new ChatMessageResponse
                 {
@@ -86,7 +110,8 @@ namespace Everwell.BLL.Services.Implements
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending chat message for appointment {AppointmentId}", request.AppointmentId);
+                _logger.LogError(ex, "Error sending chat message for appointment {AppointmentId}. Exception: {ExceptionMessage}", 
+                    request?.AppointmentId, ex.Message);
                 return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 500, "Failed to send chat message", "Internal server error");
             }
         }
@@ -261,6 +286,113 @@ namespace Everwell.BLL.Services.Implements
                 return "Patient";
             else
                 return "Unknown";
+        }
+
+        public async Task<object> GetDebugInfoAsync(Guid appointmentId, Guid userId)
+        {
+            try
+            {
+                var appointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(predicate: a => a.Id == appointmentId);
+
+                var user = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(predicate: u => u.Id == userId);
+
+                return new
+                {
+                    AppointmentId = appointmentId,
+                    UserId = userId,
+                    Appointment = appointment == null ? null : new
+                    {
+                        appointment.Id,
+                        appointment.CustomerId,
+                        appointment.ConsultantId,
+                        appointment.Status,
+                        appointment.AppointmentDate,
+                        appointment.Slot,
+                        appointment.IsVirtual,
+                        appointment.CreatedAt
+                    },
+                    User = user == null ? null : new
+                    {
+                        user.Id,
+                        user.Name,
+                        user.Email,
+                        user.Role
+                    },
+                    IsParticipant = appointment != null && (appointment.CustomerId == userId || appointment.ConsultantId == userId),
+                    UserRole = GetUserRole(user, appointment)
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting debug info for appointment {AppointmentId} and user {UserId}", appointmentId, userId);
+                return new { Error = ex.Message };
+            }
+        }
+
+        public async Task<ApiResponse<ChatMessageResponse>> SyncDailyMessageAsync(SyncDailyMessageRequest request, Guid senderId)
+        {
+            try
+            {
+                _logger.LogInformation("Syncing Daily.co message for appointment {AppointmentId} by user {SenderId}", 
+                    request.AppointmentId, senderId);
+
+                // Verify appointment exists
+                var appointment = await _unitOfWork.GetRepository<Appointment>()
+                    .FirstOrDefaultAsync(predicate: a => a.Id == request.AppointmentId);
+                
+                if (appointment == null)
+                {
+                    _logger.LogWarning("Appointment {AppointmentId} not found", request.AppointmentId);
+                    return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 404, "Appointment not found", "Appointment not found");
+                }
+
+                // Get sender info
+                var sender = await _unitOfWork.GetRepository<User>()
+                    .FirstOrDefaultAsync(predicate: u => u.Id == senderId);
+
+                // Create chat message
+                var chatMessage = new ChatMessage
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = request.AppointmentId,
+                    SenderId = senderId,
+                    Message = request.Message,
+                    SentAt = request.SentAt ?? DateTime.UtcNow,
+                    SenderName = request.SenderName ?? sender?.Name ?? "Unknown",
+                    SenderRole = GetUserRole(sender, appointment),
+                    IsSystemMessage = request.IsSystemMessage
+                };
+
+                _logger.LogInformation("Attempting to save Daily.co chat message with ID {MessageId}", chatMessage.Id);
+
+                await _unitOfWork.GetRepository<ChatMessage>().InsertAsync(chatMessage);
+                var saveResult = await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Daily.co chat message saved successfully with ID {MessageId}. SaveChanges result: {SaveResult}", 
+                    chatMessage.Id, saveResult);
+
+                var response = new ChatMessageResponse
+                {
+                    Id = chatMessage.Id,
+                    AppointmentId = chatMessage.AppointmentId,
+                    SenderId = chatMessage.SenderId,
+                    Message = chatMessage.Message,
+                    SentAt = chatMessage.SentAt,
+                    SenderName = chatMessage.SenderName,
+                    SenderRole = chatMessage.SenderRole,
+                    IsSystemMessage = chatMessage.IsSystemMessage
+                };
+
+                return ApiResponseBuilder.BuildResponse(200, "Daily.co chat message synced successfully", response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error syncing Daily.co message for appointment {AppointmentId}. Exception: {ExceptionMessage}", 
+                    request?.AppointmentId, ex.Message);
+                return ApiResponseBuilder.BuildErrorResponse<ChatMessageResponse>(null, 500, "Failed to sync Daily.co message", "Internal server error");
+            }
         }
     }
 } 

@@ -420,12 +420,21 @@ namespace Everwell.API.Controllers
         {
             try
             {
+                _logger.LogInformation("=== DAILY.CO WEBHOOK RECEIVED ===");
                 _logger.LogInformation("Received meeting join hook: {HookData}", hookData);
+                _logger.LogInformation("Request Headers: {Headers}", Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()));
+                _logger.LogInformation("Request Method: {Method}", Request.Method);
+                _logger.LogInformation("Request Path: {Path}", Request.Path);
+                _logger.LogInformation("Request Query: {Query}", Request.QueryString);
                 
                 // Process the webhook data as needed
                 // This can be used for logging, analytics, notifications, etc.
                 
-                return Ok(new { message = "Hook processed successfully" });
+                return Ok(new { 
+                    message = "Hook processed successfully", 
+                    timestamp = DateTime.UtcNow,
+                    received_data = hookData
+                });
             }
             catch (Exception ex)
             {
