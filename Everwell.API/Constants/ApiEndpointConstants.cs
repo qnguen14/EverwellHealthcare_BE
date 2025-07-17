@@ -66,6 +66,18 @@
             public const string CreateConsultantScheduleEndpoint = AppointmentEndpoint + "/consultant/schedule/create";
         }
 
+        public static class Chat
+        {
+            public const string ChatEndpoint = ApiEndpoint + "/chat";
+            public const string SendChatMessageEndpoint = ChatEndpoint + "/send";
+            public const string GetChatMessagesEndpoint = ChatEndpoint + "/get";
+            public const string DeleteChatMessageEndpoint = ChatEndpoint + "/delete/{messageId}";
+            public const string GetRecentChatMessagesEndpoint = ChatEndpoint + "/recent/{appointmentId}";
+            public const string GetDebugInfoEndpoint = ChatEndpoint + "/debug/{appointmentId}/{userId}";
+            public const string SyncDailyMessageEndpoint = ChatEndpoint + "/sync-daily";
+            public const string SaveChatLogEndpoint = ChatEndpoint + "/save-log";
+        }
+
         public static class Feedback
         {
             public const string FeedbackEndpoint = ApiEndpoint + "/feedback";

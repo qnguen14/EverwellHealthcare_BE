@@ -5,6 +5,10 @@ using Everwell.DAL.Data.Metadata;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Supabase;
+using System.Text;
+using Everwell.DAL.Data.Requests.Appointments;
+using Everwell.API.Constants;
 
 namespace Everwell.API.Controllers
 {
@@ -15,12 +19,16 @@ namespace Everwell.API.Controllers
     {
         private readonly IChatService _chatService;
         private readonly ILogger<ChatController> _logger;
+        private readonly Client _supabase;
 
-        public ChatController(IChatService chatService, ILogger<ChatController> logger)
+        public ChatController(IChatService chatService, ILogger<ChatController> logger, Client supabase)
         {
             _chatService = chatService;
             _logger = logger;
+            _supabase = supabase;
         }
+
+        #region Chat Endpoints
 
         /// <summary>
         /// Gửi tin nhắn chat trong cuộc hẹn
@@ -39,12 +47,12 @@ namespace Everwell.API.Controllers
                 }
 
                 var result = await _chatService.SendChatMessageAsync(request, userId.Value);
-                
+
                 if (result.IsSuccess)
                 {
                     return Ok(result);
                 }
-                
+
                 return result.StatusCode switch
                 {
                     404 => NotFound(result),
@@ -76,12 +84,12 @@ namespace Everwell.API.Controllers
                 }
 
                 var result = await _chatService.GetChatMessagesAsync(request, userId.Value);
-                
+
                 if (result.IsSuccess)
                 {
                     return Ok(result);
                 }
-                
+
                 return result.StatusCode switch
                 {
                     404 => NotFound(result),
@@ -104,18 +112,18 @@ namespace Everwell.API.Controllers
         /// <returns>Danh sách tin nhắn gần đây</returns>
         [HttpGet("recent/{appointmentId}")]
         public async Task<ActionResult<ApiResponse<List<ChatMessageResponse>>>> GetRecentChatMessages(
-            Guid appointmentId, 
+            Guid appointmentId,
             [FromQuery] int count = 10)
         {
             try
             {
                 var result = await _chatService.GetRecentChatMessagesAsync(appointmentId, count);
-                
+
                 if (result.IsSuccess)
                 {
                     return Ok(result);
                 }
-                
+
                 return result.StatusCode switch
                 {
                     404 => NotFound(result),
@@ -147,12 +155,12 @@ namespace Everwell.API.Controllers
                 }
 
                 var result = await _chatService.DeleteChatMessageAsync(messageId, userId.Value);
-                
+
                 if (result.IsSuccess)
                 {
                     return Ok(result);
                 }
-                
+
                 return result.StatusCode switch
                 {
                     404 => NotFound(result),
@@ -196,12 +204,12 @@ namespace Everwell.API.Controllers
                 };
 
                 var result = await _chatService.GetChatMessagesAsync(request, userId.Value);
-                
+
                 if (result.IsSuccess)
                 {
                     return Ok(result);
                 }
-                
+
                 return result.StatusCode switch
                 {
                     404 => NotFound(result),
@@ -259,12 +267,12 @@ namespace Everwell.API.Controllers
                 }
 
                 var result = await _chatService.SyncDailyMessageAsync(request, userId.Value);
-                
+
                 if (result.IsSuccess)
                 {
                     return Ok(result);
                 }
-                
+
                 return result.StatusCode switch
                 {
                     404 => NotFound(result),
@@ -288,5 +296,46 @@ namespace Everwell.API.Controllers
             }
             return null;
         }
+
+        #endregion
+
+
+        [HttpPost(ApiEndpointConstants.Chat.SaveChatLogEndpoint)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SaveChatLog([FromBody] SaveChatLogRequest request)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId == null)
+                {
+                    return Unauthorized(ApiResponseBuilder.BuildErrorResponse<string>(null, 401, "User not authenticated", "Unauthorized"));
+                }
+
+                var result = await _chatService.SaveChatLogAsync(request, userId.Value);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+
+                return result.StatusCode switch
+                {
+                    404 => NotFound(result),
+                    403 => Forbid(),
+                    400 => BadRequest(result),
+                    _ => StatusCode(500, result)
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in SaveChatLog endpoint");
+                return StatusCode(500, ApiResponseBuilder.BuildErrorResponse<string>(null, 500, "Internal server error", "Internal server error"));
+            }
+
+
+        }
     }
-} 
+}

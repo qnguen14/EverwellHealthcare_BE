@@ -13,8 +13,17 @@ using System.IdentityModel.Tokens.Jwt;
 using Everwell.DAL.Repositories.Implements;
 using Everwell.DAL.Repositories.Interfaces;
 using Everwell.DAL.Mappers;
+using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
+var supabaseUrl = builder.Configuration["Supabase:Url"];
+var supabaseKey = builder.Configuration["Supabase:ServiceKey"]; // Use the service_role key for admin actions
+
+builder.Services.AddSingleton(new Client(supabaseUrl, supabaseKey, new SupabaseOptions
+{
+    AutoRefreshToken = true,
+    AutoConnectRealtime = true
+}));
 
 // Add services to the container.
 TimeZoneInfo.ClearCachedData();
