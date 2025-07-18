@@ -117,7 +117,7 @@ public class DailyService : IDailyService
             {
                 RoomName = roomName,
                 RoomUrl = roomUrl,
-                MeetingUrl = $"{_baseUrl}/{appointment.Id}",
+                MeetingUrl = roomUrl, // Use direct Daily.co room URL instead of frontend wrapper
                 StartTime = startTimeLocal,
                 EndTime = endTimeLocal,
                 IsActive = DateTime.UtcNow >= startTime && DateTime.UtcNow <= endTime,
@@ -223,7 +223,7 @@ public class DailyService : IDailyService
             {
                 RoomName = roomName,
                 RoomUrl = roomUrl,
-                MeetingUrl = $"{_baseUrl}/{appointment.Id}",
+                MeetingUrl = roomUrl, // Use direct Daily.co room URL instead of frontend wrapper
                 StartTime = startTimeLocal,
                 EndTime = endTimeLocal,
                 IsActive = DateTime.UtcNow >= roomStartTime && DateTime.UtcNow <= endTime,
@@ -446,4 +446,4 @@ public class DailyService : IDailyService
             return null;
         }
     }
-} 
+}

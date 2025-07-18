@@ -1,23 +1,24 @@
-# Agora.io Integration with Time Controls
+# Daily.co Integration with Time Controls
 
 ## 📋 Overview
 
-This implementation replaces Jitsi Meet with Agora.io to provide precise time-controlled video meetings for appointments. The system:
+This implementation uses Daily.co to provide precise time-controlled video meetings for appointments. The system:
 
 - ✅ **Auto-starts meetings** 5 minutes before appointment time
 - ✅ **Auto-ends meetings** exactly when the slot ends  
 - ✅ **Restricts access** outside of scheduled times
-- ✅ **Background service** manages channel lifecycle
+- ✅ **Direct meeting links** for immediate access to Daily.co rooms
+- ✅ **Automatic room management** handles room lifecycle
 
 ## 🚀 Setup Instructions
 
-### 1. Get Agora.io Credentials
+### 1. Get Daily.co Credentials
 
-1. **Sign up** at [Agora.io Console](https://console.agora.io/)
-2. **Create a project** in the console
+1. **Sign up** at [Daily.co Dashboard](https://dashboard.daily.co/)
+2. **Create a domain** in the dashboard
 3. **Get your credentials**:
-   - App ID (required)
-   - App Certificate (required for production)
+   - API Key (required)
+   - Domain Name (required)
 
 ### 2. Update Configuration
 
@@ -25,36 +26,24 @@ Update your `appsettings.json`:
 
 ```json
 {
-  "Agora": {
-    "AppId": "YOUR_ACTUAL_AGORA_APP_ID",
-    "AppCertificate": "YOUR_ACTUAL_AGORA_APP_CERTIFICATE", 
-    "BaseUrl": "https://yourdomain.com/meeting"
+  "Daily": {
+    "ApiKey": "YOUR_DAILY_API_KEY",
+    "DomainName": "yourdomain.daily.co",
+    "BaseUrl": "http://localhost:5173/meeting"
   }
 }
 ```
 
-### 3. Install Agora NuGet Package (Optional - For Production)
+**Note:** With the latest update, `MeetingUrl` now returns direct Daily.co room links instead of frontend wrapper URLs for immediate access.
 
-For production, consider using the official Agora RTC token library:
+### 3. Direct Meeting Links
 
-```bash
-dotnet add package Agora.RTC.Token
-```
+The system now provides two types of URLs:
 
-Then update `AgoraService.cs` to use the official token generation:
+- **RoomUrl**: Direct Daily.co room link (e.g., `https://yourdomain.daily.co/room-name`)
+- **MeetingUrl**: Now returns the same direct Daily.co room link for immediate access
 
-```csharp
-using AgoraToken;
-
-public async Task<string> GenerateRtcTokenAsync(string channelName, uint uid, string role, DateTime validUntil)
-{
-    var timestamp = ((DateTimeOffset)validUntil).ToUnixTimeSeconds();
-    var privilegeExpired = (uint)timestamp;
-    
-    return RtcTokenBuilder.BuildTokenWithUid(_appId, _appCertificate, channelName, uid, 
-        RtcTokenBuilder.Role.RolePublisher, privilegeExpired);
-}
-```
+This eliminates the need to go through a frontend meeting room interface and provides instant access to video meetings.
 
 ### 4. Frontend Meeting Interface
 
@@ -99,11 +88,11 @@ GET /api/meeting/channel/{channelName}/status
 ## 🎯 How It Works
 
 ### Backend Flow
-1. **Appointment created** → Agora channel scheduled
-2. **Background service** monitors appointment times
-3. **5 minutes before** → Channel enabled automatically
-4. **After end time** → Channel disabled automatically
-5. **API access control** → Validates time before allowing join
+1. **Appointment created** → Daily.co room scheduled
+2. **Room management** handles appointment times
+3. **5 minutes before** → Room becomes accessible
+4. **After end time** → Room access expires
+5. **API access control** → Validates time before providing room URL
 
 ### Frontend Flow
 1. User clicks **meeting link** from appointment
@@ -116,19 +105,19 @@ GET /api/meeting/channel/{channelName}/status
 
 ### Modify Time Windows
 
-In `AgoraChannelManagementService.cs`:
+In `DailyService.cs`:
 
 ```csharp
 // Change early access (currently 5 minutes before)
-if (currentTime >= startTime.AddMinutes(-5) && currentTime < startTime.AddMinutes(5))
+var roomStartTime = startTime.AddMinutes(-5);
 
-// Change late access (currently disabled at end time)
-if (currentTime >= endTime)
+// Room expiration time
+exp = ((DateTimeOffset)endTime).ToUnixTimeSeconds()
 ```
 
 ### Modify Slot Duration
 
-In `AgoraService.cs`:
+In `DailyService.cs`:
 
 ```csharp
 private DateTime GetAppointmentEndTime(Appointment appointment)
@@ -142,36 +131,37 @@ private DateTime GetAppointmentEndTime(Appointment appointment)
 
 Update the `BaseUrl` in configuration to point to your custom meeting interface.
 
-## 🔄 Migration from Jitsi
+## 🔄 Direct Meeting Links Update
 
-The system automatically uses Agora instead of Jitsi. No database changes required since:
+The system now provides direct Daily.co room links instead of frontend wrapper URLs:
 
-- Same `IsVirtual` field usage
-- Same `MeetingId` field for storing channel names
-- Same appointment booking flow
+- **MeetingUrl** now returns direct Daily.co room links
+- **Faster access** - no intermediate pages
+- **Same API endpoints** - no breaking changes
+- **Backward compatible** - existing integrations continue to work
 
 ## 🧪 Testing
 
 1. **Create virtual appointment** for current time slot
-2. **Wait 5 minutes before** start time
-3. **Visit meeting page** → Should show "waiting" status  
-4. **At 5 minutes before** → Should show "Join Meeting" button
-5. **After end time** → Should show "Meeting ended"
+2. **Get meeting info** via API endpoint
+3. **Before 5 minutes** → MeetingUrl will be null or restricted
+4. **At 5 minutes before** → MeetingUrl returns direct Daily.co link
+5. **After end time** → Room access expires automatically
 
 ## 📱 Production Considerations
 
-1. **Load balancing**: Agora handles this automatically
+1. **Load balancing**: Daily.co handles this automatically
 2. **Scaling**: No server-side video processing needed
-3. **Security**: Tokens auto-expire at appointment end
-4. **Monitoring**: Logs all channel activities
+3. **Security**: Rooms auto-expire at appointment end
+4. **Monitoring**: Logs all room activities
 5. **Cost**: Pay only for active meeting minutes
 
-## 🎉 Benefits vs Jitsi
+## 🎉 Benefits of Direct Meeting Links
 
-- ✅ **Precise timing control** vs manual access
-- ✅ **Professional reliability** vs community platform  
-- ✅ **Automatic management** vs manual room creation
-- ✅ **Better mobile support** vs browser-only
-- ✅ **Analytics & monitoring** vs limited insights
+- ✅ **Instant access** - no intermediate pages
+- ✅ **Professional reliability** with Daily.co platform
+- ✅ **Automatic room management** with time controls
+- ✅ **Better user experience** - direct to video call
+- ✅ **Simplified flow** - fewer clicks to join
 
-Your appointments now have **exact time control** - users can only join during their scheduled slot! 🎯 
+Your appointments now have **direct access** with **exact time control** - users get immediate access to Daily.co rooms during their scheduled slot! 🎯

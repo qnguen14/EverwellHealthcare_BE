@@ -330,12 +330,12 @@ public class AppointmentService : BaseService<AppointmentService>, IAppointmentS
                                     _logger.LogError("🔍 DEBUG - Daily stack trace: {StackTrace}", ex.StackTrace);
                                     
                                     // Set a fallback meeting URL so users can still access the meeting page
-                                    var fallbackUrl = $"{_configuration?["Daily:BaseUrl"] ?? "http://localhost:5173/meeting"}/{newAppointment.Id}";
-                                    newAppointment.GoogleMeetLink = fallbackUrl;
+                                    //var fallbackUrl = $"{_configuration?["Daily:BaseUrl"] ?? "http://localhost:5173/meeting"}/{newAppointment.Id}";
+                                    //newAppointment.GoogleMeetLink = fallbackUrl;
                                     newAppointment.MeetingId = newAppointment.Id.ToString();
                                     
-                                    _logger.LogWarning("⚠️ Set fallback meeting URL for appointment {AppointmentId}: {FallbackUrl}", 
-                                        newAppointment.Id, fallbackUrl);
+                                    //_logger.LogWarning("⚠️ Set fallback meeting URL for appointment {AppointmentId}: {FallbackUrl}", 
+                                    //    newAppointment.Id, fallbackUrl);
                                 }
                             }
                 
