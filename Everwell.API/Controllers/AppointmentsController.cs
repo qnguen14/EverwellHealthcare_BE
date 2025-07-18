@@ -342,7 +342,7 @@ public class AppointmentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<GetScheduleResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin, Staff, Consultant")]
+    [Authorize(Roles = "Admin, Staff, Consultant, Customer")]
     public async Task<IActionResult> GetConsultantSchedulesById(Guid id)
     {
         try

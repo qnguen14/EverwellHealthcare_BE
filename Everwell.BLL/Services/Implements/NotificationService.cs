@@ -40,7 +40,7 @@ namespace Everwell.BLL.Services.Implements
                     _logger.LogError("CreateNotification request is null");
                     throw new ArgumentNullException(nameof(request), "Request cannot be null");
                 }
-                
+
                 var notification = new Notification
                 {
                     UserId = request.UserId,
