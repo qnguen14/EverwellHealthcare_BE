@@ -30,5 +30,7 @@ namespace Everwell.DAL.Data.Requests.Notifications
         public Guid? STITestingId { get; set; }
         
         public Guid? QuestionId { get; set; }
+        
+        public Guid? MenstrualCycleTrackingId { get; set; }
     }
 }

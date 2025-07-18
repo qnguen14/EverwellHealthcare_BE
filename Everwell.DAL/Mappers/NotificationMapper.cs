@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Data.Requests.Notifications;
 using Everwell.DAL.Data.Responses.Notifications;
@@ -20,7 +20,8 @@ public class NotificationMapper : Profile
             .ForMember(dest => dest.IsRead, opt => opt.MapFrom(src => src.IsRead))
             .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
             .ForMember(dest => dest.TestResultId, opt => opt.MapFrom(src => src.TestResultId))
-            .ForMember(dest => dest.STITestingId, opt => opt.MapFrom(src => src.STITestingId));
+            .ForMember(dest => dest.STITestingId, opt => opt.MapFrom(src => src.STITestingId))
+            .ForMember(dest => dest.MenstrualCycleTrackingId, opt => opt.MapFrom(src => src.MenstrualCycleTrackingId));
 
         // Map from CreateNotificationRequest to Notification entity
         CreateMap<CreateNotificationRequest, Notification>()
@@ -33,10 +34,12 @@ public class NotificationMapper : Profile
             .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
             .ForMember(dest => dest.TestResultId, opt => opt.MapFrom(src => src.TestResultId))
             .ForMember(dest => dest.STITestingId, opt => opt.MapFrom(src => src.STITestingId))
+            .ForMember(dest => dest.MenstrualCycleTrackingId, opt => opt.MapFrom(src => src.MenstrualCycleTrackingId))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
             .ForMember(dest => dest.IsRead, opt => opt.MapFrom(_ => false))
             .ForMember(dest => dest.Customer, opt => opt.Ignore())
             .ForMember(dest => dest.Appointment, opt => opt.Ignore())
-            .ForMember(dest => dest.TestResult, opt => opt.Ignore());
+            .ForMember(dest => dest.TestResult, opt => opt.Ignore())
+            .ForMember(dest => dest.MenstrualCycleTracking, opt => opt.Ignore());
     }
 }

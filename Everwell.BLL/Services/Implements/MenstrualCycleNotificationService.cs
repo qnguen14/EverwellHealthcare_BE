@@ -10,16 +10,19 @@ namespace Everwell.BLL.Services.Implements
     public class MenstrualCycleNotificationService : BaseService<MenstrualCycleNotificationService>, IMenstrualCycleNotificationService
     {
         private readonly IEmailService _emailService;
+        private readonly INotificationService _notificationService;
 
         public MenstrualCycleNotificationService(
             IUnitOfWork<EverwellDbContext> unitOfWork,
             ILogger<MenstrualCycleNotificationService> logger,
             IHttpContextAccessor httpContextAccessor,
             AutoMapper.IMapper mapper,
-            IEmailService emailService)
+            IEmailService emailService,
+            INotificationService notificationService)
             : base(unitOfWork, logger, mapper, httpContextAccessor)
         {
             _emailService = emailService;
+            _notificationService = notificationService;
         }
 
         public async Task ProcessPendingNotificationsAsync()
@@ -37,7 +40,11 @@ namespace Everwell.BLL.Services.Implements
 
                 foreach (var notification in pendingNotifications)
                 {
+                    // Send email notification
                     await SendNotificationEmail(notification);
+                    
+                    // Create in-app notification
+                    await CreateInAppNotificationAsync(notification);
                     
                     // Mark as sent
                     notification.IsSent = true;
@@ -467,6 +474,59 @@ namespace Everwell.BLL.Services.Implements
                 _logger.LogError(ex, "Error in test notification creation");
                 return false;
             }
+        }
+
+        private async Task CreateInAppNotificationAsync(MenstrualCycleNotification notification)
+        {
+            try
+            {
+                var title = GetNotificationTitle(notification.Phase);
+                var priority = GetNotificationPriority(notification.Phase);
+
+                var createRequest = new DAL.Data.Requests.Notifications.CreateNotificationRequest
+                {
+                    UserId = notification.Tracking.CustomerId,
+                    Title = title,
+                    Message = notification.Message,
+                    Type = NotificationType.MenstrualCycle,
+                    Priority = priority,
+                    MenstrualCycleTrackingId = notification.TrackingId
+                };
+
+                await _notificationService.CreateNotification(createRequest);
+                _logger.LogInformation("Created in-app notification for tracking {TrackingId}, phase {Phase}", 
+                    notification.TrackingId, notification.Phase);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating in-app notification for tracking {TrackingId}", 
+                    notification.TrackingId);
+                // Don't throw - we don't want to break email notifications if in-app fails
+            }
+        }
+
+        private string GetNotificationTitle(MenstrualCyclePhase phase)
+        {
+            return phase switch
+            {
+                MenstrualCyclePhase.Menstrual => "Period Reminder",
+                MenstrualCyclePhase.Ovulation => "Ovulation Reminder",
+                MenstrualCyclePhase.Follicular => "Fertility Window",
+                MenstrualCyclePhase.Luteal => "Cycle Update",
+                _ => "Menstrual Cycle Reminder"
+            };
+        }
+
+        private NotificationPriority GetNotificationPriority(MenstrualCyclePhase phase)
+        {
+            return phase switch
+            {
+                MenstrualCyclePhase.Menstrual => NotificationPriority.High,
+                MenstrualCyclePhase.Ovulation => NotificationPriority.Medium,
+                MenstrualCyclePhase.Follicular => NotificationPriority.Medium,
+                MenstrualCyclePhase.Luteal => NotificationPriority.Low,
+                _ => NotificationPriority.Medium
+            };
         }
     }
 }

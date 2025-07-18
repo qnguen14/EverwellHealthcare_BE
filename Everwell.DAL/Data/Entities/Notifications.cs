@@ -11,6 +11,7 @@ namespace Everwell.DAL.Data.Entities
         STITest,
         Payment,
         Question,
+        MenstrualCycle,
     }
 
     public enum NotificationPriority
@@ -74,5 +75,9 @@ namespace Everwell.DAL.Data.Entities
         [Column("question_id")]
         public Guid? QuestionId { get; set; }
         public virtual Question? Question { get; set; }
+        
+        [Column("menstrual_cycle_tracking_id")]
+        public Guid? MenstrualCycleTrackingId { get; set; }
+        public virtual MenstrualCycleTracking? MenstrualCycleTracking { get; set; }
     }
-}   
+}
