@@ -23,7 +23,7 @@ public class PostsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreatePostResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize]
+    
     public async Task<IActionResult> GetAllPosts()
     {
         try
@@ -55,7 +55,6 @@ public class PostsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<CreatePostResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize]
     public async Task<IActionResult> GetPostById(Guid id)
     {
         try
@@ -86,7 +85,6 @@ public class PostsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreatePostResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize]
     public async Task<IActionResult> GetFilteredPosts(
         [FromQuery] string? title,
         [FromQuery] string? content,
