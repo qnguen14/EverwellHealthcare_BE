@@ -75,10 +75,10 @@ Write-Host "  Setting email configuration..." -ForegroundColor Gray
 & $azPath webapp config appsettings set --resource-group $ResourceGroup --name $AppName --settings "Email__SmtpServer=smtp.gmail.com" "Email__SmtpPort=587" "Email__Username=everwellhealth777@gmail.com" "Email__Password=puip varc ptnx rvtz" "Email__FromEmail=everwellhealth777@gmail.com" "Email__FromName=Everwell Health" --output none
 
 Write-Host "  Setting VnPay configuration with correct URLs..." -ForegroundColor Gray
-& $azPath webapp config appsettings set --resource-group $ResourceGroup --name $AppName --settings "VnPay__TmnCode=FFNSYP0G" "VnPay__HashSecret=DJCLGLGI5MEPJS6EPR4V8WEJMU2IRNAU" "VnPay__BaseUrl=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html" "VnPay__Version=2.1.0" "VnPay__Command=pay" "VnPay__ReturnUrl=$WebAppUrl/vnpay-callback" "VnPay__IpnUrl=$WebAppUrl/api/payment/vnpay-ipn" --output none
+& $azPath webapp config appsettings set --resource-group $ResourceGroup --name $AppName --settings "VnPay__TmnCode=FFNSYP0G" "VnPay__HashSecret=DJCLGLGI5MEPJS6EPR4V8WEJMU2IRNAU" "VnPay__BaseUrl=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html" "VnPay__Version=2.1.0" "VnPay__Command=pay" "VnPay__ReturnUrl=https://everwell-zeta.vercel.app/vnpay-callback" "VnPay__IpnUrl=$WebAppUrl/api/payment/vnpay-ipn" --output none
 
-Write-Host "  Configuring security..." -ForegroundColor Gray
-& $azPath webapp cors add --resource-group $ResourceGroup --name $AppName --allowed-origins "*" --output none
+Write-Host "  Configuring security and CORS..." -ForegroundColor Gray
+& $azPath webapp cors add --resource-group $ResourceGroup --name $AppName --allowed-origins "https://everwell-zeta.vercel.app" "http://localhost:5173" --output none
 & $azPath webapp update --resource-group $ResourceGroup --name $AppName --https-only true --output none
 
 Write-Host "Application configured successfully!" -ForegroundColor Green
@@ -178,4 +178,4 @@ Write-Host "  3. Update your frontend to use: $WebAppUrl" -ForegroundColor White
 Write-Host "  4. Monitor in Azure Portal" -ForegroundColor White
 Write-Host ""
 Write-Host "Success! Your API is live at: $WebAppUrl" -ForegroundColor Green
-Write-Host "Payment issues from previous deployments should now be resolved!" -ForegroundColor Green 
+Write-Host "Payment issues from previous deployments should now be resolved!" -ForegroundColor Green

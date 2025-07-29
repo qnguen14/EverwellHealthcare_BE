@@ -24,7 +24,22 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "Admin,Customer,Consultant,Staff")]
-    public async Task<IActionResult> GetUserNotifications()
+    public async Task<IActionResult> GetUserNotifications(Guid userId)
+    {
+        var notifications = await _notificationService.GetUserNotifications(userId);
+
+        return Ok(ApiResponseBuilder.BuildResponse(
+            StatusCodes.Status200OK,
+            "Notifications retrieved successfully",
+            notifications));
+    }
+
+    [HttpGet(ApiEndpointConstants.Notification.GetMyNotifications)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<GetNotificationResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin,Customer,Consultant,Staff")]
+    public async Task<IActionResult> GetMyNotifications()
     {
         var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
         var notifications = await _notificationService.GetUserNotifications(userId);

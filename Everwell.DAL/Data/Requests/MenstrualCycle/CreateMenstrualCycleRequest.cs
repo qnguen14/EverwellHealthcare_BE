@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Everwell.DAL.Data.Requests.MenstrualCycle
 {
-    public class CreateMenstrualCycleRequest
+    public class CreateMenstrualCycleRequest : IValidatableObject
     {
         [Required(ErrorMessage = "Cycle start date is required")]
         [DataType(DataType.Date)]
@@ -46,16 +46,24 @@ namespace Everwell.DAL.Data.Requests.MenstrualCycle
                 }
             }
 
-            // Validate start date is not in future
-            if (CycleStartDate > DateTime.UtcNow.Date)
+            // Validate start date is not in future (considering Vietnam timezone UTC+7)
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var vietnamNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+            if (CycleStartDate.Date > vietnamNow.Date)
             {
                 results.Add(new ValidationResult("Cycle start date cannot be in the future", new[] { nameof(CycleStartDate) }));
+            }
+
+            // Validate end date is not in future (considering Vietnam timezone UTC+7)
+            if (CycleEndDate.HasValue && CycleEndDate.Value.Date > vietnamNow.Date)
+            {
+                results.Add(new ValidationResult("Cycle end date cannot be in the future", new[] { nameof(CycleEndDate) }));
             }
 
             // Validate notification settings
             if (NotificationEnabled && (!NotifyBeforeDays.HasValue || NotifyBeforeDays <= 0))
             {
-                results.Add(new ValidationResult("Notify before days must be specified when notifications are enabled", new[] { nameof(NotifyBeforeDays) }));
+                results.Add(new ValidationResult("Notify before days must be specified and greater than 0 when notifications are enabled", new[] { nameof(NotifyBeforeDays) }));
             }
 
             return results;

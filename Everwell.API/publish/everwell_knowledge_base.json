@@ -1,0 +1,169 @@
+{
+  "app_info": {
+    "name": "Everwell Healthcare",
+    "description": "Ứng dụng chăm sóc sức khỏe giới tính toàn diện",
+    "focus_areas": [
+      "Sức khỏe sinh sản",
+      "Theo dõi chu kỳ kinh nguyệt",
+      "Xét nghiệm STI",
+      "Tư vấn y tế trực tuyến",
+      "Đặt lịch hẹn bác sĩ"
+    ]
+  },
+  
+  "services": {
+    "menstrual_tracking": {
+      "name": "Theo dõi chu kỳ kinh nguyệt",
+      "description": "Ghi nhận và phân tích chu kỳ kinh nguyệt để dự đoán ngày rụng trứng và thời kỳ màn mỡ",
+      "features": [
+        "Tính toán chu kỳ trung bình",
+        "Dự đoán ngày kinh nguyệt tiếp theo",
+        "Theo dõi triệu chứng PMS",
+        "Nhắc nhở uống thuốc tránh thai",
+        "Phân tích sức khỏe sinh sản"
+      ],
+      "normal_cycle": "21-35 ngày",
+      "ovulation_signs": [
+        "Tăng thân nhiệt cơ thể",
+        "Thay đổi chất nhầy cổ tử cung",
+        "Đau bụng dưới một bên",
+        "Tăng ham muốn tình dục"
+      ]
+    },
+    
+    "sti_testing": {
+      "name": "Xét nghiệm STI",
+      "description": "Dịch vụ xét nghiệm bệnh lây truyền qua đường tình dục tại nhà và phòng lab",
+      "common_tests": [
+        "HIV/AIDS",
+        "Giang mai (Syphilis)",
+        "Lậu (Gonorrhea)",
+        "Chlamydia",
+        "Herpes (HSV-1, HSV-2)",
+        "HPV (Human Papillomavirus)",
+        "Viêm gan B, C"
+      ],
+      "testing_frequency": "6-12 tháng một lần cho người có đời sống tình dục",
+      "prevention": [
+        "Sử dụng bao cao su",
+        "Giới hạn số lượng bạn tình",
+        "Xét nghiệm định kỳ",
+        "Tránh chia sẻ đồ dùng cá nhân",
+        "Tiêm vaccine HPV"
+      ]
+    },
+    
+    "appointments": {
+      "name": "Đặt lịch hẹn",
+      "description": "Đặt lịch tư vấn với bác sĩ chuyên khoa phụ sản",
+      "specialties": [
+        "Phụ khoa",
+        "Sản khoa", 
+        "Nội tiết sinh sản",
+        "Tâm lý học",
+        "Dinh dưỡng"
+      ],
+      "consultation_types": [
+        "Tư vấn trực tuyến",
+        "Khám tại phòng mạch",
+        "Tư vấn qua video call",
+        "Chat với bác sĩ"
+      ]
+    },
+    
+    "health_tracking": {
+      "name": "Theo dõi sức khỏe hàng ngày",
+      "metrics": [
+        "Cân nặng",
+        "Huyết áp",
+        "Nhịp tim",
+        "Giấc ngủ",
+        "Tâm trạng",
+        "Mức độ căng thẳng",
+        "Hoạt động thể chất"
+      ]
+    }
+  },
+  
+  "medical_knowledge": {
+    "menstrual_cycle": {
+      "phases": {
+        "menstrual": "Ngày 1-7: Lót tử cung bong ra",
+        "follicular": "Ngày 1-13: Nang trứng phát triển",
+        "ovulation": "Ngày 14: Rụng trứng",
+        "luteal": "Ngày 15-28: Chuẩn bị cho thai kỳ"
+      },
+      "irregular_signs": [
+        "Chu kỳ < 21 ngày hoặc > 35 ngày",
+        "Kinh nguyệt kéo dài > 7 ngày",
+        "Lượng kinh quá nhiều hoặc quá ít",
+        "Đau bụng dưới dữ dội",
+        "Ra máu ngoài chu kỳ"
+      ]
+    },
+    
+    "reproductive_health": {
+      "birth_control": [
+        "Thuốc tránh thai",
+        "Vòng tránh thai",
+        "Tiêm tránh thai",
+        "Bao cao su",
+        "Phương pháp tự nhiên"
+      ],
+      "pregnancy_planning": [
+        "Uống acid folic trước khi mang thai",
+        "Tập thể dục đều đặn",
+        "Tránh thuốc lá và rượu",
+        "Kiểm tra sức khỏe tổng quát",
+        "Theo dõi chu kỳ rụng trứng"
+      ]
+    },
+    
+    "warning_signs": {
+      "seek_immediate_care": [
+        "Đau bụng dưới dữ dội đột ngột",
+        "Ra máu âm đạo nhiều bất thường",
+        "Sốt cao kèm đau bụng",
+        "Ngất xỉu hoặc chóng mặt nặng",
+        "Khó thở",
+        "Đau ngực"
+      ],
+      "schedule_appointment": [
+        "Chu kỳ kinh nguyệt bất thường",
+        "Đau khi quan hệ tình dục",
+        "Ngứa hoặc tiết dịch bất thường",
+        "Thay đổi tâm trạng nghiêm trọng",
+        "Mụn nước hoặc loét ở bộ phận sinh dục"
+      ]
+    }
+  },
+  
+  "faqs": {
+    "menstrual": [
+      {
+        "q": "Chu kỳ kinh nguyệt bao nhiêu ngày là bình thường?",
+        "a": "Chu kỳ kinh nguyệt bình thường từ 21-35 ngày, trung bình 28 ngày. Mỗi người có chu kỳ khác nhau và có thể thay đổi theo tuổi tác."
+      },
+      {
+        "q": "Tại sao chu kỳ kinh nguyệt của tôi không đều?",
+        "a": "Chu kỳ không đều có thể do stress, thay đổi cân nặng, tập luyện quá sức, rối loạn hormone, hoặc các vấn đề sức khỏe khác. Nên tư vấn bác sĩ nếu kéo dài."
+      }
+    ],
+    "sti": [
+      {
+        "q": "Tôi nên xét nghiệm STI bao lâu một lần?",
+        "a": "Người có đời sống tình dục nên xét nghiệm STI 6-12 tháng một lần, hoặc khi thay đổi bạn tình, có triệu chứng bất thường."
+      },
+      {
+        "q": "Xét nghiệm STI có đau không?",
+        "a": "Hầu hết xét nghiệm STI chỉ cần lấy mẫu máu hoặc nước tiểu, không gây đau. Một số xét nghiệm cần lấy mẫu âm đạo có thể hơi khó chịu nhưng rất nhanh."
+      }
+    ]
+  },
+  
+  "disclaimers": {
+    "medical": "Thông tin trên đây chỉ mang tính chất tham khảo và không thay thế việc tư vấn, chẩn đoán hoặc điều trị y tế chuyên nghiệp. Luôn tham khảo ý kiến bác sĩ khi có vấn đề sức khỏe.",
+    "emergency": "Trong trường hợp cấp cứu, hãy gọi 115 hoặc đến cơ sở y tế gần nhất ngay lập tức.",
+    "privacy": "Mọi thông tin cá nhân và sức khỏe của bạn được bảo mật tuyệt đối theo quy định pháp luật."
+  }
+} 

@@ -66,12 +66,18 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
     {
         try
         {
+            _logger.LogInformation("Creating menstrual cycle tracking - CycleStartDate: {StartDate}, CycleEndDate: {EndDate}, CustomerId: {CustomerId}", 
+                request.CycleStartDate, request.CycleEndDate, customerId);
+
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var tracking = _mapper.Map<MenstrualCycleTracking>(request);
                 tracking.TrackingId = Guid.NewGuid();
                 tracking.CustomerId = customerId;
                 tracking.CreatedAt = DateTime.UtcNow;
+                
+                _logger.LogInformation("Mapped tracking entity - CycleStartDate: {StartDate}, CycleEndDate: {EndDate}", 
+                    tracking.CycleStartDate, tracking.CycleEndDate);
                 
                 _logger.LogInformation("Creating tracking with ID {TrackingId}, NotificationEnabled: {NotificationEnabled}, NotifyBeforeDays: {NotifyBeforeDays}", 
                     tracking.TrackingId, tracking.NotificationEnabled, tracking.NotifyBeforeDays);
@@ -245,7 +251,27 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
     {
         try
         {
-            var prediction = await PredictNextCycleAsync(customerId);
+            CyclePredictionResponse prediction;
+            try
+            {
+                prediction = await PredictNextCycleAsync(customerId);
+            }
+            catch (InvalidOperationException)
+            {
+                // Handle insufficient data by providing default 28-day cycle prediction
+                var defaultNextPeriodStart = DateTime.UtcNow.AddDays(28);
+                prediction = new CyclePredictionResponse
+                {
+                    PredictedNextPeriodStart = defaultNextPeriodStart,
+                    PredictedNextPeriodEnd = defaultNextPeriodStart.AddDays(5),
+                    PredictedCycleLength = 28,
+                    ConfidenceScore = 0.3, // Low confidence for default prediction
+                    IsRegularCycle = false,
+                    PredictedPeriodLength = 5,
+                    ConfidenceLevel = "Low",
+                    Factors = new List<string> { "Insufficient data for accurate prediction" }
+                };
+            }
             
             // Calculate ovulation date with improved logic
             var lutealPhaseLength = CalculateLutealPhaseLength(prediction.PredictedCycleLength);

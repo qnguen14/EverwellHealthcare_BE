@@ -1,4 +1,4 @@
-﻿namespace Everwell.API.Constants
+namespace Everwell.API.Constants
 {
     public class ApiEndpointConstants
     {
@@ -180,6 +180,7 @@
         {
             public const string NotificationEndpoint = ApiEndpoint + "/notification";
             public const string GetUserNotifications = NotificationEndpoint + "/user/{userId}";
+            public const string GetMyNotifications = NotificationEndpoint + "/user/me";
             public const string MarkAsRead = NotificationEndpoint + "/mark/{id}";
             public const string DeleteNotificationEndpoint = NotificationEndpoint + "/delete/{id}";
         }

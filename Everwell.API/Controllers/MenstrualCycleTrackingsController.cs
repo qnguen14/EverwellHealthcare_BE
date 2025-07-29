@@ -57,6 +57,18 @@ public class MenstrualCycleTrackingsController : ControllerBase
     {
         try
         {
+            // Log the incoming request data for debugging
+            Console.WriteLine($"Received request: CycleStartDate={request.CycleStartDate}, NotificationEnabled={request.NotificationEnabled}, NotifyBeforeDays={request.NotifyBeforeDays}");
+            Console.WriteLine($"Raw CycleStartDate: {request.CycleStartDate}, Raw CycleEndDate: {request.CycleEndDate}");
+            
+            // Validate the model manually to see validation errors
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine($"Model validation errors: {string.Join(", ", errors)}");
+                return BadRequest(new { message = "Validation failed", errors = errors });
+            }
+            
             var userId = GetCurrentUserId();
             
             var tracking = await _menstrualCycleTrackingService.CreateMenstrualCycleTrackingAsync(request, userId);
@@ -64,14 +76,17 @@ public class MenstrualCycleTrackingsController : ControllerBase
         }
         catch (ArgumentException ex)
         {
+            Console.WriteLine($"ArgumentException: {ex.Message}");
             return BadRequest(new { message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
+            Console.WriteLine($"InvalidOperationException: {ex.Message}");
             return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Exception: {ex.Message}");
             return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
@@ -160,12 +175,28 @@ public class MenstrualCycleTrackingsController : ControllerBase
         try
         {
             var userId = GetCurrentUserId();
-            var prediction = await _menstrualCycleTrackingService.PredictNextCycleAsync(userId);
+            CyclePredictionResponse prediction;
+            try
+            {
+                prediction = await _menstrualCycleTrackingService.PredictNextCycleAsync(userId);
+            }
+            catch (InvalidOperationException)
+            {
+                // Handle insufficient data by providing default 28-day cycle prediction
+                var defaultNextPeriodStart = DateTime.UtcNow.AddDays(28);
+                prediction = new CyclePredictionResponse
+                {
+                    PredictedNextPeriodStart = defaultNextPeriodStart,
+                    PredictedNextPeriodEnd = defaultNextPeriodStart.AddDays(5),
+                    PredictedCycleLength = 28,
+                    ConfidenceScore = 0.3, // Low confidence for default prediction
+                    IsRegularCycle = false,
+                    PredictedPeriodLength = 5,
+                    ConfidenceLevel = "Low",
+                    Factors = new List<string> { "Insufficient data for accurate prediction" }
+                };
+            }
             return Ok(prediction);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
