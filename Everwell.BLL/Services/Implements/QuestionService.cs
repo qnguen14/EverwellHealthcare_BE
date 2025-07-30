@@ -88,7 +88,8 @@ public class QuestionService : BaseService<QuestionService>, IQuestionService
                 {
                     // Lấy tất cả consultant đang hoạt động
                     var consultants = await _unitOfWork.GetRepository<User>()
-                        .GetListAsync(predicate: u => u.RoleId == (int)RoleName.Consultant && u.IsActive);
+                        .GetListAsync(predicate: u => u.RoleId == 2 && u.IsActive);
+                    Console.WriteLine($"Found {consultants.Count()} active consultants");
 
                     if (consultants.Any())
                     {
