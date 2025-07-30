@@ -251,15 +251,31 @@
   },
   {
     "ContainingType": "Everwell.API.Controllers.MeetingController",
-    "Method": "HandleMeetingJoinHook",
-    "RelativePath": "api/Meeting/hooks/meeting-join",
+    "Method": "HandleMeetingEventsHook",
+    "RelativePath": "api/Meeting/hooks/meeting-events",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "hookData",
-        "Type": "System.Object",
+        "Type": "System.Text.Json.JsonElement",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.MeetingController",
+    "Method": "JoinMeeting",
+    "RelativePath": "api/Meeting/join/{appointmentId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appointmentId",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -321,6 +337,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Everwell.API.Controllers.MeetingController",
+    "Method": "TestWebhook",
+    "RelativePath": "api/Meeting/test/webhook",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "testData",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

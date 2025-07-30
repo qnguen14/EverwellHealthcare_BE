@@ -177,7 +177,7 @@ public class DailyService : IDailyService
                     max_participants = 10,
                     // Pre-scheduled room config
                     enable_prejoin_ui = true,
-                    meeting_join_hook = $"{_configuration["ApiBaseUrl"] ?? "http://localhost:5000"}/api/meeting/hooks/meeting-join"
+                    meeting_join_hook = $"{_configuration["ApiBaseUrl"] ?? "http://localhost:5190"}/api/meeting/hooks/meeting-events"
                 }
             };
 

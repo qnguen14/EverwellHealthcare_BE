@@ -2802,7 +2802,55 @@
         }
       }
     },
-    "/api/Meeting/hooks/meeting-join": {
+    "/api/Meeting/join/{appointmentId}": {
+      "post": {
+        "tags": [
+          "Meeting"
+        ],
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Meeting/hooks/meeting-events": {
+      "post": {
+        "tags": [
+          "Meeting"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { }
+            },
+            "text/json": {
+              "schema": { }
+            },
+            "application/*+json": {
+              "schema": { }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Meeting/test/webhook": {
       "post": {
         "tags": [
           "Meeting"
