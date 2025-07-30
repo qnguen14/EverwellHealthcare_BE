@@ -1,4 +1,45 @@
-﻿using Everwell.API.Constants;
+﻿// ============================================================================
+// POSTS CONTROLLER
+// ============================================================================
+// This controller manages educational content, community posts, and health articles
+// It handles content creation, moderation, and knowledge sharing within the platform
+// 
+// CONTENT MANAGEMENT FLOW:
+// 1. CONTENT CREATION: Healthcare professionals create educational posts
+// 2. CONTENT REVIEW: Medical team reviews for accuracy and appropriateness
+// 3. CONTENT PUBLICATION: Approved content published to community
+// 4. CONTENT ENGAGEMENT: Users interact through views, likes, comments
+// 5. CONTENT ANALYTICS: Track engagement and educational impact
+// 6. CONTENT UPDATES: Regular updates based on latest medical guidelines
+// 
+// POST TYPES:
+// - Educational articles: Women's health topics, preventive care
+// - Health tips: Daily wellness advice, lifestyle recommendations
+// - Medical updates: Latest research, treatment options
+// - Community stories: Patient experiences, success stories
+// - FAQ posts: Common questions and expert answers
+// 
+// CONTENT CATEGORIES:
+// - Reproductive health: Menstrual health, fertility, contraception
+// - STI prevention: Testing, treatment, prevention strategies
+// - Mental health: Stress management, emotional wellness
+// - Lifestyle: Nutrition, exercise, sleep hygiene
+// - Preventive care: Screening schedules, health checkups
+// 
+// QUALITY ASSURANCE:
+// - Medical accuracy verification by healthcare professionals
+// - Content moderation for appropriateness and sensitivity
+// - Regular updates based on current medical guidelines
+// - User feedback integration for content improvement
+// 
+// ENGAGEMENT FEATURES:
+// - Content rating and feedback system
+// - Bookmark functionality for important articles
+// - Share capabilities for spreading health awareness
+// - Comment system for community discussion
+// - Personalized content recommendations
+
+using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
 using Everwell.DAL.Data.Metadata;
@@ -19,6 +60,41 @@ public class PostsController : ControllerBase
         _postService = postService;
     }
 
+    /// <summary>
+    /// GET ALL POSTS
+    /// =============
+    /// Retrieves all published educational content and community posts
+    /// 
+    /// CONTENT DELIVERY:
+    /// - Published educational articles and health tips
+    /// - Community-generated content and success stories
+    /// - Latest medical updates and research findings
+    /// - FAQ posts and expert answers
+    /// 
+    /// CONTENT FILTERING:
+    /// - Only approved and published content
+    /// - Content sorted by relevance and recency
+    /// - Category-based organization
+    /// - User engagement metrics included
+    /// 
+    /// EDUCATIONAL VALUE:
+    /// - Evidence-based health information
+    /// - Expert-reviewed medical content
+    /// - Practical health tips and advice
+    /// - Community support and shared experiences
+    /// 
+    /// USE CASES:
+    /// - Health education: Learning about women's health topics
+    /// - Community engagement: Reading shared experiences
+    /// - Medical updates: Staying informed about latest research
+    /// - Preventive care: Understanding health screening schedules
+    /// - Lifestyle improvement: Wellness tips and recommendations
+    /// 
+    /// PUBLIC ACCESS:
+    /// - No authentication required for educational content
+    /// - Promotes health awareness and education
+    /// - Supports community health initiatives
+    /// </summary>
     [HttpGet(ApiEndpointConstants.Post.GetAllPostsEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreatePostResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
@@ -28,6 +104,8 @@ public class PostsController : ControllerBase
     {
         try
         {
+            // Retrieve all published educational content and community posts
+            // Content is pre-filtered for approval status and publication date
             var posts = await _postService.GetAllPostsAsync();
 
             if (posts == null || !posts.Any())
@@ -40,7 +118,7 @@ public class PostsController : ControllerBase
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Posts retrieved successfully",
                 IsSuccess = true,
-                Data = posts
+                Data = posts // Educational content, health tips, community posts
             };
 
             return Ok(apiResponse);
@@ -238,4 +316,4 @@ public class PostsController : ControllerBase
             return StatusCode(500, new { message = "Internal server error", details = ex.Message });
         }
     }
-} 
+}

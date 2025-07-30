@@ -1,3 +1,41 @@
+// ============================================================================
+// FEEDBACKS CONTROLLER
+// ============================================================================
+// This controller manages customer feedback, reviews, and service ratings
+// It handles feedback collection, moderation, and quality improvement insights
+// 
+// FEEDBACK SYSTEM FLOW:
+// 1. SERVICE COMPLETION: Customer completes appointment or service
+// 2. FEEDBACK REQUEST: System prompts for feedback via notification
+// 3. FEEDBACK SUBMISSION: Customer provides rating and comments
+// 4. MODERATION: Staff reviews feedback for appropriateness
+// 5. PUBLICATION: Approved feedback displayed publicly
+// 6. ANALYTICS: Feedback data used for service improvement
+// 
+// FEEDBACK TYPES:
+// - Appointment feedback: Rating consultant and consultation quality
+// - Service feedback: STI testing, cycle tracking, general app experience
+// - Feature feedback: Suggestions for app improvements
+// - Support feedback: Customer service experience ratings
+// 
+// RATING SYSTEM:
+// - 5-star rating scale for overall satisfaction
+// - Category-specific ratings (communication, expertise, timeliness)
+// - Written comments for detailed feedback
+// - Anonymous feedback option for sensitive topics
+// 
+// QUALITY ASSURANCE:
+// - Feedback moderation to filter inappropriate content
+// - Sentiment analysis for automated quality monitoring
+// - Trend analysis for service improvement insights
+// - Response system for addressing customer concerns
+// 
+// PRIVACY & MODERATION:
+// - Customer identity protection in public reviews
+// - Content filtering for inappropriate language
+// - Healthcare provider response capabilities
+// - Feedback analytics for business intelligence
+
 using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
@@ -19,21 +57,51 @@ public class FeedbacksController : ControllerBase
         _feedbackService = feedbackService;
     }
 
+    /// <summary>
+    /// GET ALL FEEDBACKS
+    /// =================
+    /// Retrieves all feedback records with role-based filtering and access control
+    /// 
+    /// ROLE-BASED ACCESS:
+    /// - Admin: View all feedbacks for quality monitoring and analytics
+    /// - Consultant: View feedbacks about their services for improvement
+    /// - Customer: View public feedbacks to make informed decisions
+    /// 
+    /// FEEDBACK ANALYTICS:
+    /// - Overall service quality trends
+    /// - Individual consultant performance metrics
+    /// - Service improvement opportunities
+    /// - Customer satisfaction patterns
+    /// 
+    /// DATA FILTERING:
+    /// - Service applies role-based data filtering
+    /// - Sensitive information protected based on user role
+    /// - Public vs private feedback distinction
+    /// - Moderation status consideration
+    /// 
+    /// USE CASES:
+    /// - Admin dashboard: Service quality overview
+    /// - Consultant profile: Performance insights
+    /// - Customer decision: Service provider selection
+    /// - Quality assurance: Trend monitoring
+    /// </summary>
     [HttpGet(ApiEndpointConstants.Feedback.GetAllFeedbacksEndpoint)]
-    [Authorize(Roles = "Admin,Consultant,Customer")]
+    [Authorize(Roles = "Admin,Consultant,Customer")] // Role-based feedback access
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<FeedbackResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllFeedbacks()
     {
         try
         {
+            // Service applies role-based filtering and privacy controls
+            // Returns appropriate feedback data based on user's role and permissions
             var feedbacks = await _feedbackService.GetAllFeedbackResponsesAsync();
             var response = new ApiResponse<IEnumerable<FeedbackResponse>>
             {
                 Message = "Feedbacks retrieved successfully",
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
-                Data = feedbacks
+                Data = feedbacks // Filtered feedback data based on user role
             };
             return Ok(response);
         }
@@ -245,22 +313,53 @@ public class FeedbacksController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// GET FEEDBACKS BY CUSTOMER
+    /// =========================
+    /// Retrieves feedback records for a specific customer
+    /// 
+    /// CUSTOMER FEEDBACK TRACKING:
+    /// - Personal feedback history and submissions
+    /// - Service experience timeline
+    /// - Rating patterns and preferences
+    /// - Follow-up feedback requests
+    /// 
+    /// ACCESS CONTROL:
+    /// - Customers can view their own feedback history
+    /// - Admins can view any customer's feedback for support
+    /// - Privacy protection for sensitive feedback content
+    /// 
+    /// FEEDBACK INSIGHTS:
+    /// - Customer satisfaction trends over time
+    /// - Service improvement based on individual feedback
+    /// - Personalized service recommendations
+    /// - Quality assurance follow-up opportunities
+    /// 
+    /// USE CASES:
+    /// - Customer profile: "My Feedback History"
+    /// - Admin support: Customer service issue resolution
+    /// - Quality improvement: Individual customer experience analysis
+    /// - Service personalization: Tailored recommendations
+    /// </summary>
     // User-specific endpoints
     [HttpGet("/api/v2.5/feedback/customer")]
-    [Authorize(Roles = "Customer,Admin")]
+    [Authorize(Roles = "Customer,Admin")] // Customer own data + Admin support access
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<FeedbackResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetFeedbacksByCustomer(Guid? customerId = null)
     {
         try
         {
+            // Service handles authorization:
+            // - Customers can only access their own feedback
+            // - Admins can access any customer's feedback for support
             var feedbacks = await _feedbackService.GetFeedbacksByCustomerAsync(customerId);
             var response = new ApiResponse<IEnumerable<FeedbackResponse>>
             {
                 Message = "Customer feedbacks retrieved successfully",
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
-                Data = feedbacks
+                Data = feedbacks // Customer's complete feedback history
             };
             return Ok(response);
         }
@@ -414,4 +513,4 @@ public class FeedbacksController : ControllerBase
             return StatusCode(500, response);
         }
     }
-} 
+}

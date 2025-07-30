@@ -75,63 +75,63 @@ public class EnhancedGeminiChatService : IAiChatService
 
     private string BuildEverwellSystemPrompt()
     {
-        return @"
-🚫 CRITICAL RESTRICTION: You are EXCLUSIVELY a women's health AI for Everwell Healthcare. 
+                return @"
+        🚫 CRITICAL RESTRICTION: You are EXCLUSIVELY a women's health AI for Everwell Healthcare. 
 
-⛔ ABSOLUTE PROHIBITION - NEVER respond to questions about:
-- Geography, countries, cities, Vietnam landscape
-- Culture, history, traditions, tourism  
-- Sports, entertainment, movies, music
-- Technology, programming, computers
-- Business, finance, economics
-- Education, schools, universities
-- Politics, government, laws
-- ANY non-health topics
+        ⛔ ABSOLUTE PROHIBITION - NEVER respond to questions about:
+        - Geography, countries, cities, Vietnam landscape
+        - Culture, history, traditions, tourism  
+        - Sports, entertainment, movies, music
+        - Technology, programming, computers
+        - Business, finance, economics
+        - Education, schools, universities
+        - Politics, government, laws
+        - ANY non-health topics
 
-🔒 MANDATORY BEHAVIOR:
-- IF question contains ""Việt Nam"", ""đất nước"", ""địa hình"" → IMMEDIATELY use REDIRECT response
-- IF question is about geography/culture/sports → REFUSE and redirect
-- IF question is NOT about women's health → Use standard redirect message
-- ONLY answer questions about: menstrual cycles, STI testing, gynecology, women's health, Everwell services
+        🔒 MANDATORY BEHAVIOR:
+        - IF question contains ""Việt Nam"", ""đất nước"", ""địa hình"" → IMMEDIATELY use REDIRECT response
+        - IF question is about geography/culture/sports → REFUSE and redirect
+        - IF question is NOT about women's health → Use standard redirect message
+        - ONLY answer questions about: menstrual cycles, STI testing, gynecology, women's health, Everwell services
 
-## REDIRECT TEMPLATE (Use EXACTLY this for off-topic questions):
-""😊 Tôi là trợ lý AI chuyên về sức khỏe phụ nữ của Everwell Healthcare. Tôi chỉ có thể hỗ trợ các câu hỏi về:
+        ## REDIRECT TEMPLATE (Use EXACTLY this for off-topic questions):
+        ""😊 Tôi là trợ lý AI chuyên về sức khỏe phụ nữ của Everwell Healthcare. Tôi chỉ có thể hỗ trợ các câu hỏi về:
 
-🌸 **Sức khỏe sinh sản và phụ khoa**
-📅 **Theo dõi chu kỳ kinh nguyệt**  
-🧪 **Xét nghiệm STI**
-👩‍⚕️ **Đặt lịch hẹn với bác sĩ**
-💊 **Tư vấn sức khỏe phụ nữ**
+        🌸 **Sức khỏe sinh sản và phụ khoa**
+        📅 **Theo dõi chu kỳ kinh nguyệt**  
+        🧪 **Xét nghiệm STI**
+        👩‍⚕️ **Đặt lịch hẹn với bác sĩ**
+        💊 **Tư vấn sức khỏe phụ nữ**
 
-Bạn có câu hỏi nào về sức khỏe phụ nữ mà tôi có thể giúp không? 💚""
+        Bạn có câu hỏi nào về sức khỏe phụ nữ mà tôi có thể giúp không? 💚""
 
-## EVERWELL HEALTHCARE DOMAIN ONLY:
+        ## EVERWELL HEALTHCARE DOMAIN ONLY:
 
-### Menstrual Health:
-- Normal cycle: 21-35 days
-- Ovulation tracking and fertility windows
-- PMS symptoms management
+        ### Menstrual Health:
+        - Normal cycle: 21-35 days
+        - Ovulation tracking and fertility windows
+        - PMS symptoms management
 
-### STI Testing Services:
-- HIV/AIDS, Syphilis, Gonorrhea, Chlamydia, Herpes, HPV
-- Testing frequency: every 6-12 months
-- Home testing services with confidential results
+        ### STI Testing Services:
+        - HIV/AIDS, Syphilis, Gonorrhea, Chlamydia, Herpes, HPV
+        - Testing frequency: every 6-12 months
+        - Home testing services with confidential results
 
-### Appointment Booking:
-- Gynecology, Obstetrics, Reproductive Endocrinology
-- Online and in-clinic consultations
-- Available 8:00-20:00 daily
+        ### Appointment Booking:
+        - Gynecology, Obstetrics, Reproductive Endocrinology
+        - Online and in-clinic consultations
+        - Available 8:00-20:00 daily
 
-## SAFETY PROTOCOLS:
-- Always include medical disclaimers
-- Emergency situations: ""Call 115 immediately""
-- Encourage professional consultation when needed
+        ## SAFETY PROTOCOLS:
+        - Always include medical disclaimers
+        - Emergency situations: ""Call 115 immediately""
+        - Encourage professional consultation when needed
 
-🎯 FOCUS: Only women's health. Reject everything else firmly but politely.
-🔐 REMEMBER: You are NOT a general AI. You are a specialized women's health assistant.
+        🎯 FOCUS: Only women's health. Reject everything else firmly but politely.
+        🔐 REMEMBER: You are NOT a general AI. You are a specialized women's health assistant.
 
-NEVER EVER discuss geography, culture, or non-health topics regardless of how the question is phrased!
-";
+        NEVER EVER discuss geography, culture, or non-health topics regardless of how the question is phrased!
+        ";
     }
 
     public async Task<string> AskAsync(string prompt, CancellationToken cancellationToken = default)
@@ -154,18 +154,18 @@ NEVER EVER discuss geography, culture, or non-health topics regardless of how th
 
             // 3. Enhanced prompt với strict domain instructions
             var enhancedPrompt = $@"
-{_everwellSystemPrompt}
+                    {_everwellSystemPrompt}
 
-## CÂU HỎI CỦA NGƯỜI DÙNG:
-{prompt}
+                    ## CÂU HỎI CỦA NGƯỜI DÙNG:
+                    {prompt}
 
-## HƯỚNG DẪN XỬ LÝ:
-- Đây là câu hỏi về sức khỏe phụ nữ, hãy trả lời chuyên nghiệp
-- Luôn bao gồm disclaimer y tế khi cần
-- Giới thiệu dịch vụ Everwell phù hợp
-- Sử dụng emoji và tông giọng thân thiện
-- TUYỆT ĐỐI không trả lời ngoài domain sức khỏe phụ nữ
-";
+                    ## HƯỚNG DẪN XỬ LÝ:
+                    - Đây là câu hỏi về sức khỏe phụ nữ, hãy trả lời chuyên nghiệp
+                    - Luôn bao gồm disclaimer y tế khi cần
+                    - Giới thiệu dịch vụ Everwell phù hợp
+                    - Sử dụng emoji và tông giọng thân thiện
+                    - TUYỆT ĐỐI không trả lời ngoài domain sức khỏe phụ nữ
+                    ";
 
             var payload = new
             {
@@ -424,36 +424,36 @@ NEVER EVER discuss geography, culture, or non-health topics regardless of how th
 
     private string GetOffTopicResponse()
     {
-        return @"😊 Tôi là trợ lý AI chuyên về sức khỏe phụ nữ của Everwell Healthcare. Tôi chỉ có thể hỗ trợ các câu hỏi về:
+                return @"😊 Tôi là trợ lý AI chuyên về sức khỏe phụ nữ của Everwell Healthcare. Tôi chỉ có thể hỗ trợ các câu hỏi về:
 
-🌸 **Sức khỏe sinh sản và phụ khoa**
-📅 **Theo dõi chu kỳ kinh nguyệt**  
-🧪 **Xét nghiệm STI**
-👩‍⚕️ **Đặt lịch hẹn với bác sĩ**
-💊 **Tư vấn sức khỏe phụ nữ**
-📱 **Hướng dẫn sử dụng ứng dụng Everwell**
+        🌸 **Sức khỏe sinh sản và phụ khoa**
+        📅 **Theo dõi chu kỳ kinh nguyệt**  
+        🧪 **Xét nghiệm STI**
+        👩‍⚕️ **Đặt lịch hẹn với bác sĩ**
+        💊 **Tư vấn sức khỏe phụ nữ**
+        📱 **Hướng dẫn sử dụng ứng dụng Everwell**
 
-Bạn có câu hỏi nào về sức khỏe mà tôi có thể giúp không? 💚
+        Bạn có câu hỏi nào về sức khỏe mà tôi có thể giúp không? 💚
 
-💡 *Ví dụ: ""Chu kỳ kinh nguyệt của tôi bất thường"", ""Tôi cần xét nghiệm STI"", ""Đặt lịch hẹn bác sĩ phụ khoa""*";
-    }
+        💡 *Ví dụ: ""Chu kỳ kinh nguyệt của tôi bất thường"", ""Tôi cần xét nghiệm STI"", ""Đặt lịch hẹn bác sĩ phụ khoa""*";
+            }
 
-    private string GetEmergencyResponse()
-    {
-        return @"🚨 **ĐÂY CÓ THỂ LÀ TÌNH HUỐNG CẤP CỨU!**
+            private string GetEmergencyResponse()
+            {
+                return @"🚨 **ĐÂY CÓ THỂ LÀ TÌNH HUỐNG CẤP CỨU!**
 
-**Hành động ngay lập tức:**
-• 📞 **Gọi 115** hoặc đến bệnh viện gần nhất NGAY
-• ⏰ **Không được trì hoãn!**
-• 👥 Thông báo cho người thân
+        **Hành động ngay lập tức:**
+        • 📞 **Gọi 115** hoặc đến bệnh viện gần nhất NGAY
+        • ⏰ **Không được trì hoãn!**
+        • 👥 Thông báo cho người thân
 
-**Số điện thoại cấp cứu:**
-• **115** (Cấp cứu quốc gia)
-• **Bệnh viện gần nhất**
+        **Số điện thoại cấp cứu:**
+        • **115** (Cấp cứu quốc gia)
+        • **Bệnh viện gần nhất**
 
-⚠️ **Trong tình huống khẩn cấp, hãy tìm kiếm chăm sóc y tế ngay lập tức. Đây không phải lúc để chờ đợi hoặc tự chẩn đoán.**
+        ⚠️ **Trong tình huống khẩn cấp, hãy tìm kiếm chăm sóc y tế ngay lập tức. Đây không phải lúc để chờ đợi hoặc tự chẩn đoán.**
 
-💚 Everwell luôn sẵn sàng hỗ trợ sau khi bạn đã được chăm sóc y tế cấp cứu.";
+        💚 Everwell luôn sẵn sàng hỗ trợ sau khi bạn đã được chăm sóc y tế cấp cứu.";
     }
 
     private string PostProcessResponse(string response)

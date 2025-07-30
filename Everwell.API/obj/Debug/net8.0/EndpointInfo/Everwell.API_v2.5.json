@@ -9844,6 +9844,11 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "menstrualCycleTrackingId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false

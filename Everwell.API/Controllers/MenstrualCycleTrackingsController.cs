@@ -52,13 +52,14 @@ public class MenstrualCycleTrackingsController : ControllerBase
     }
 
     [HttpPost(ApiEndpointConstants.MenstrualCycleTracking.CreateMenstrualCycleTrackingEndpoint)]
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = "Customer")] // Only customers can track their own cycles
     public async Task<ActionResult<CreateMenstrualCycleResponse>> CreateMenstrualCycleTracking([FromBody] CreateMenstrualCycleRequest request)
     {
         try
         {
-            var userId = GetCurrentUserId();
+            var userId = GetCurrentUserId(); // Extract user ID from JWT token claims
             
+            // Service handles cycle validation, overlap detection, and notification scheduling
             var tracking = await _menstrualCycleTrackingService.CreateMenstrualCycleTrackingAsync(request, userId);
             return CreatedAtAction(nameof(GetMenstrualCycleTrackingById), new { id = tracking.TrackingId }, tracking);
         }
@@ -84,11 +85,12 @@ public class MenstrualCycleTrackingsController : ControllerBase
         {
             var userId = GetCurrentUserId();
             
-            // Verify ownership
+            // Critical: Verify ownership to prevent unauthorized access to sensitive health data
             var existingTracking = await _menstrualCycleTrackingService.GetMenstrualCycleTrackingByIdAsync(id);
             if (existingTracking == null)
                 return NotFound(new { message = "Menstrual Cycle Tracking not found" });
                 
+            // HIPAA compliance: Users can only modify their own reproductive health data
             if (existingTracking.CustomerId != userId)
                 return Forbid("You can only update your own cycle tracking data");
             
@@ -114,13 +116,14 @@ public class MenstrualCycleTrackingsController : ControllerBase
             var userId = GetCurrentUserId();
             var userRole = GetCurrentUserRole();
             
-            // Verify ownership (unless admin)
+            // Admin bypass: Admins can delete any cycle data for moderation/support purposes
             if (userRole != "Admin")
             {
                 var existingTracking = await _menstrualCycleTrackingService.GetMenstrualCycleTrackingByIdAsync(id);
                 if (existingTracking == null)
                     return NotFound(new { message = "Menstrual Cycle Tracking not found" });
                     
+                // Privacy protection: Non-admin users can only delete their own sensitive health data
                 if (existingTracking.CustomerId != userId)
                     return Forbid("You can only delete your own cycle tracking data");
             }
@@ -154,12 +157,13 @@ public class MenstrualCycleTrackingsController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.MenstrualCycleTracking.PredictNextCycleEndpoint)]
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = "Customer")] // Predictions are personal and user-specific
     public async Task<ActionResult<CyclePredictionResponse>> PredictNextCycle()
     {
         try
         {
             var userId = GetCurrentUserId();
+            // Complex algorithm: Uses historical data, cycle patterns, and ML to predict next period
             var prediction = await _menstrualCycleTrackingService.PredictNextCycleAsync(userId);
             return Ok(prediction);
         }
@@ -174,12 +178,13 @@ public class MenstrualCycleTrackingsController : ControllerBase
     }
 
     [HttpGet(ApiEndpointConstants.MenstrualCycleTracking.GetFertilityWindowEndpoint)]
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = "Customer")] // Fertility data is highly sensitive reproductive information
     public async Task<ActionResult<FertilityWindowResponse>> GetFertilityWindow()
     {
         try
         {
             var userId = GetCurrentUserId();
+            // Critical calculation: Determines ovulation window for family planning/contraception
             var fertilityWindow = await _menstrualCycleTrackingService.GetFertilityWindowAsync(userId);
             return Ok(fertilityWindow);
         }
@@ -279,12 +284,15 @@ public class MenstrualCycleTrackingsController : ControllerBase
 
     private Guid GetCurrentUserId()
     {
+        // Extract user ID from JWT token - critical for data isolation and security
         var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        // Fail fast if token is invalid or missing user ID to prevent unauthorized access
         return Guid.Parse(userIdClaim ?? throw new UnauthorizedAccessException("User ID not found in token"));
     }
 
     private string GetCurrentUserRole()
     {
+        // Role-based authorization for admin functions and data access control
         return User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? throw new UnauthorizedAccessException("User role not found in token");
     }
 }

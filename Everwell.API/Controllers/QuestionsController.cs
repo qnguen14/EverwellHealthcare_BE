@@ -1,3 +1,51 @@
+// ============================================================================
+// QUESTIONS CONTROLLER
+// ============================================================================
+// This controller manages the Q&A system, knowledge base, and expert consultations
+// It handles question submission, expert answers, and community knowledge sharing
+// 
+// Q&A SYSTEM FLOW:
+// 1. QUESTION SUBMISSION: Users submit health-related questions
+// 2. QUESTION MODERATION: Staff reviews for appropriateness and medical relevance
+// 3. EXPERT ASSIGNMENT: Questions routed to appropriate healthcare professionals
+// 4. EXPERT RESPONSE: Medical experts provide evidence-based answers
+// 5. ANSWER REVIEW: Medical team validates answer accuracy and completeness
+// 6. PUBLICATION: Approved Q&A pairs added to knowledge base
+// 7. COMMUNITY ACCESS: Users search and browse answered questions
+// 
+// QUESTION CATEGORIES:
+// - Reproductive health: Menstrual cycles, fertility, contraception
+// - STI concerns: Testing, symptoms, treatment, prevention
+// - General wellness: Lifestyle, nutrition, mental health
+// - Preventive care: Screening schedules, health maintenance
+// - Symptom inquiries: Health concerns, when to seek care
+// 
+// EXPERT NETWORK:
+// - Gynecologists: Reproductive health specialists
+// - General practitioners: Primary care physicians
+// - Mental health professionals: Counselors and therapists
+// - Nutritionists: Diet and wellness experts
+// - Pharmacists: Medication and supplement guidance
+// 
+// KNOWLEDGE BASE FEATURES:
+// - Searchable Q&A database
+// - Category-based organization
+// - Expert-verified medical information
+// - Related question suggestions
+// - Popular questions highlighting
+// 
+// QUALITY ASSURANCE:
+// - Medical accuracy verification by licensed professionals
+// - Regular content updates based on latest guidelines
+// - User feedback integration for answer improvement
+// - Disclaimer and medical advice limitations
+// 
+// PRIVACY & SAFETY:
+// - Anonymous question submission option
+// - Personal information protection
+// - Emergency situation identification and referral
+// - Professional medical consultation recommendations
+
 using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
@@ -20,14 +68,51 @@ public class QuestionsController : ControllerBase
         _questionService = questionService;
     }
 
+    /// <summary>
+    /// GET ALL QUESTIONS
+    /// =================
+    /// Retrieves all questions from the knowledge base and Q&A system
+    /// 
+    /// KNOWLEDGE BASE ACCESS:
+    /// - Expert-answered questions with verified medical information
+    /// - Community Q&A database for health education
+    /// - Frequently asked questions about women's health
+    /// - Categorized questions for easy browsing
+    /// 
+    /// QUESTION TYPES:
+    /// - Answered questions: Expert-verified responses available
+    /// - Popular questions: Most viewed and helpful content
+    /// - Recent questions: Latest additions to knowledge base
+    /// - Category-specific: Organized by health topics
+    /// 
+    /// EDUCATIONAL VALUE:
+    /// - Evidence-based medical information
+    /// - Expert insights from healthcare professionals
+    /// - Common health concerns and solutions
+    /// - Preventive care guidance and recommendations
+    /// 
+    /// USE CASES:
+    /// - Health education: Learning about women's health topics
+    /// - Self-assessment: Understanding symptoms and concerns
+    /// - Preventive care: Guidance on health maintenance
+    /// - Decision support: Information for healthcare decisions
+    /// - Community learning: Shared health knowledge
+    /// 
+    /// PUBLIC ACCESS:
+    /// - No authentication required for knowledge base
+    /// - Promotes health literacy and awareness
+    /// - Supports informed healthcare decisions
+    /// </summary>
     [HttpGet(ApiEndpointConstants.Question.GetAllQuestionsEndpoint)]
     [Authorize]
     public async Task<ActionResult<IEnumerable<QuestionResponse>>> GetAllQuestions()
     {
         try
         {
+            // Retrieve all questions from the knowledge base
+            // Includes expert-answered questions and community Q&A
             var questions = await _questionService.GetAllQuestionsAsync();
-            return Ok(questions);
+            return Ok(questions); // Knowledge base Q&A, expert answers, health education
         }
         catch (Exception ex)
         {
@@ -233,4 +318,4 @@ public class QuestionsController : ControllerBase
             return StatusCode(500, new { message = "Debug error", details = ex.Message });
         }
     }
-} 
+}

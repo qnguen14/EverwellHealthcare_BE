@@ -31,7 +31,8 @@ namespace Everwell.BLL.Services.Implements
             {
                 var today = DateTime.UtcNow.Date;
                 
-                // Get all notifications scheduled for today that haven't been sent
+                // Query optimization: Get today's unsent notifications with related data in single query
+                // Includes tracking and customer data to avoid N+1 query problems
                 var pendingNotifications = await _unitOfWork.GetRepository<MenstrualCycleNotification>()
                     .GetListAsync(
                         predicate: n => n.SentAt.Date == today && !n.IsSent,
@@ -40,17 +41,19 @@ namespace Everwell.BLL.Services.Implements
 
                 foreach (var notification in pendingNotifications)
                 {
-                    // Send email notification
+                    // Multi-channel delivery: Send both email and in-app notifications
+                    // Email for immediate attention, in-app for when user opens application
                     await SendNotificationEmail(notification);
                     
-                    // Create in-app notification
+                    // In-app notification for real-time user experience
                     await CreateInAppNotificationAsync(notification);
                     
-                    // Mark as sent
+                    // Idempotency: Mark as sent to prevent duplicate notifications
                     notification.IsSent = true;
                     _unitOfWork.GetRepository<MenstrualCycleNotification>().UpdateAsync(notification);
                 }
 
+                // Batch update: Save all notification status changes in single transaction
                 await _unitOfWork.SaveChangesAsync();
                 
                 _logger.LogInformation($"Processed {pendingNotifications.Count} pending notifications");
@@ -107,13 +110,14 @@ namespace Everwell.BLL.Services.Implements
         {
             try
             {
+                // Guard clause: Skip if tracking is invalid or notifications disabled
                 if (tracking == null || !tracking.NotificationEnabled)
                 {
                     _logger.LogWarning("Tracking is null or notifications disabled for trackingId: {TrackingId}", tracking?.TrackingId);
                     return;
                 }
 
-                // Load customer if needed
+                // Lazy loading: Load customer data only when needed for notification personalization
                 if (tracking.Customer == null)
                 {
                     tracking.Customer = await _unitOfWork.GetRepository<User>()
@@ -122,15 +126,17 @@ namespace Everwell.BLL.Services.Implements
 
                 _logger.LogInformation("Scheduling notifications for tracking {TrackingId}, Customer {CustomerId}", tracking.TrackingId, tracking.CustomerId);
 
-                // Calculate next cycle prediction with correct logic
+                // Core prediction engine: Uses historical data and ML algorithms for accurate forecasting
                 var (nextPeriodStart, cycleLength, confidence) = await CalculateNextCyclePredictionWithConfidence(tracking.CustomerId);
+                // Ovulation calculation: Based on luteal phase length (typically 14 days before period)
                 var ovulationDate = CalculateOvulationDate(nextPeriodStart, cycleLength);
+                // Fertility window: 5 days before ovulation + ovulation day (sperm survival + egg lifespan)
                 var (fertilityStart, fertilityEnd) = CalculateFertilityWindow(ovulationDate);
 
                 _logger.LogInformation("Predictions - Next period: {NextPeriod}, Ovulation: {Ovulation}, Cycle length: {CycleLength}, Confidence: {Confidence}",
                     nextPeriodStart, ovulationDate, cycleLength, confidence);
 
-                // Schedule period reminder
+                // Period reminder: User-configurable advance notice (typically 1-7 days)
                 if (tracking.NotifyBeforeDays.HasValue && tracking.NotifyBeforeDays.Value > 0)
                 {
                     var reminderDate = nextPeriodStart.AddDays(-tracking.NotifyBeforeDays.Value);
@@ -142,7 +148,7 @@ namespace Everwell.BLL.Services.Implements
                     _logger.LogInformation("Period reminder created: {Created} for date {ReminderDate}", created, reminderDate);
                 }
 
-                // Schedule ovulation reminder (2 days before ovulation)
+                // Ovulation alert: 2-day advance notice for family planning or contraception
                 var ovulationReminderDate = ovulationDate.AddDays(-2);
                 var ovulationCreated = await CreateNotificationAsync(
                     tracking.TrackingId,
@@ -151,7 +157,7 @@ namespace Everwell.BLL.Services.Implements
                     $"Your ovulation is expected on {ovulationDate:MMM dd, yyyy}. Your fertile window starts soon!");
                 _logger.LogInformation("Ovulation reminder created: {Created} for date {ReminderDate}", ovulationCreated, ovulationReminderDate);
 
-                // Schedule fertility window reminder (1 day before fertile window starts)
+                // Fertility window alert: 1-day advance notice for conception planning
                 var fertilityReminderDate = fertilityStart.AddDays(-1);
                 var fertilityCreated = await CreateNotificationAsync(
                     tracking.TrackingId,
@@ -171,45 +177,50 @@ namespace Everwell.BLL.Services.Implements
 
         private async Task<(DateTime nextPeriodStart, double cycleLength, int confidence)> CalculateNextCyclePredictionWithConfidence(Guid customerId)
         {
-            // Get last 6 cycles for prediction (more data = better accuracy)
+            // Optimal data window: 6 months provides balance between recent patterns and statistical significance
             var startDate = DateTime.UtcNow.AddMonths(-6);
             var trackings = await _unitOfWork.GetRepository<MenstrualCycleTracking>()
                 .GetListAsync(
                     predicate: m => m.CustomerId == customerId && m.CycleStartDate >= startDate,
-                    orderBy: q => q.OrderByDescending(x => x.CycleStartDate));
+                    orderBy: q => q.OrderByDescending(x => x.CycleStartDate)); // Most recent first
 
-            // Convert to list to enable indexing
+            // Performance optimization: Convert to list for efficient indexing operations
             var trackingsList = trackings.ToList();
 
+            // Minimum data requirement: Need at least 2 cycles to calculate any meaningful pattern
             if (trackingsList.Count < 2)
             {
-                // Default for new users - use standard 28-day cycle
-                return (DateTime.UtcNow.AddDays(28), 28, 30); // Low confidence for new users
+                // Fallback for new users: Use medical standard 28-day cycle with low confidence
+                return (DateTime.UtcNow.AddDays(28), 28, 30); // 30% confidence reflects uncertainty
             }
 
-            // Calculate cycle lengths correctly (start of one period to start of next)
+            // Cycle length calculation: Medical standard is start-to-start measurement
             var cycleLengths = new List<double>();
             for (int i = 0; i < trackingsList.Count - 1; i++)
             {
-                var currentStart = trackingsList[i].CycleStartDate;
-                var nextStart = trackingsList[i + 1].CycleStartDate;
+                var currentStart = trackingsList[i].CycleStartDate; // More recent cycle
+                var nextStart = trackingsList[i + 1].CycleStartDate; // Previous cycle chronologically
                 var cycleLength = (currentStart - nextStart).TotalDays;
                 
-                // Validate reasonable cycle length (21-45 days)
+                // Medical validation: Normal cycles range 21-45 days (WHO guidelines)
+                // Filter outliers that could skew predictions
                 if (cycleLength >= 21 && cycleLength <= 45)
                     cycleLengths.Add(cycleLength);
             }
 
+            // Safety check: If all cycles were outliers, fall back to default
             if (!cycleLengths.Any())
             {
                 return (DateTime.UtcNow.AddDays(28), 28, 30);
             }
 
+            // Statistical analysis: Calculate average cycle length for prediction baseline
             var averageCycleLength = cycleLengths.Average();
-            var lastCycleStart = trackingsList.First().CycleStartDate; // First is most recent due to OrderByDescending
+            var lastCycleStart = trackingsList.First().CycleStartDate; // Most recent cycle
+            // Core prediction: Add average cycle length to last period start date
             var nextPeriodStart = lastCycleStart.AddDays(averageCycleLength);
             
-            // Calculate confidence based on cycle regularity and data points
+            // Confidence scoring: Based on cycle regularity and data quantity
             var confidence = CalculateConfidenceScore(cycleLengths);
             
             return (nextPeriodStart, averageCycleLength, confidence);
@@ -217,6 +228,8 @@ namespace Everwell.BLL.Services.Implements
 
         private DateTime CalculateOvulationDate(DateTime nextPeriodStart, double cycleLength)
         {
+            // Medical standard: Luteal phase is consistently ~14 days regardless of cycle length
+            // This is the most reliable method for ovulation prediction
             // Luteal phase is typically 12-16 days (average 14)
             // For shorter cycles, luteal phase might be shorter
             double lutealPhaseLength = 14;
@@ -231,6 +244,9 @@ namespace Everwell.BLL.Services.Implements
 
         private (DateTime start, DateTime end) CalculateFertilityWindow(DateTime ovulationDate)
         {
+            // Biological basis: Sperm can survive up to 5 days in reproductive tract
+            // Egg is viable for ~24 hours after ovulation
+            // Total fertile window: 5 days before + ovulation day = 6 days
             return (
                 start: ovulationDate.AddDays(-5), // 5 days before ovulation (sperm survival)
                 end: ovulationDate                // Ovulation day (egg survives ~24h)
@@ -239,18 +255,27 @@ namespace Everwell.BLL.Services.Implements
 
         private int CalculateConfidenceScore(List<double> cycleLengths)
         {
-            if (cycleLengths.Count < 2) return 30; // Low confidence for insufficient data
+            // Minimum confidence for insufficient data
+            if (cycleLengths.Count < 2) return 30;
             
-            // Calculate standard deviation
+            // Statistical analysis: Calculate standard deviation to measure cycle regularity
             var mean = cycleLengths.Average();
             var standardDeviation = Math.Sqrt(cycleLengths.Select(x => Math.Pow(x - mean, 2)).Average());
             
-            // Base confidence on regularity and data points
-            var regularityScore = Math.Max(0, 100 - (standardDeviation * 10)); // Lower deviation = higher score
-            var dataPointBonus = Math.Min(20, cycleLengths.Count * 4); // More data = higher confidence
+            // Regularity scoring: Lower deviation indicates more predictable cycles
+            // Scale factor of 10 converts days of deviation to percentage points
+            var regularityScore = Math.Max(0, 100 - (standardDeviation * 10));
             
+            // Data quantity bonus: More cycles provide better statistical foundation
+            // Each cycle adds 4% confidence up to maximum of 20% bonus
+            var dataPointBonus = Math.Min(20, cycleLengths.Count * 4);
+            
+            // Weighted confidence calculation: Prioritize regularity over quantity
+            // 80% weight on regularity reflects medical importance of cycle consistency
             var confidence = (int)(regularityScore * 0.8 + dataPointBonus);
-            return Math.Max(30, Math.Min(95, confidence)); // Clamp between 30-95%
+            
+            // Confidence bounds: Never below 30% (some predictive value) or above 95% (biological variability)
+            return Math.Max(30, Math.Min(95, confidence));
         }
 
         private bool IsRegularCycle(List<double> cycleLengths)

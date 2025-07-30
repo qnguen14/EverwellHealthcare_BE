@@ -68,31 +68,35 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         {
             return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
+                // Map request to entity and set required tracking properties
                 var tracking = _mapper.Map<MenstrualCycleTracking>(request);
-                tracking.TrackingId = Guid.NewGuid();
-                tracking.CustomerId = customerId;
-                tracking.CreatedAt = DateTime.UtcNow;
+                tracking.TrackingId = Guid.NewGuid(); // Generate unique identifier for this cycle
+                tracking.CustomerId = customerId; // Associate with specific user for data isolation
+                tracking.CreatedAt = DateTime.UtcNow; // Audit trail timestamp
                 
                 _logger.LogInformation("Creating tracking with ID {TrackingId}, NotificationEnabled: {NotificationEnabled}, NotifyBeforeDays: {NotifyBeforeDays}", 
                     tracking.TrackingId, tracking.NotificationEnabled, tracking.NotifyBeforeDays);
                 
+                // Persist the tracking record to database
                 await _unitOfWork.GetRepository<MenstrualCycleTracking>().InsertAsync(tracking);
                 
                 // Force save to make tracking available for notification service
+                // This ensures the tracking entity exists before creating dependent notifications
                 await _unitOfWork.SaveChangesAsync();
                 
-                // Schedule notifications if enabled
+                // Smart notification scheduling: Creates period reminders, ovulation alerts, and fertility window notifications
                 if (tracking.NotificationEnabled)
                 {
                     _logger.LogInformation("About to schedule notifications for tracking {TrackingId}", tracking.TrackingId);
+                    // Calculates future notification dates based on cycle patterns and user preferences
                     await _notificationService.ScheduleNotificationsForTrackingAsync(tracking);
                     _logger.LogInformation("Notifications scheduled for tracking {TrackingId}", tracking.TrackingId);
                     
-                    // Check context state after notifications
+                    // Debug logging: Monitor Entity Framework change tracking state
                     var contextStateAfterNotifications = _unitOfWork.Context.ChangeTracker.Entries().Count();
                     _logger.LogInformation("Context has {Count} tracked entities after adding notifications", contextStateAfterNotifications);
                     
-                    // Log all tracked entities
+                    // Log all tracked entities for debugging transaction state
                     var trackedEntities = _unitOfWork.Context.ChangeTracker.Entries()
                         .Select(e => new { Type = e.Entity.GetType().Name, State = e.State })
                         .ToList();
@@ -189,21 +193,24 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
     {
         try
         {
+            // Retrieve last 6 cycles for statistical accuracy - more cycles = better prediction
             var history = await GetCycleHistoryAsync(customerId, 6);
             if (!history.Any())
                 throw new InvalidOperationException("Not enough cycle data to make prediction");
 
             // Calculate cycle lengths correctly (start to start, not start to end)
+            // This is the medical standard for measuring menstrual cycle length
             var cycleLengths = new List<double>();
             var sortedHistory = history.OrderBy(h => h.CycleStartDate).ToList();
             
+            // Iterate through consecutive cycles to calculate intervals
             for (int i = 0; i < sortedHistory.Count - 1; i++)
             {
                 var currentStart = sortedHistory[i].CycleStartDate;
                 var nextStart = sortedHistory[i + 1].CycleStartDate;
                 var cycleLength = (nextStart - currentStart).TotalDays;
                 
-                // Validate reasonable cycle length
+                // Medical validation: Normal cycles are 21-45 days, filter outliers
                 if (cycleLength >= 21 && cycleLength <= 45)
                     cycleLengths.Add(cycleLength);
             }
@@ -211,14 +218,15 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
             if (!cycleLengths.Any())
                 throw new InvalidOperationException("No valid cycle lengths found for prediction");
 
+            // Statistical analysis: Average cycle length for prediction baseline
             var averageCycleLength = cycleLengths.Average();
             var lastCycle = sortedHistory.OrderByDescending(h => h.CycleStartDate).First();
             
-            // Calculate next period start correctly
+            // Core prediction algorithm: Add average cycle length to last period start
             var nextPeriodStart = lastCycle.CycleStartDate.AddDays(averageCycleLength);
-            var nextPeriodEnd = nextPeriodStart.AddDays(5); // Average period length
+            var nextPeriodEnd = nextPeriodStart.AddDays(5); // Average period length (medical standard)
             
-            // Calculate confidence and regularity
+            // Confidence calculation: Higher regularity = higher confidence in prediction
             var confidenceScore = CalculateConfidenceScore(cycleLengths);
             var isRegular = IsRegularCycle(cycleLengths);
             
@@ -245,15 +253,18 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
     {
         try
         {
+            // Get cycle prediction data for fertility calculations
             var prediction = await PredictNextCycleAsync(customerId);
             
-            // Calculate ovulation date with improved logic
+            // Medical standard: Calculate ovulation based on luteal phase length
+            // Luteal phase is more consistent than follicular phase (12-16 days vs variable)
             var lutealPhaseLength = CalculateLutealPhaseLength(prediction.PredictedCycleLength);
             var ovulationDate = prediction.PredictedNextPeriodStart.AddDays(-lutealPhaseLength);
             
-            // Calculate fertility window (5 days before + ovulation day)
+            // Fertility window calculation: Sperm can survive 5 days, egg survives 24 hours
+            // Total fertile period = 5 days before ovulation + ovulation day (6 days total)
             var fertilityStart = ovulationDate.AddDays(-5);
-            var fertilityEnd = ovulationDate;
+            var fertilityEnd = ovulationDate; // Peak fertility day
             
             return new FertilityWindowResponse
             {
@@ -278,33 +289,42 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
     {
         try
         {
+            // Analyze 12 months of data for comprehensive health insights
             var history = await GetCycleHistoryAsync(customerId, 12);
             if (!history.Any())
                 throw new InvalidOperationException("Not enough cycle data for analytics");
 
+            // Filter to completed cycles for accurate statistical analysis
             var completedCycles = history.Where(h => h.CycleEndDate.HasValue).ToList();
+            // Calculate cycle lengths (start to end of period, not full cycle)
             var cycleLengths = completedCycles.Select(h => (h.CycleEndDate!.Value - h.CycleStartDate).TotalDays).ToList();
             
+            // Symptom analysis: Extract and categorize reported symptoms
             var symptoms = history
                 .Where(h => !string.IsNullOrEmpty(h.Symptoms))
                 .SelectMany(h => h.Symptoms!.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 .Select(s => s.Trim())
                 .ToList();
 
+            // Statistical analysis: Calculate symptom frequency for pattern recognition
             var symptomFrequency = symptoms
                 .GroupBy(s => s)
                 .ToDictionary(g => g.Key, g => g.Count());
 
             return new CycleAnalyticsResponse
             {
+                // Core metrics: Average cycle length for health assessment
                 AverageCycleLength = cycleLengths.Any() ? cycleLengths.Average() : 0,
-                AveragePeriodLength = 5, // Default period length
+                AveragePeriodLength = 5, // Medical standard: Average period duration
                 TotalCyclesTracked = history.Count,
                 FirstCycleDate = history.Min(h => h.CycleStartDate),
                 LastCycleDate = history.Max(h => h.CycleStartDate),
+                // Regularity score: Measures cycle consistency (0-100 scale)
                 CycleRegularityScore = CalculateCycleRegularity(cycleLengths.Select(l => (int)l).ToList()),
+                // Top 5 most frequent symptoms for health pattern analysis
                 CommonSymptoms = symptomFrequency.OrderByDescending(kv => kv.Value).Take(5).Select(kv => kv.Key).ToList(),
                 SymptomFrequency = symptomFrequency,
+                // Historical data: Cycle length trends for visualization and analysis
                 CycleLengthHistory = completedCycles.Select(h => new CycleLengthData
                 {
                     CycleStart = h.CycleStartDate,
@@ -367,7 +387,8 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
         {
             var result = new CycleValidationResult { IsValid = true };
 
-            // Period length validation
+            // Medical validation: Normal menstruation duration is 1-10 days (WHO guidelines)
+            // Periods shorter than 1 day or longer than 10 days may indicate health issues
             if (request.CycleEndDate.HasValue)
             {
                 var periodLength = (request.CycleEndDate.Value - request.CycleStartDate).TotalDays;
@@ -378,21 +399,24 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
                 }
             }
 
-            // Cycle start date validation
+            // Temporal validation: Prevent future dates which would break prediction algorithms
+            // Allow 1 day buffer for timezone differences
             if (request.CycleStartDate > DateTime.UtcNow.AddDays(1))
             {
                 result.IsValid = false;
                 result.Errors.Add("Cycle start date cannot be in the future");
             }
 
-            // Check if cycle start is too far in the past (1 year)
+            // Historical limit: 1-year limit prevents stale data from affecting current predictions
+            // Older data becomes less relevant for cycle prediction accuracy
             if (request.CycleStartDate < DateTime.UtcNow.AddYears(-1))
             {
                 result.IsValid = false;
                 result.Errors.Add("Cycle start date cannot be more than 1 year in the past");
             }
 
-            // Check for overlapping or too close cycles
+            // Cycle spacing validation: Ensures realistic gaps between menstrual cycles
+            // Medical standard: Minimum 15 days prevents overlapping cycles
             var lastCycle = await GetLastCycleAsync(customerId);
             if (lastCycle != null)
             {
@@ -403,6 +427,7 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
                     result.Errors.Add("Cycles must be at least 15 days apart");
                 }
                 
+                // Maximum gap validation: Cycles more than 60 days apart may indicate missed periods
                 if (daysBetween > 60) // Maximum 60 days between cycles
                 {
                     result.IsValid = false;
@@ -410,7 +435,8 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
                 }
             }
 
-            // Validate symptoms format
+            // Symptom data validation: Limit symptom count to prevent data overload
+            // Maximum 10 symptoms ensures focused tracking without overwhelming the user
             if (!string.IsNullOrEmpty(request.Symptoms))
             {
                 var symptoms = request.Symptoms.Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -532,17 +558,31 @@ public class MenstrualCycleTrackingService : BaseService<MenstrualCycleTrackingS
 
     private double CalculateConfidenceScore(List<double> cycleLengths)
     {
+        // Minimum data requirement: At least 2 cycles needed for any meaningful prediction
+        // Return low baseline confidence (30%) when insufficient historical data exists
         if (cycleLengths.Count < 2) return 30; // Low confidence for insufficient data
         
+        // Statistical analysis: Calculate cycle length variability using standard deviation
+        // Lower variability = more predictable cycles = higher confidence scores
         var mean = cycleLengths.Average();
         var variance = cycleLengths.Select(x => Math.Pow(x - mean, 2)).Average();
         var standardDeviation = Math.Sqrt(variance);
         
-        // Base confidence on regularity and data points
+        // Confidence algorithm: Combines cycle regularity with data quantity
+        // Regularity score: Penalize high standard deviation (irregular cycles)
+        // Factor of 8: Each day of deviation reduces confidence by ~8 points
         var regularityScore = Math.Max(0, 100 - (standardDeviation * 8));
+        
+        // Data quantity bonus: More cycles = better predictions (max 25% bonus)
+        // Each additional cycle adds 5% confidence up to 5 cycles
         var dataPointBonus = Math.Min(25, cycleLengths.Count * 5);
         
+        // Final confidence calculation: 75% weight on regularity, 25% on data quantity
+        // This prioritizes cycle consistency over raw data volume
         var confidence = regularityScore * 0.75 + dataPointBonus;
+        
+        // Confidence bounds: Ensure score stays within realistic range (30-95%)
+        // Never below 30% (always some uncertainty) or above 95% (biological variability)
         return Math.Max(30, Math.Min(95, confidence));
     }
 

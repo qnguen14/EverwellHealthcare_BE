@@ -1,3 +1,24 @@
+// ============================================================================
+// APPOINTMENTS CONTROLLER
+// ============================================================================
+// This controller manages the complete appointment lifecycle in the healthcare system
+// It handles appointment booking, scheduling, updates, cancellations, and meeting management
+// 
+// APPOINTMENT FLOW OVERVIEW:
+// 1. BOOKING: Customer selects consultant and available time slot
+// 2. SCHEDULING: System creates appointment with consultant's schedule
+// 3. CONFIRMATION: Both parties receive notifications
+// 4. MEETING SETUP: Daily.co room created for video consultation
+// 5. CHECK-IN/OUT: Attendance tracking for billing and records
+// 6. COMPLETION: Feedback collection and payment processing
+// 
+// KEY BUSINESS RULES:
+// - Only authenticated users can book appointments
+// - Consultants manage their own schedules
+// - Admins have full appointment management access
+// - Meeting links are generated automatically
+// - Check-in required for session billing
+
 using Everwell.API.Constants;
 using Everwell.BLL.Services.Interfaces;
 using Everwell.DAL.Data.Entities;
@@ -20,28 +41,53 @@ public class AppointmentsController : ControllerBase
         _appointmentService = appointmentService;
     }
 
+    /// <summary>
+    /// GET ALL APPOINTMENTS
+    /// ====================
+    /// Retrieves all appointments in the system with role-based filtering
+    /// 
+    /// ACCESS CONTROL:
+    /// - Admin: Can view all appointments system-wide
+    /// - Consultant: Can view their own appointments only
+    /// - Customer: Can view their own appointments only
+    /// 
+    /// BUSINESS LOGIC:
+    /// 1. Service layer applies role-based filtering
+    /// 2. Returns appointments with related data (Customer, Consultant info)
+    /// 3. Includes appointment status, meeting links, and scheduling details
+    /// 
+    /// RESPONSE DATA:
+    /// - Appointment details (date, time, status)
+    /// - Customer information (name, contact)
+    /// - Consultant information (name, specialization)
+    /// - Meeting link (if generated)
+    /// - Check-in/out status
+    /// </summary>
     [HttpGet(ApiEndpointConstants.Appointment.GetAllAppointmentsEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<CreateAppointmentsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin,Customer,Consultant")]
+    [Authorize(Roles = "Admin,Customer,Consultant")] // Role-based access control
     public async Task<IActionResult> GetAllAppointments()
     {
         try
         {
+            // Service applies role-based filtering based on JWT claims
+            // - Customers see only their appointments
+            // - Consultants see only their appointments
+            // - Admins see all appointments
             var response = await _appointmentService.GetAllAppointmentsAsync();
             if (response == null || !response.Any())
             {
-                return NotFound(new { message = "Không tìm thấy cuộc hẹn nào" });
+                return NotFound(new { message = "Không tìm thấy cuộc hẹn nào" }); // "No appointments found"
             }
                 
-
             var apiResponse = new ApiResponse<IEnumerable<CreateAppointmentsResponse>>
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Appointment retrieved successfully",
                 IsSuccess = true,
-                Data = response
+                Data = response // Contains filtered appointment list with related entities
             };
 
             return Ok(apiResponse);
@@ -52,6 +98,27 @@ public class AppointmentsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// GET APPOINTMENT BY ID
+    /// =====================
+    /// Retrieves specific appointment details with authorization validation
+    /// 
+    /// AUTHORIZATION FLOW:
+    /// 1. Validate user has access to this specific appointment
+    /// 2. Customer can only access their own appointments
+    /// 3. Consultant can only access appointments they're assigned to
+    /// 4. Admin can access any appointment
+    /// 
+    /// USE CASES:
+    /// - View appointment details before meeting
+    /// - Access meeting link and room information
+    /// - Check appointment status and timing
+    /// - Review participant information
+    /// 
+    /// SECURITY:
+    /// - ID-based access control prevents unauthorized viewing
+    /// - Service layer validates user relationship to appointment
+    /// </summary>
     [HttpGet(ApiEndpointConstants.Appointment.GetAppointmentEndpoint)]
     [ProducesResponseType(typeof(ApiResponse<CreateAppointmentsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
@@ -61,16 +128,18 @@ public class AppointmentsController : ControllerBase
     {
         try
         {
+            // Service validates user has access to this specific appointment
+            // Uses JWT claims to check user ID against appointment participants
             var response = await _appointmentService.GetAppointmentByIdAsync(id);
             if (response == null)
-                return NotFound(new { message = "Cuộc hẹn không tồn tại" });
+                return NotFound(new { message = "Cuộc hẹn không tồn tại" }); // "Appointment does not exist"
 
             var apiResponse = new ApiResponse<CreateAppointmentsResponse>
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Appointment retrieved successfully",
                 IsSuccess = true,
-                Data = response
+                Data = response // Contains complete appointment details with participants
             };
 
             return Ok(apiResponse);
